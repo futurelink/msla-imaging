@@ -18,12 +18,8 @@ public class PhotonWorkshopFileSoftwareTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public void read(LittleEndianDataInputStream stream) throws IOException {
-
-    }
+    public void read(LittleEndianDataInputStream stream) throws IOException {}
 
     @Override
-    public void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException {
-
-    }
+    public void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException {}
 }

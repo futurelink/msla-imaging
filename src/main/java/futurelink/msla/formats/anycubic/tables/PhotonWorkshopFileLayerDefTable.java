@@ -2,10 +2,12 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+import futurelink.msla.formats.MSLADecodeWriter;
 import futurelink.msla.formats.MSLAEncodeReader;
 import lombok.Getter;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -32,34 +34,74 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         }
     }
 
+    private final int maxDecoders;
+    private volatile int decoders = 0;
+    private final int maxEncoders;
+    private volatile int encoders = 0;
+
     @Getter private int LayerCount;
     private final ArrayList<PhotonWorkshopFileLayerDef> layers = new ArrayList<>();
     private final ArrayList<byte[]> layerData = new ArrayList<>();
 
-    public void addLayer(PhotonWorkshopFileLayerDef def, MSLAEncodeReader reader) {
+    public PhotonWorkshopFileLayerDefTable() {
+        maxDecoders = 4;
+        maxEncoders = 4;
+    }
+
+    public final void encodeLayer(PhotonWorkshopFileLayerDef def, MSLAEncodeReader reader) {
         var number = layers.size();
         layers.add(def);
         layerData.add(null);
         LayerCount = layers.size();
-        reader.onStart(number);
+        while (!canEncode()); // Wait while decoders available
         new Thread(() -> {
+            synchronized(this) { encoders++; }
             try {
                 var input = reader.read(number);
                 var iSize = input.available();
                 var output = new ByteArrayOutputStream();
                 var oSize = reader.getCodec().Encode(input, output);
+                reader.onStart(number);
                 if (output.size() > 0) {
                     layers.get(number).DataLength = oSize;
                     layerData.set(number, output.toByteArray());
-                } else reader.onError(number, "empty image");
-                reader.onFinish(number, iSize, oSize);
+                    reader.onFinish(number, iSize, oSize);
+                } else
+                    reader.onError(number, "empty image");
             } catch (IOException e) {
                 reader.onError(number, "Encoder error " + e.getMessage());
             }
+            synchronized(this) { encoders--; }
         }).start();
     }
 
-    public void addLayer(PhotonWorkshopFileLayerDef def, byte[] data) throws IOException {
+    public final void decodeLayer(DataInputStream stream, int layer, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
+        var encodedDataLength = getLayer(layer).DataLength;
+        var data = stream.readNBytes(encodedDataLength);
+
+        while (!canDecode()); // Wait while decoders available
+        new Thread(() -> {
+            synchronized(this) { decoders++; }
+            try {
+                writer.onStart(layer);
+                var pixels = writer.getCodec().Decode(data, layer, decodedDataLength, writer);
+                writer.onFinish(layer, pixels);
+            } catch (IOException e) {
+                writer.onError(layer, e.getMessage());
+            }
+            synchronized(this) { decoders--; }
+        }).start();
+    }
+
+    private boolean canDecode() {
+        return (decoders < maxDecoders);
+    }
+
+    private boolean canEncode() {
+        return (encoders < maxEncoders);
+    }
+
+    public final void addLayer(PhotonWorkshopFileLayerDef def, byte[] data) throws IOException {
         if ((data != null) && (def != null)) {
             if (data.length != def.DataLength) throw new IOException("DataLength in layer definition does not match data size");
             layers.add(def);
@@ -68,7 +110,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         }
     }
 
-    public void addLayer(PhotonWorkshopFileLayerDef def, InputStream stream) throws IOException {
+    public final void addLayer(PhotonWorkshopFileLayerDef def, InputStream stream) throws IOException {
         if ((stream != null) && (def != null)) {
             layers.add(def);
             layerData.add(stream.readAllBytes());
@@ -85,7 +127,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    int calculateTableLength(byte versionMajor, byte versionMinor) {
+    final int calculateTableLength(byte versionMajor, byte versionMinor) {
         return 4 + getLayerCount() * 32;
     }
 
@@ -121,7 +163,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException {
+    public final void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException {
         stream.write(Name.getBytes());
         stream.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
         TableLength = calculateTableLength(versionMajor, versionMinor);

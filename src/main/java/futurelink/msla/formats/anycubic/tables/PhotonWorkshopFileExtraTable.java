@@ -1,6 +1,5 @@
 package futurelink.msla.formats.anycubic.tables;
 
-import com.google.common.collect.Table;
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
 import lombok.Getter;

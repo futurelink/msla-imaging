@@ -48,14 +48,6 @@ public class PhotonWorkshopFile implements MSLAFile {
     }
 
     public PhotonWorkshopFile(PhotonWorkshopFileDefaults.Values defaults) throws IOException {
-        var format = defaults.getMachine().getLayerImageFormat();
-        if (format.equals("pw0Img")) {
-            codec = new PhotonWorkshopCodecPW0();
-        } else if (format.equals("pwsImg")) {
-            codec = new PhotonWorkshopCodecPWS();
-        } else {
-            throw new IOException("Codec not implemented for '" + format + "'");
-        }
         descriptor = new PhotonWorkshopFileDescriptor(defaults.VersionMajor, defaults.VersionMinor);
         tables.put("HEADER", new PhotonWorkshopFileHeaderTable(defaults.Header));
         tables.put("MACHINE", new PhotonWorkshopFileMachineTable(defaults.Machine));
@@ -63,6 +55,7 @@ public class PhotonWorkshopFile implements MSLAFile {
         tables.put("SOFTWARE", new PhotonWorkshopFileSoftwareTable());
         tables.put("LAYERDEF", new PhotonWorkshopFileLayerDefTable());
         tables.put("EXTRA", new PhotonWorkshopFileExtraTable());
+        initCodec();
     }
 
     public PhotonWorkshopFile(FileInputStream stream) throws IOException {
@@ -79,6 +72,18 @@ public class PhotonWorkshopFile implements MSLAFile {
     public final void read(FileInputStream iStream) throws IOException {
         descriptor = PhotonWorkshopFileDescriptor.read(new LittleEndianDataInputStream(iStream));
         readTables(iStream);
+        initCodec();
+    }
+
+    private void initCodec() throws IOException {
+        var format = getMachine().getLayerImageFormat();
+        if (format.equals("pw0Img")) {
+            codec = new PhotonWorkshopCodecPW0();
+        } else if (format.equals("pwsImg")) {
+            codec = new PhotonWorkshopCodecPWS();
+        } else {
+            throw new IOException("Codec not implemented for '" + format + "'");
+        }
     }
 
     private void readTables(FileInputStream iStream) throws IOException {
@@ -141,7 +146,8 @@ public class PhotonWorkshopFile implements MSLAFile {
         var width = getHeader().getResolutionX();
         var height = getHeader().getResolutionY();
         var imageLength = width * height;
-        codec.Decode(new DataInputStream(iStream), imageLength, writer);
+
+        getLayerDef().decodeLayer(new DataInputStream(iStream), layer, imageLength, writer);
     }
 
     @Override
@@ -166,7 +172,7 @@ public class PhotonWorkshopFile implements MSLAFile {
         layerDef.DataAddress = 0;
         layerDef.NonZeroPixelCount = 0;
 
-        getLayerDef().addLayer(layerDef, reader);
+        getLayerDef().encodeLayer(layerDef, reader);
     }
 
     @Override

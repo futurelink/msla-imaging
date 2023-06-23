@@ -1,7 +1,5 @@
 package futurelink.msla.formats;
 
-import futurelink.msla.formats.MSLAFileCodec;
-
 import java.io.IOException;
 
 public interface MSLADecodeWriter {
@@ -18,16 +16,24 @@ public interface MSLADecodeWriter {
      * @param linearPos position in a sequence of pixels
      * @param count number of pixels of the same color
      */
-    void pixels(int color, int linearPos, int count);
+    void pixels(int layerNumber, int color, int linearPos, int count);
 
     /**
-     *
+     * Method is being called when decoding process starts.
+     * @param layerNumber layer number that is to be decoded
      */
-    void onStart();
+    void onStart(int layerNumber);
 
     /**
-     *
-     * @param nonZeroPixels
+     * Method is being called when decoding process ends.
+     * @param layerNumber layer number that had been being decoded
+     * @param nonZeroPixels a number of exposed pixels in decoded data
      */
-    void onFinish(int nonZeroPixels);
+    void onFinish(int layerNumber, int nonZeroPixels) throws IOException;
+
+    /**
+     * Method is being called when decoding process encounters an error.
+     * @param layerNumber layer number that had been being decoded
+     */
+    void onError(int layerNumber, String error);
 }

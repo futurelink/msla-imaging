@@ -64,6 +64,8 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     public static final String Name = "MACHINE";
     private final Fields fields;
 
+    public String getLayerImageFormat() { return fields.getLayerImageFormat(); }
+
     public PhotonWorkshopFileMachineTable() {
         fields = new Fields();
     }
@@ -92,8 +94,8 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
         }
         stream.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
         TableLength = stream.readInt();
-        fields.MachineName = new String(stream.readNBytes(96), StandardCharsets.US_ASCII);
-        fields.LayerImageFormat = new String(stream.readNBytes(16), StandardCharsets.US_ASCII);
+        fields.MachineName = new String(stream.readNBytes(96), StandardCharsets.US_ASCII).trim();
+        fields.LayerImageFormat = new String(stream.readNBytes(16), StandardCharsets.US_ASCII).trim();
         fields.MaxAntialiasingLevel = stream.readInt();
         fields.PropertyFields = stream.readInt();
         fields.DisplayWidth = stream.readFloat();

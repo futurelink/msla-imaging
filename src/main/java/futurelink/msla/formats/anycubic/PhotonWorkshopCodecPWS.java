@@ -25,12 +25,13 @@ public class PhotonWorkshopCodecPWS implements MSLAFileCodec {
     }
 
     @Override
-    public void Decode(byte[] data, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
-
+    public int Decode(byte[] data, int layerNumber, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
+        return 0;
     }
 
     @Override
-    public void Decode(DataInputStream stream, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
-
+    public int Decode(DataInputStream stream, int layerNumber,
+                      int encodedDataLength, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
+        return 0;
     }
 }

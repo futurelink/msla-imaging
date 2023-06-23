@@ -20,7 +20,6 @@ public class PCBCalibration {
      * @param startTime initial curing time
      * @param interval curing time interval
      * @param repetitions number of samples or intervals
-     * @throws IOException
      */
     public static void generateTestPattern(String machineName, String fileName, float startTime, float interval, int repetitions) throws IOException {
         var defaults = PhotonWorkshopFileDefaults.get(machineName);

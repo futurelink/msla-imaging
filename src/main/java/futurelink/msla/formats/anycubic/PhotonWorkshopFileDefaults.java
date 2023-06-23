@@ -1,12 +1,10 @@
 package futurelink.msla.formats.anycubic;
 
-import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileExtraTable;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileHeaderTable;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileMachineTable;
 import lombok.Getter;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -67,6 +65,9 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setTransitionLayerType(0);
         values.Header.setAdvancedMode(1);
         Settings.put(name, values);
+
+        var name2 = "Anycubic Photon M3 Plus";
+        Settings.put(name2, values);
     }
 
     static {

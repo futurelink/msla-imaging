@@ -58,7 +58,7 @@ public class PCBCalibrationPattern {
         this.pixelSize = pixelSize;
     }
 
-    public BufferedImage generate(int height, int repetition, int repetitions) throws IOException {
+    public final BufferedImage generate(int height, int repetition, int repetitions) {
         var image = new BufferedImage(resolutionX, resolutionY, BufferedImage.TYPE_BYTE_GRAY);
         var g = image.getGraphics();
 

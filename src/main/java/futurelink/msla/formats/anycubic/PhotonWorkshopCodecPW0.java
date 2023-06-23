@@ -75,24 +75,26 @@ public class PhotonWorkshopCodecPW0 implements MSLAFileCodec {
     }
 
     @Override
-    public void Decode(DataInputStream stream, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
+    public int Decode(DataInputStream stream, int layerNumber, int encodedDataLength, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
+        return Decode(stream.readNBytes(encodedDataLength), layerNumber, decodedDataLength, writer);
+    }
+
+    @Override
+    public int Decode(byte[] data, int layerNumber, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
         int pixelPos = 0;
         int pixels = 0;
-
-        writer.onStart();
-
-        while (stream.available() > 0) {
-            byte b = stream.readByte();
+        for (int i = 0; i < data.length; i++) {
+            byte b = data[i];
             byte code = (byte) ((b & 0xf0) >> 4);         // 1st 4 bits is a code
             int repeat = Byte.toUnsignedInt((byte) (b & 0x0f)); // 2nd 4 bits is repetitions
             byte color;
             if (code == 0) {                                    // Black sequences
                 color = 0;
-                if (stream.available() > 0) repeat = (repeat << 8) + Byte.toUnsignedInt(stream.readByte());
+                if (++i < data.length) repeat = (repeat << 8) + Byte.toUnsignedInt(data[i]);
                 else repeat = decodedDataLength - pixelPos;
             } else if (code == 0x0f) {                          // White sequences
                 color = (byte) 0xff;
-                if (stream.available() > 0) repeat = (repeat << 8) + Byte.toUnsignedInt(stream.readByte());
+                if (++i < data.length) repeat = (repeat << 8) + Byte.toUnsignedInt(data[i]);
                 else repeat = decodedDataLength - pixelPos;
             } else {                                            // Other colors
                 color = (byte) ((code << 4) | code);
@@ -106,7 +108,7 @@ public class PhotonWorkshopCodecPW0 implements MSLAFileCodec {
              * Set pixels or something like this...
              */
             if (color != 0) {
-                writer.pixels(color, pixelPos, repeat);
+                writer.pixels(layerNumber, color, pixelPos, repeat);
                 pixels += repeat;
             }
             pixelPos += repeat;
@@ -117,12 +119,7 @@ public class PhotonWorkshopCodecPW0 implements MSLAFileCodec {
         if ((pixelPos > 0) && (pixelPos != decodedDataLength))
             throw new IOException("Image ended short: " + pixelPos + ", expecting: " + decodedDataLength);
 
-        writer.onFinish(pixels);
-    }
-
-    @Override
-    public void Decode(byte[] data, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
-        Decode(new DataInputStream(new ByteArrayInputStream(data)), decodedDataLength, writer);
+        return pixels;
     }
 
     private static short CRCRle4(byte[] data) {
