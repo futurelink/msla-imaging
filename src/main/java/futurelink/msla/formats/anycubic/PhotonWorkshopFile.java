@@ -55,6 +55,7 @@ public class PhotonWorkshopFile implements MSLAFile {
         tables.put("SOFTWARE", new PhotonWorkshopFileSoftwareTable());
         tables.put("LAYERDEF", new PhotonWorkshopFileLayerDefTable());
         tables.put("EXTRA", new PhotonWorkshopFileExtraTable());
+        updatePreviewImage();
         initCodec();
     }
 
@@ -76,6 +77,7 @@ public class PhotonWorkshopFile implements MSLAFile {
     }
 
     private void initCodec() throws IOException {
+        if (getMachine() == null) throw new IOException("Machine section was not initialized properly");
         var format = getMachine().getLayerImageFormat();
         if (format.equals("pw0Img")) {
             codec = new PhotonWorkshopCodecPW0();

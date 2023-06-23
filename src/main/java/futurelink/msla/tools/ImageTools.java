@@ -1,16 +1,15 @@
 package futurelink.msla.tools;
 
+import futurelink.Main;
 import futurelink.msla.formats.MSLADecodeWriter;
+import futurelink.msla.formats.MSLAEncodeReader;
 import futurelink.msla.formats.MSLAFileCodec;
 import futurelink.msla.formats.anycubic.PhotonWorkshopFile;
+import futurelink.msla.formats.anycubic.PhotonWorkshopFileDefaults;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
+import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ImageTools {
@@ -69,5 +68,39 @@ public class ImageTools {
                     wsFile.readLayer(fis, i, decodeWriter);
             }
         }
+    }
+
+    public static void createFromPNG(String machineName, String pngFileName, String outputFileName) throws IOException  {
+        var defaults = PhotonWorkshopFileDefaults.get(machineName);
+        var wsFile = new PhotonWorkshopFile(defaults);
+
+        // Create preview image
+        wsFile.addLayer(new MSLAEncodeReader() {
+            @Override public MSLAFileCodec getCodec() {
+                return wsFile.getCodec();
+            }
+            @Override public InputStream read(int layerNumber) throws IOException {
+                try (var stream = new FileInputStream(pngFileName)) {
+                    var raster = ImageIO.read(stream).getRaster();
+                    return new Main.RasterBytesInputStream(raster);
+                }
+            }
+            @Override public void onStart(int layerNumber) {
+                System.out.print("Encoding layer " + layerNumber + "... ");
+            }
+            @Override public void onFinish(int layerNumber, int pixels, int length) {
+                System.out.println("done pixels: " + pixels + ", " + "bytes: " + length);
+
+                // Encoding only one layer, so we write a file here.
+                try (var fos = new FileOutputStream(outputFileName + "." + defaults.getFileExtension())) {
+                    wsFile.write(fos);
+                } catch (IOException e) {
+                    System.out.println("Error writing data: " + e.getMessage());
+                }
+            }
+            @Override public void onError(int layerNumber, String error) {
+                System.out.println("error: " + error);
+            }
+        });
     }
 }

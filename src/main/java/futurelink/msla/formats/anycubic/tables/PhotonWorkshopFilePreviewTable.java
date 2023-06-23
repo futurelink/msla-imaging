@@ -98,7 +98,6 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable impl
         stream.writeInt(ResolutionX);
         stream.writeInt(Mark);
         stream.writeInt(ResolutionY);
-        var data = new byte[DataSize]; // Empty data for now
         stream.write(ImageData);
         stream.writeInt(UseFullGreyscale);
         stream.writeInt(GreyMaxCount);
