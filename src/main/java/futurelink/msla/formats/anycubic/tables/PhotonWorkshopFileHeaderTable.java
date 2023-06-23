@@ -8,6 +8,9 @@ import lombok.Setter;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * "HEADER" section representation.
+ */
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     public static final String Name = "HEADER";
     public static class Fields {
@@ -93,12 +96,25 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     public int getResolutionX() {
         return fields.getResolutionX();
     }
-
     public int getResolutionY() {
         return fields.getResolutionY();
     }
-
     public float getPixelSizeUm() { return fields.getPixelSizeUm(); }
+    public void setPerLayerOverride(int enabled) { fields.setPerLayerOverride(enabled); }
+    public void setBottomLayersCount(int count) { fields.setBottomLayersCount(count); }
+    public void setBottomExposureTime(float time) { fields.setBottomExposureTime(time); }
+    public void setExposureTime(float time) { fields.setExposureTime(time); }
+    public void setLiftHeight(float height) { fields.setLiftHeight(height); }
+    public void setTransitionLayers(int number) { fields.setTransitionLayerCount(number); }
+    public int getBottomLayersCount() { return (int) fields.getBottomLayersCount(); }
+    public float getExposureTime() { return fields.getExposureTime(); }
+    public float getBottomExposureTime() { return fields.getBottomExposureTime(); }
+    public float getLiftSpeed() { return fields.getLiftSpeed(); }
+    public float getBottomLiftSpeed() { return fields.getLiftSpeed(); }
+    public float getLiftHeight() { return fields.getLiftHeight(); }
+    public float getBottomLiftHeight() { return fields.getLiftHeight(); }
+    public float getLayerHeight() { return fields.getLayerHeight(); }
+    public float getBottomLayerHeight() { return fields.getLayerHeight(); }
 
     @Override
     public void read(LittleEndianDataInputStream stream) throws IOException {

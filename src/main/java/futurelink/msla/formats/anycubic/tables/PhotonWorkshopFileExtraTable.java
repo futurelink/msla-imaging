@@ -9,6 +9,9 @@ import lombok.Setter;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * "EXTRA" section representation.
+ */
 public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     public static final String Name = "EXTRA";
     @Getter @Setter int BottomLiftCount = 2;

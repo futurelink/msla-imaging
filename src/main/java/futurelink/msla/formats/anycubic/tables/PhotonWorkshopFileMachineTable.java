@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+/**
+ * "MACHINE" section representation.
+ */
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     public static class Fields {
         @Getter @Setter String MachineName = null;

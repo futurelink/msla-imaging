@@ -2,12 +2,18 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+import futurelink.msla.formats.MSLAEncodeReader;
 import lombok.Getter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * "LAYERDEF" section representation.
+ */
 public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     public static final String Name = "LAYERDEF";
     public static class PhotonWorkshopFileLayerDef {
@@ -30,11 +36,42 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     private final ArrayList<PhotonWorkshopFileLayerDef> layers = new ArrayList<>();
     private final ArrayList<byte[]> layerData = new ArrayList<>();
 
+    public void addLayer(PhotonWorkshopFileLayerDef def, MSLAEncodeReader reader) {
+        var number = layers.size();
+        layers.add(def);
+        layerData.add(null);
+        LayerCount = layers.size();
+        reader.onStart(number);
+        new Thread(() -> {
+            try {
+                var input = reader.read(number);
+                var iSize = input.available();
+                var output = new ByteArrayOutputStream();
+                var oSize = reader.getCodec().Encode(input, output);
+                if (output.size() > 0) {
+                    layers.get(number).DataLength = oSize;
+                    layerData.set(number, output.toByteArray());
+                } else reader.onError(number, "empty image");
+                reader.onFinish(number, iSize, oSize);
+            } catch (IOException e) {
+                reader.onError(number, "Encoder error " + e.getMessage());
+            }
+        }).start();
+    }
+
     public void addLayer(PhotonWorkshopFileLayerDef def, byte[] data) throws IOException {
         if ((data != null) && (def != null)) {
             if (data.length != def.DataLength) throw new IOException("DataLength in layer definition does not match data size");
             layers.add(def);
             layerData.add(data);
+            LayerCount = layers.size();
+        }
+    }
+
+    public void addLayer(PhotonWorkshopFileLayerDef def, InputStream stream) throws IOException {
+        if ((stream != null) && (def != null)) {
+            layers.add(def);
+            layerData.add(stream.readAllBytes());
             LayerCount = layers.size();
         }
     }

@@ -2,12 +2,17 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+import futurelink.msla.formats.MSLAPreview;
 import lombok.Getter;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable {
+/**
+ * "PREVIEW" section representation.
+ */
+public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable implements MSLAPreview {
     public static final String Name = "PREVIEW";
     @Getter private int ResolutionX = 224;
     @Getter private int Mark = 'x'; /// Gets the operation mark 'x'
@@ -25,6 +30,27 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable {
             (byte) 207, (byte) 223, (byte) 239, (byte) 255
     };
     public int Unknown;
+
+    @Getter BufferedImage Image;
+    public byte[] ImageData = null;
+
+    public PhotonWorkshopFilePreviewTable() {
+        Image = new BufferedImage(getResolutionX(), getResolutionY(), BufferedImage.TYPE_USHORT_GRAY);
+    }
+
+    public void updateImageData() throws IOException{
+        var buffer = getImage().getData().getDataBuffer();
+        var size = buffer.getSize() * 2;
+        if (getDataSize() != size)
+            throw new IOException("Preview size " + size + " does not match resolution size " + getDataSize());
+
+        ImageData = new byte[size];
+        for (int i = 0; i < size; i+=2) {
+            int elem = buffer.getElem(i / 2);
+            ImageData[i] = (byte) ((elem >> 8) & 0xff);
+            ImageData[i+1] = (byte) (elem & 0xff);
+        }
+    }
 
     @Override
     int calculateTableLength(byte versionMajor, byte versionMinor) {
@@ -73,7 +99,7 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable {
         stream.writeInt(Mark);
         stream.writeInt(ResolutionY);
         var data = new byte[DataSize]; // Empty data for now
-        stream.write(data);
+        stream.write(ImageData);
         stream.writeInt(UseFullGreyscale);
         stream.writeInt(GreyMaxCount);
         stream.write(ShadesOfGrey);

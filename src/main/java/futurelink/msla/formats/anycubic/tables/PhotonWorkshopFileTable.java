@@ -6,6 +6,9 @@ import lombok.Getter;
 
 import java.io.IOException;
 
+/**
+ * Common class for section representation.
+ */
 abstract public class PhotonWorkshopFileTable {
     public static final int MarkLength = 12;
     public static final float DefaultLiftHeight = 100;

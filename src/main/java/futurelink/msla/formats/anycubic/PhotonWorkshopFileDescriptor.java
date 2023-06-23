@@ -10,11 +10,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
+/**
+ * File descriptor section representation.
+ * This descriptor is located at the beginning of a file and starts with 'ANYCUBIC' padded up to 12 bytes.
+ */
 public class PhotonWorkshopFileDescriptor {
     public static class PhotonWorkshopFileDescriptorFields {
         /**
-         * Gets the area num
-         * 4 for v1, 5 for v515, 8 for v516?
+         * 4 for v1, 5 for v2.3, 8 for v2.4 etc.
          */
         public int NumberOfTables;
 
@@ -28,14 +31,14 @@ public class PhotonWorkshopFileDescriptor {
          * Gets the preview start offset
          */
         @Getter @Setter private int PreviewAddress;
-        @Getter @Setter private int LayerImageColorTableAddress; // V515 only!
+        @Getter @Setter private int LayerImageColorTableAddress; // v2.3 and greater
         @Getter @Setter private int LayerDefinitionAddress;
-        @Getter @Setter private int ExtraAddress; // V516 only!
-        @Getter @Setter private int MachineAddress; // V516 only!
+        @Getter @Setter private int ExtraAddress;               // v2.4 and greater
+        @Getter @Setter private int MachineAddress;             // v2.4 and greater
         @Getter @Setter private int LayerImageAddress;
-        @Getter @Setter private int ModelAddress; // V517 only
-        @Getter @Setter private int SubLayerDefinitionAddress; // V518 only
-        @Getter @Setter private int Preview2Address; // V518 only
+        @Getter @Setter private int ModelAddress;               // v2.6 and greater
+        @Getter @Setter private int SubLayerDefinitionAddress;  // v2.6 and greater
+        @Getter @Setter private int Preview2Address;            // v2.6 and greater
     }
 
     static final HashMap<Byte, HashMap<Byte, String>> versions = new HashMap<>();

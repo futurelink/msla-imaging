@@ -5,6 +5,10 @@ import com.google.common.io.LittleEndianDataOutputStream;
 
 import java.io.IOException;
 
+/**
+ * "SOFTWARE" section representation.
+ * TODO Not implemented yet.
+ */
 public class PhotonWorkshopFileSoftwareTable extends PhotonWorkshopFileTable {
     public static final String Name = "SOFTWARE";
 
