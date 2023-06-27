@@ -26,29 +26,26 @@ public class PCBCalibration {
         if (defaults == null) throw new IOException("Unknown machine name: " + machineName);
         try (var fos = new FileOutputStream(fileName + "." + defaults.getFileExtension())) {
             var wsFile = new PhotonWorkshopFile(defaults);
-            var wsHeader = wsFile.getHeader();
-            var wsExtra =  wsFile.getExtra();
-            if ((wsHeader == null) || (wsExtra == null)) throw new IOException("File was not initialized properly");
+            if (!wsFile.isValid()) throw new IOException("File was not initialized properly");
 
             // Set options
-            wsHeader.setPerLayerOverride(1);
-            wsHeader.setBottomLayersCount(1);
-            wsHeader.setBottomExposureTime(startTime);
-            wsHeader.setExposureTime(interval);
-            wsHeader.setLiftHeight(0.5f);
-            wsHeader.setTransitionLayers(0);
+            wsFile.setOption("PerLayerOverride", 1);
+            wsFile.setOption("BottomLayersCount", 1);
+            wsFile.setOption("BottomExposureTime", startTime);
+            wsFile.setOption("ExposureTime", interval);
+            wsFile.setOption("LiftHeight", 0.5f);
+            wsFile.setOption("TransitionLayerCount", 0);
 
-            wsExtra.setLiftHeight1(0.5f);
-            wsExtra.setLiftHeight2(0.5f);
-            wsExtra.setBottomLiftHeight1(0.5f);
-            wsExtra.setBottomLiftHeight2(0.5f);
+            wsFile.setOption("LiftHeight1", 0.5f);
+            wsFile.setOption("LiftHeight2", 0.5f);
+            wsFile.setOption("BottomLiftHeight1", 0.5f);
+            wsFile.setOption("BottomLiftHeight2", 0.5f);
 
             // Create preview image
             createPreview(wsFile);
 
             // Generate pattern layers
-            var pattern = new PCBCalibrationPattern(wsHeader.getResolutionX(), wsHeader.getResolutionY(),
-                    wsHeader.getPixelSizeUm());
+            var pattern = new PCBCalibrationPattern(wsFile.getResolution(), wsFile.getPixelSizeUm());
             pattern.setStartTime(startTime);
             var encoder = new MSLAEncodeReader() {
                 volatile int layersLeft = repetitions;
@@ -56,7 +53,7 @@ public class PCBCalibration {
                     return wsFile.getCodec();
                 }
                 @Override public InputStream read(int layerNumber) throws IOException {
-                    var image = pattern.generate(wsHeader.getResolutionY() / 3, layerNumber, repetitions);
+                    var image = pattern.generate(wsFile.getResolution().getWidth() / 3, layerNumber, repetitions);
                     var raster = image.getRaster();
                     return new Main.RasterBytesInputStream(raster);
                 }
@@ -85,8 +82,8 @@ public class PCBCalibration {
             graphics.setFont(graphics.getFont().deriveFont(20.0f));
             graphics.setColor(Color.WHITE);
             graphics.drawRoundRect(10, 10,
-                    preview.getResolutionX() - 20,
-                    preview.getResolutionY() - 20,
+                    preview.getResolution().getWidth() - 20,
+                    preview.getResolution().getHeight() - 20,
                     10, 10);
             graphics.setColor(Color.WHITE);
             graphics.drawString("PCB Test pattern", 16, 16 + 20);

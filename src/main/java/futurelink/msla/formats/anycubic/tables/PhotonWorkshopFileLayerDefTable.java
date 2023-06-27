@@ -6,10 +6,7 @@ import futurelink.msla.formats.MSLADecodeWriter;
 import futurelink.msla.formats.MSLAEncodeReader;
 import lombok.Getter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -19,14 +16,14 @@ import java.util.Arrays;
 public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     public static final String Name = "LAYERDEF";
     public static class PhotonWorkshopFileLayerDef {
-        public int DataAddress;
-        public int DataLength;
-        public float LiftHeight;
-        public float LiftSpeed;
-        public float ExposureTime;
-        public float LayerHeight;
-        public int NonZeroPixelCount;
-        public int Padding1;
+        public Integer DataAddress;
+        public Integer DataLength;
+        public Float LiftHeight = 0.0f;
+        public Float LiftSpeed = 0.0f;
+        public Float ExposureTime = 0.0f;
+        public Float LayerHeight = 0.0f;
+        public Integer NonZeroPixelCount = 0;
+        public Integer Padding1 = 0;
 
         @Override
         public String toString() {
@@ -34,21 +31,24 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         }
     }
 
-    private final int maxDecoders;
-    private volatile int decoders = 0;
-    private final int maxEncoders;
-    private volatile int encoders = 0;
+    private final Integer maxDecoders;
+    private volatile Integer decoders = 0;
+    private final Integer maxEncoders;
+    private volatile Integer encoders = 0;
 
-    @Getter private int LayerCount;
+    @Getter private Integer LayerCount;
     private final ArrayList<PhotonWorkshopFileLayerDef> layers = new ArrayList<>();
     private final ArrayList<byte[]> layerData = new ArrayList<>();
 
-    public PhotonWorkshopFileLayerDefTable() {
+    public PhotonWorkshopFileLayerDefTable(byte versionMajor, byte versionMinor) {
+        super(versionMajor, versionMinor);
         maxDecoders = 4;
         maxEncoders = 4;
     }
 
-    public final void encodeLayer(PhotonWorkshopFileLayerDef def, MSLAEncodeReader reader) {
+    public final void encodeLayer(PhotonWorkshopFileLayerDef def, MSLAEncodeReader reader) throws IOException {
+        if (reader.getCodec() == null) throw new IOException("No codec defined for layer data");
+
         var number = layers.size();
         layers.add(def);
         layerData.add(null);
@@ -78,6 +78,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     public final void decodeLayer(DataInputStream stream, int layer, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
         var encodedDataLength = getLayer(layer).DataLength;
         var data = stream.readNBytes(encodedDataLength);
+        if (writer.getCodec() == null) throw new IOException("No codec defined for layer data");
 
         while (!canDecode()); // Wait while decoders available
         new Thread(() -> {
@@ -132,27 +133,30 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public void read(LittleEndianDataInputStream stream) throws IOException {
+    public void read(FileInputStream stream, int position) throws IOException {
+        var fc = stream.getChannel(); fc.position(position);
+        var dis = new LittleEndianDataInputStream(stream);
+
         int dataRead = 0;
         var headerMark = stream.readNBytes(Name.length());
         if (!Arrays.equals(headerMark, Name.getBytes())) {
             throw new IOException("Layer definition mark not found! Corrupted data.");
         }
-        stream.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
-        TableLength = stream.readInt();
-        LayerCount = stream.readInt();
+        dis.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
+        TableLength = dis.readInt();
+        LayerCount = dis.readInt();
         dataRead += 4;
 
         while (layers.size() < LayerCount) {
             var layer = new PhotonWorkshopFileLayerDef();
-            layer.DataAddress = stream.readInt();
-            layer.DataLength = stream.readInt();
-            layer.LiftHeight = stream.readFloat();
-            layer.LiftSpeed = stream.readFloat();
-            layer.ExposureTime = stream.readFloat();
-            layer.LayerHeight = stream.readFloat();
-            layer.NonZeroPixelCount = stream.readInt();
-            layer.Padding1 = stream.readInt();
+            layer.DataAddress = dis.readInt();
+            layer.DataLength = dis.readInt();
+            layer.LiftHeight = dis.readFloat();
+            layer.LiftSpeed = dis.readFloat();
+            layer.ExposureTime = dis.readFloat();
+            layer.LayerHeight = dis.readFloat();
+            layer.NonZeroPixelCount = dis.readInt();
+            layer.Padding1 = dis.readInt();
             layers.add(layer);
             dataRead += 32;
         }
@@ -163,23 +167,24 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public final void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException {
-        stream.write(Name.getBytes());
-        stream.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
+    public final void write(OutputStream stream) throws IOException {
+        var dos = new LittleEndianDataOutputStream(stream);
+        dos.write(Name.getBytes());
+        dos.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
         TableLength = calculateTableLength(versionMajor, versionMinor);
 
-        stream.writeInt(TableLength);   // Pre-calculate table length
-        stream.writeInt(LayerCount);    // Pre-calculate layer count
+        dos.writeInt(TableLength);   // Pre-calculate table length
+        dos.writeInt(LayerCount);    // Pre-calculate layer count
         for (var i = 0; i < LayerCount; i++) {
             var layer = layers.get(i);
-            stream.writeInt(layer.DataAddress);
-            stream.writeInt(layer.DataLength);
-            stream.writeFloat(layer.LiftHeight);
-            stream.writeFloat(layer.LiftSpeed);
-            stream.writeFloat(layer.ExposureTime);
-            stream.writeFloat(layer.LayerHeight);
-            stream.writeInt(layer.NonZeroPixelCount);
-            stream.writeInt(layer.Padding1);
+            dos.writeInt(layer.DataAddress);
+            dos.writeInt(layer.DataLength);
+            dos.writeFloat(layer.LiftHeight);
+            dos.writeFloat(layer.LiftSpeed);
+            dos.writeFloat(layer.ExposureTime);
+            dos.writeFloat(layer.LayerHeight);
+            dos.writeInt(layer.NonZeroPixelCount);
+            dos.writeInt(layer.Padding1);
         }
     }
 

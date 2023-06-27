@@ -1,5 +1,7 @@
 package futurelink.msla.formats;
 
+import futurelink.msla.formats.utils.Size;
+
 import java.io.IOException;
 
 public interface MSLADecodeWriter {
@@ -11,12 +13,19 @@ public interface MSLADecodeWriter {
     MSLAFileCodec getCodec();
 
     /**
+     * Must be implemented to get printer specific image size.
+     * @return machine display resolution
+     */
+    Size getLayerResolution();
+
+    /**
      * Must be implemented to write sequence of pixels of the same color into some sort of output image.
      * @param color pixel color
-     * @param linearPos position in a sequence of pixels
-     * @param count number of pixels of the same color
+     * @param position position in a sequence of pixels
+     * @param length number of pixels of the same color
+     * @param vertical specifies if stripes should be aligned vertically
      */
-    void pixels(int layerNumber, int color, int linearPos, int count);
+    void stripe(int layerNumber, int color, int position, int length, boolean vertical);
 
     /**
      * Method is being called when decoding process starts.

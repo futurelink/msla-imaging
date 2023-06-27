@@ -2,11 +2,17 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+import futurelink.msla.formats.MSLAOption;
+import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Delegate;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * "HEADER" section representation.
@@ -14,47 +20,50 @@ import java.util.Arrays;
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     public static final String Name = "HEADER";
     public static class Fields {
-        @Getter @Setter private float PixelSizeUm = 47.25f;
-        @Getter @Setter private float LayerHeight;
-        @Getter @Setter private float ExposureTime;
-        @Getter @Setter private float WaitTimeBeforeCure1;
-        @Getter @Setter private float BottomExposureTime;
-        @Getter @Setter private float BottomLayersCount;
-        @Getter @Setter private float LiftHeight = DefaultLiftHeight;
-        @Getter @Setter private float LiftSpeed;// = SpeedConverter.Convert(DefaultLiftSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
-        @Getter @Setter private float RetractSpeed;// = SpeedConverter.Convert(DefaultRetractSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
-        @Getter @Setter private float VolumeMl;
-        @Getter @Setter private int AntiAliasing = 1;
-        @Getter @Setter private int ResolutionX;
-        @Getter @Setter private int ResolutionY;
-        @Getter @Setter private float WeightG;
-        @Getter @Setter private float Price;
-        @Getter @Setter private int PriceCurrencySymbol = '$'; /// 24 00 00 00 $ or ¥ C2 A5 00 00 or € = E2 82 AC 00
-        @Getter @Setter private int PerLayerOverride; // boolean (80 - true, 00 - false)
-        @Getter @Setter private int PrintTime;
+        @Getter private Float PixelSizeUm;
+        @MSLAOption @Setter @Getter private Float LayerHeight;
+        @MSLAOption @Setter @Getter private Float ExposureTime;
+        @MSLAOption @Setter @Getter private Float WaitTimeBeforeCure1;
+        @MSLAOption @Setter @Getter private Float BottomExposureTime;
+        @MSLAOption @Setter @Getter private Integer BottomLayersCount;
+        @MSLAOption @Setter @Getter private Float LiftHeight = DefaultLiftHeight;
+        @MSLAOption @Setter @Getter private Float LiftSpeed;// = SpeedConverter.Convert(DefaultLiftSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
+        @MSLAOption @Setter @Getter private Float RetractSpeed;// = SpeedConverter.Convert(DefaultRetractSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
+        @MSLAOption @Setter @Getter private Float VolumeMl;
+        @MSLAOption @Setter @Getter private Integer AntiAliasing = 1;
+        @Getter private Size Resolution;
+        @MSLAOption @Setter @Getter private Float WeightG;
+        @MSLAOption @Setter @Getter private Float Price;
+        @MSLAOption @Setter @Getter private Integer PriceCurrencySymbol; /// 24 00 00 00 $ or ¥ C2 A5 00 00 or € = E2 82 AC 00
+        @MSLAOption @Setter @Getter private Integer PerLayerOverride; // boolean (80 - true, 00 - false)
+        @MSLAOption @Setter @Getter private Integer PrintTime;
 
         /*
             Version 2.4 fields
          */
-        @Getter @Setter private int TransitionLayerCount;
-        @Getter @Setter private int TransitionLayerType;
-        @Getter @Setter private int AdvancedMode; /// 0 = Basic mode | 1 = Advanced mode which allows TSMC
+        @MSLAOption @Setter @Getter private Integer TransitionLayerCount;
+        @MSLAOption @Setter @Getter private Integer TransitionLayerType;
+        @MSLAOption @Setter @Getter private Integer AdvancedMode; /// 0 = Basic mode | 1 = Advanced mode which allows TSMC
 
         /*
             Version 2.5 fields
          */
-        @Getter @Setter private short Grey;
-        @Getter @Setter private short BlurLevel;
-        @Getter @Setter private  int ResinType;
+        @MSLAOption @Setter @Getter private Short Grey;
+        @MSLAOption @Setter @Getter private Short BlurLevel;
+        @MSLAOption @Setter @Getter private Integer ResinType;
 
         /*
             Version 2.6 fields
          */
-        @Getter @Setter private int IntelligentMode; // boolean, when true, normal exposure time will be auto set, use false for traditional way
+        @MSLAOption @Getter @Setter private int IntelligentMode; // boolean, when true, normal exposure time will be auto set, use false for traditional way
+
+        public Fields(Float PixelSizeUm, Size Resolution) {
+            this.PixelSizeUm = PixelSizeUm;
+            this.Resolution = new Size(Resolution);
+        }
 
         public static Fields copyOf(Fields source) {
-            var f = new Fields();
-            f.PixelSizeUm = source.PixelSizeUm;
+            var f = new Fields(source.PixelSizeUm, source.Resolution);
             f.LayerHeight = source.LayerHeight;
             f.ExposureTime = source.ExposureTime;
             f.WaitTimeBeforeCure1 = source.WaitTimeBeforeCure1;
@@ -65,8 +74,6 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
             f.RetractSpeed = source.RetractSpeed;
             f.VolumeMl = source.VolumeMl;
             f.AntiAliasing = source.AntiAliasing;
-            f.ResolutionX = source.ResolutionX;
-            f.ResolutionY = source.ResolutionY;
             f.WeightG = source.WeightG;
             f.Price = source.Price;
             f.PriceCurrencySymbol = source.PriceCurrencySymbol;
@@ -83,78 +90,59 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         }
     }
 
-    private final Fields fields;
+    @Delegate private final Fields fields;
 
-    public PhotonWorkshopFileHeaderTable() {
-        fields = new Fields();
+    public PhotonWorkshopFileHeaderTable(byte versionMajor, byte versionMinor) {
+        super(versionMajor, versionMinor);
+        fields = new Fields(0.0f, new Size(0, 0));
     }
 
-    public PhotonWorkshopFileHeaderTable(Fields defaults) {
+    public PhotonWorkshopFileHeaderTable(Fields defaults, byte versionMajor, byte versionMinor) {
+        super(versionMajor, versionMinor);
         fields = Fields.copyOf(defaults);
     }
 
-    public int getResolutionX() {
-        return fields.getResolutionX();
-    }
-    public int getResolutionY() {
-        return fields.getResolutionY();
-    }
-    public float getPixelSizeUm() { return fields.getPixelSizeUm(); }
-    public void setPerLayerOverride(int enabled) { fields.setPerLayerOverride(enabled); }
-    public void setBottomLayersCount(int count) { fields.setBottomLayersCount(count); }
-    public void setBottomExposureTime(float time) { fields.setBottomExposureTime(time); }
-    public void setExposureTime(float time) { fields.setExposureTime(time); }
-    public void setLiftHeight(float height) { fields.setLiftHeight(height); }
-    public void setTransitionLayers(int number) { fields.setTransitionLayerCount(number); }
-    public int getBottomLayersCount() { return (int) fields.getBottomLayersCount(); }
-    public float getExposureTime() { return fields.getExposureTime(); }
-    public float getBottomExposureTime() { return fields.getBottomExposureTime(); }
-    public float getLiftSpeed() { return fields.getLiftSpeed(); }
-    public float getBottomLiftSpeed() { return fields.getLiftSpeed(); }
-    public float getLiftHeight() { return fields.getLiftHeight(); }
-    public float getBottomLiftHeight() { return fields.getLiftHeight(); }
-    public float getLayerHeight() { return fields.getLayerHeight(); }
-    public float getBottomLayerHeight() { return fields.getLayerHeight(); }
-
     @Override
-    public void read(LittleEndianDataInputStream stream) throws IOException {
+    public void read(FileInputStream stream, int position) throws IOException {
+        var fc = stream.getChannel(); fc.position(position);
+        var dis = new LittleEndianDataInputStream(stream);
+
         int dataRead;
         var headerMark = stream.readNBytes(Name.length());
         if (!Arrays.equals(headerMark, Name.getBytes())) {
             throw new IOException("Header mark not found! Corrupted data.");
         }
         stream.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
-        TableLength = stream.readInt();
-        fields.PixelSizeUm = stream.readFloat();
-        fields.LayerHeight = stream.readFloat();
-        fields.ExposureTime = stream.readFloat();
-        fields.WaitTimeBeforeCure1 = stream.readFloat();
-        fields.BottomExposureTime = stream.readFloat();
-        fields.BottomLayersCount = stream.readFloat();
-        fields.LiftHeight = stream.readFloat();
-        fields.LiftSpeed = stream.readFloat();
-        fields.RetractSpeed = stream.readFloat();
-        fields.VolumeMl = stream.readFloat();
-        fields.AntiAliasing = stream.readInt();
-        fields.ResolutionX = stream.readInt();
-        fields.ResolutionY = stream.readInt();
-        fields.WeightG = stream.readFloat();
-        fields.Price = stream.readFloat();
-        fields.PriceCurrencySymbol = stream.readInt();
-        fields.PerLayerOverride = stream.readInt(); // boolean (80 - true, 00 - false)
-        fields.PrintTime = stream.readInt(); // in seconds
-        fields.TransitionLayerCount = stream.readInt();
-        fields.TransitionLayerType = stream.readInt();
+        TableLength = dis.readInt();
+        fields.PixelSizeUm = dis.readFloat();
+        fields.LayerHeight = dis.readFloat();
+        fields.ExposureTime = dis.readFloat();
+        fields.WaitTimeBeforeCure1 = dis.readFloat();
+        fields.BottomExposureTime = dis.readFloat();
+        fields.BottomLayersCount = dis.readInt();
+        fields.LiftHeight = dis.readFloat();
+        fields.LiftSpeed = dis.readFloat();
+        fields.RetractSpeed = dis.readFloat();
+        fields.VolumeMl = dis.readFloat();
+        fields.AntiAliasing = dis.readInt();
+        fields.Resolution = new Size(dis.readInt(), dis.readInt());
+        fields.WeightG = dis.readFloat();
+        fields.Price = dis.readFloat();
+        fields.PriceCurrencySymbol = dis.readInt();
+        fields.PerLayerOverride = dis.readInt(); // boolean (80 - true, 00 - false)
+        fields.PrintTime = dis.readInt(); // in seconds
+        fields.TransitionLayerCount = dis.readInt();
+        fields.TransitionLayerType = dis.readInt();
         dataRead = 80; // Assume we read 20 fields x 4 bytes
 
         // Version 2.4 has this table length
-        if (TableLength >= 84) { fields.AdvancedMode = stream.readInt(); dataRead += 4; }
+        if (TableLength >= 84) { fields.AdvancedMode = dis.readInt(); dataRead += 4; }
 
         // Version 2.5 and greater has this table length
-        if (TableLength >= 86) { fields.Grey = stream.readShort(); dataRead += 2; }
-        if (TableLength >= 88) { fields.BlurLevel = stream.readShort(); dataRead += 2; }
-        if (TableLength >= 92) { fields.ResinType = stream.readInt();  dataRead += 4; }
-        if (TableLength >= 96) { fields.IntelligentMode = stream.readInt(); dataRead += 4; }
+        if (TableLength >= 86) { fields.Grey = dis.readShort(); dataRead += 2; }
+        if (TableLength >= 88) { fields.BlurLevel = dis.readShort(); dataRead += 2; }
+        if (TableLength >= 92) { fields.ResinType = dis.readInt();  dataRead += 4; }
+        if (TableLength >= 96) { fields.IntelligentMode = dis.readInt(); dataRead += 4; }
 
         if (dataRead != TableLength) {
             throw new IOException("Header was not completely read out (" + dataRead + " of " + TableLength + "), some extra data left unread");
@@ -173,40 +161,42 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         return 80;
     }
 
-    public void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException {
-        stream.write(Name.getBytes());
-        stream.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
+    @Override
+    public final void write(OutputStream stream) throws IOException {
+        var dos = new LittleEndianDataOutputStream(stream);
+        dos.write(Name.getBytes());
+        dos.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
         TableLength = calculateTableLength(versionMajor, versionMinor);
-        stream.writeInt(TableLength);
-        stream.writeFloat(fields.PixelSizeUm);
-        stream.writeFloat(fields.LayerHeight);
-        stream.writeFloat(fields.ExposureTime);
-        stream.writeFloat(fields.WaitTimeBeforeCure1);
-        stream.writeFloat(fields.BottomExposureTime);
-        stream.writeFloat(fields.BottomLayersCount);
-        stream.writeFloat(fields.LiftHeight);
-        stream.writeFloat(fields.LiftSpeed);
-        stream.writeFloat(fields.RetractSpeed);
-        stream.writeFloat(fields.VolumeMl);
-        stream.writeInt(fields.AntiAliasing);
-        stream.writeInt(fields.ResolutionX);
-        stream.writeInt(fields.ResolutionY);
-        stream.writeFloat(fields.WeightG);
-        stream.writeFloat(fields.Price);
-        stream.writeInt(fields.PriceCurrencySymbol);
-        stream.writeInt(fields.PerLayerOverride); // boolean (80 - true, 00 - false)
-        stream.writeInt(fields.PrintTime); // in seconds
-        stream.writeInt(fields.TransitionLayerCount);
-        stream.writeInt(fields.TransitionLayerType);
+        dos.writeInt(TableLength);
+        dos.writeFloat(fields.PixelSizeUm);
+        dos.writeFloat(fields.LayerHeight);
+        dos.writeFloat(fields.ExposureTime);
+        dos.writeFloat(fields.WaitTimeBeforeCure1);
+        dos.writeFloat(fields.BottomExposureTime);
+        dos.writeFloat(fields.BottomLayersCount);
+        dos.writeFloat(fields.LiftHeight);
+        dos.writeFloat(fields.LiftSpeed);
+        dos.writeFloat(fields.RetractSpeed);
+        dos.writeFloat(fields.VolumeMl);
+        dos.writeInt(fields.AntiAliasing);
+        dos.writeInt(fields.Resolution.getWidth());
+        dos.writeInt(fields.Resolution.getHeight());
+        dos.writeFloat(fields.WeightG);
+        dos.writeFloat(fields.Price);
+        dos.writeInt(fields.PriceCurrencySymbol);
+        dos.writeInt(fields.PerLayerOverride); // boolean (80 - true, 00 - false)
+        dos.writeInt(fields.PrintTime); // in seconds
+        dos.writeInt(fields.TransitionLayerCount);
+        dos.writeInt(fields.TransitionLayerType);
 
         // Version 2.4 has this table length
-        if (TableLength >= 84) { stream.writeInt(fields.AdvancedMode); }
+        if (TableLength >= 84) { dos.writeInt(fields.AdvancedMode); }
 
         // Version 2.5 and greater has this table length
-        if (TableLength >= 86) { stream.writeShort(fields.Grey); }
-        if (TableLength >= 88) { stream.writeShort(fields.BlurLevel); }
-        if (TableLength >= 92) { stream.writeInt(fields.ResinType); }
-        if (TableLength >= 96) { stream.writeInt(fields.IntelligentMode); }
+        if (TableLength >= 86) { dos.writeShort(fields.Grey); }
+        if (TableLength >= 88) { dos.writeShort(fields.BlurLevel); }
+        if (TableLength >= 92) { dos.writeInt(fields.ResinType); }
+        if (TableLength >= 96) { dos.writeInt(fields.IntelligentMode); }
         stream.flush();
     }
 
@@ -227,8 +217,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         b.append("VolumeMl: ").append(fields.VolumeMl).append("\n");
 
         b.append("AntiAliasing: ").append(fields.AntiAliasing).append("\n");
-        b.append("ResolutionX: ").append(fields.ResolutionX).append("\n");
-        b.append("ResolutionY: ").append(fields.ResolutionY).append("\n");
+        b.append("Resolution: ").append(fields.Resolution).append("\n");
         b.append("WeightG: ").append(fields.WeightG).append("\n");
         b.append("Price: ").append(fields.Price).append("\n");
         b.append("PriceCurrencySymbol: ").append(fields.PriceCurrencySymbol).append("\n");
@@ -244,6 +233,39 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         if (TableLength >= 96) b.append("IntelligentMode: ").append(fields.IntelligentMode).append("\n");
 
         return b.toString();
+    }
+
+    public HashMap<String, Class<?>> getOptions() {
+        var optionsMap = new HashMap<String, Class<?>>();
+        optionsMap.put("LayerHeight", Float.class);
+        optionsMap.put("ExposureTime", Float.class);
+        optionsMap.put("WaitTimeBeforeCure1", Float.class);
+        optionsMap.put("BottomExposureTime", Float.class);
+        optionsMap.put("BottomLayersCount", Integer.class);
+        optionsMap.put("LiftHeight", Float.class);
+        optionsMap.put("LiftSpeed", Float.class);
+        optionsMap.put("RetractSpeed", Float.class);
+        optionsMap.put("VolumeMl", Float.class);
+        optionsMap.put("AntiAliasing", Float.class);
+        optionsMap.put("WeightG", Float.class);
+        optionsMap.put("Price", Float.class);
+        optionsMap.put("PriceCurrencySymbol", String.class);
+        optionsMap.put("PerLayerOverride", Integer.class);
+        optionsMap.put("PrintTime", Float.class);
+
+        /* Version 2.4 fields */
+        optionsMap.put("TransitionLayerCount", Integer.class);
+        optionsMap.put("TransitionLayerType", Integer.class);
+        optionsMap.put("AdvancedMode", Integer.class);
+
+        /* Version 2.5 fields */
+        optionsMap.put("Grey", Short.class);
+        optionsMap.put("BlurLevel", Short.class);
+        optionsMap.put("ResinType", Integer.class);
+
+        /* Version 2.6 fields */
+        optionsMap.put("IntelligentMode", Integer.class);
+        return optionsMap;
     }
 
 }

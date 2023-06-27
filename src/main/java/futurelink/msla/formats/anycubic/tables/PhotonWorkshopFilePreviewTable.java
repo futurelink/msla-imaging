@@ -3,10 +3,13 @@ package futurelink.msla.formats.anycubic.tables;
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
 import futurelink.msla.formats.MSLAPreview;
+import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 
 /**
@@ -14,11 +17,10 @@ import java.util.Arrays;
  */
 public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable implements MSLAPreview {
     public static final String Name = "PREVIEW";
-    @Getter private int ResolutionX = 224;
+    @Getter private Size Resolution = new Size(224, 168);
     @Getter private int Mark = 'x'; /// Gets the operation mark 'x'
-    @Getter private int ResolutionY = 168;
     @Getter byte[] Data = null;
-    @Getter private int DataSize = ResolutionX * ResolutionY * 2;
+    @Getter private int DataSize = Resolution.length() * 2;
 
     /* Color table fields are part of preview section */
     @Getter public int UseFullGreyscale;
@@ -34,8 +36,9 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable impl
     @Getter BufferedImage Image;
     public byte[] ImageData = null;
 
-    public PhotonWorkshopFilePreviewTable() {
-        Image = new BufferedImage(getResolutionX(), getResolutionY(), BufferedImage.TYPE_USHORT_GRAY);
+    public PhotonWorkshopFilePreviewTable(byte versionMajor, byte versionMinor) {
+        super(versionMajor, versionMinor);
+        Image = new BufferedImage(getResolution().getWidth(), getResolution().getHeight(), BufferedImage.TYPE_USHORT_GRAY);
     }
 
     public void updateImageData() throws IOException{
@@ -58,28 +61,31 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable impl
     }
 
     @Override
-    public void read(LittleEndianDataInputStream stream) throws IOException {
+    public void read(FileInputStream stream, int position) throws IOException {
+        var fc = stream.getChannel(); fc.position(position);
+        var dis = new LittleEndianDataInputStream(stream);
         var dataRead = 0;
         var mark = stream.readNBytes(Name.length());
         if (!Arrays.equals(mark, Name.getBytes())) {
-            throw new IOException("Preview mark not found! Found: '" + new String(mark) + "'. Corrupted data.");
+            throw new IOException("Preview mark not found! Found: '" + new String(mark) + "' at " + position + ". Corrupted data.");
         }
         stream.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
-        TableLength = stream.readInt();
+        TableLength = dis.readInt();
         if (TableLength > 0) {
-            ResolutionX = stream.readInt();
-            Mark = stream.readInt(); // 'x' character and 3 zeroes
-            ResolutionY = stream.readInt();
+            var ResolutionX = dis.readInt();
+            Mark = dis.readInt(); // 'x' character and 3 zeroes
+            var ResolutionY = dis.readInt();
+            Resolution = new Size(ResolutionX, ResolutionY);
             dataRead = 12;
 
-            stream.skipBytes(DataSize); // We won't read data here
+            dis.skipBytes(DataSize); // We won't read data here
             dataRead += DataSize;
 
             // Read color table
-            UseFullGreyscale = stream.readInt();
-            GreyMaxCount = stream.readInt();
-            ShadesOfGrey = stream.readNBytes(GreyMaxCount);
-            Unknown = stream.readInt();
+            UseFullGreyscale = dis.readInt();
+            GreyMaxCount = dis.readInt();
+            ShadesOfGrey = dis.readNBytes(GreyMaxCount);
+            Unknown = dis.readInt();
             dataRead += 16; // Grey table is not counted, don't know why
 
             if (dataRead != TableLength) {
@@ -90,25 +96,26 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable impl
     }
 
     @Override
-    public void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException {
+    public void write(OutputStream stream) throws IOException {
+        var fos = new LittleEndianDataOutputStream(stream);
         TableLength = calculateTableLength(versionMajor, versionMinor) + 4; // TODO sort out where this comes from :()
-        stream.write(Name.getBytes());
-        stream.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
-        stream.writeInt(TableLength);
-        stream.writeInt(ResolutionX);
-        stream.writeInt(Mark);
-        stream.writeInt(ResolutionY);
-        stream.write(ImageData);
-        stream.writeInt(UseFullGreyscale);
-        stream.writeInt(GreyMaxCount);
-        stream.write(ShadesOfGrey);
-        stream.writeInt(Unknown);
+        fos.write(Name.getBytes());
+        fos.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
+        fos.writeInt(TableLength);
+        fos.writeInt(Resolution.getWidth());
+        fos.writeInt(Mark);
+        fos.writeInt(Resolution.getHeight());
+        fos.write(ImageData);
+        fos.writeInt(UseFullGreyscale);
+        fos.writeInt(GreyMaxCount);
+        fos.write(ShadesOfGrey);
+        fos.writeInt(Unknown);
     }
 
     public String toString() {
         return "-- Preview data --\n" +
                 "TableLength: " + TableLength + "\n" +
-                "Resolution: " + ResolutionX + (char) Mark + ResolutionY + "\n" +
+                "Resolution: " + Resolution + "\n" +
                 "DataSize: " + DataSize + "\n" +
                 "UseFullGreyscale: " + UseFullGreyscale + "\n" +
                 "GreyMaxCount: " + GreyMaxCount + "\n";

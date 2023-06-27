@@ -108,7 +108,7 @@ public class PhotonWorkshopCodecPW0 implements MSLAFileCodec {
              * Set pixels or something like this...
              */
             if (color != 0) {
-                writer.pixels(layerNumber, color, pixelPos, repeat);
+                writer.stripe(layerNumber, color, pixelPos, repeat, false);
                 pixels += repeat;
             }
             pixelPos += repeat;

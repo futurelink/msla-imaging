@@ -5,7 +5,10 @@ import com.google.common.io.LittleEndianDataOutputStream;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -13,34 +16,35 @@ import java.util.Arrays;
  * "MACHINE" section representation.
  */
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
+
     public static class Fields {
         @Getter @Setter String MachineName = null;
         @Getter @Setter String LayerImageFormat = "pw0img";
-        @Getter @Setter int MaxAntialiasingLevel = 16;
-        @Getter @Setter int PropertyFields = 7;
-        @Getter @Setter float DisplayWidth;
-        @Getter @Setter float DisplayHeight;
-        @Getter @Setter float MachineZ;
-        @Getter @Setter int MaxFileVersion = 0x0206;
-        @Getter @Setter int MachineBackground = 6506241;
-        @Getter @Setter float PixelWidthUm;
-        @Getter @Setter float PixelHeightUm;
-        @Getter @Setter int Padding1;
-        @Getter @Setter int Padding2;
-        @Getter @Setter int Padding3;
-        @Getter @Setter int Padding4;
-        @Getter @Setter int Padding5;
-        @Getter @Setter int Padding6;
-        @Getter @Setter int Padding7;
-        @Getter @Setter int Padding8;
-        @Getter @Setter int DisplayCount = 1;
-        @Getter @Setter int Padding9;
-        @Getter @Setter short ResolutionX ;
-        @Getter @Setter short ResolutionY;
-        @Getter @Setter int Padding10;
-        @Getter @Setter int Padding11;
-        @Getter @Setter int Padding12;
-        @Getter @Setter int Padding13;
+        @Getter @Setter Integer MaxAntialiasingLevel = 16;
+        @Getter @Setter Integer PropertyFields = 7;
+        @Getter @Setter Float DisplayWidth;
+        @Getter @Setter Float DisplayHeight;
+        @Getter @Setter Float MachineZ;
+        @Getter @Setter Integer MaxFileVersion = 0x0206;
+        @Getter @Setter Integer MachineBackground = 6506241;
+        @Getter @Setter Float PixelWidthUm;
+        @Getter @Setter Float PixelHeightUm;
+        @Getter @Setter Integer Padding1;
+        @Getter @Setter Integer Padding2;
+        @Getter @Setter Integer Padding3;
+        @Getter @Setter Integer Padding4;
+        @Getter @Setter Integer Padding5;
+        @Getter @Setter Integer Padding6;
+        @Getter @Setter Integer Padding7;
+        @Getter @Setter Integer Padding8;
+        @Getter @Setter Integer DisplayCount = 1;
+        @Getter @Setter Integer Padding9;
+        @Getter @Setter Short ResolutionX ;
+        @Getter @Setter Short ResolutionY;
+        @Getter @Setter Integer Padding10;
+        @Getter @Setter Integer Padding11;
+        @Getter @Setter Integer Padding12;
+        @Getter @Setter Integer Padding13;
 
         public static Fields copyOf(Fields source) {
             var f = new Fields();
@@ -66,10 +70,12 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
 
     public String getLayerImageFormat() { return fields.getLayerImageFormat(); }
 
-    public PhotonWorkshopFileMachineTable() {
+    public PhotonWorkshopFileMachineTable(byte versionMajor, byte versionMinor) {
+        super(versionMajor, versionMinor);
         fields = new Fields();
     }
-    public PhotonWorkshopFileMachineTable(Fields defaults) {
+    public PhotonWorkshopFileMachineTable(Fields defaults, byte versionMajor, byte versionMinor) {
+        super(versionMajor, versionMinor);
         fields = Fields.copyOf(defaults);
     }
 
@@ -79,50 +85,52 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public int calculateDataLength(byte versionMajor, byte versionMinor) {
+    public int getDataLength() {
         // Need to subtract 16 to data length because for some reason
         // the value of TableLength is 16 bytes greater than factual table length...
         return calculateTableLength(versionMajor, versionMinor) + MarkLength + 4 - 16;
     }
 
     @Override
-    public void read(LittleEndianDataInputStream stream) throws IOException {
+    public void read(FileInputStream stream, int position) throws IOException {
+        var fc = stream.getChannel(); fc.position(position);
+        var dis = new LittleEndianDataInputStream(stream);
         int dataRead;
         var headerMark = stream.readNBytes(Name.length());
         if (!Arrays.equals(headerMark, Name.getBytes())) {
             throw new IOException("Machine mark not found! Corrupted data.");
         }
         stream.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
-        TableLength = stream.readInt();
-        fields.MachineName = new String(stream.readNBytes(96), StandardCharsets.US_ASCII).trim();
-        fields.LayerImageFormat = new String(stream.readNBytes(16), StandardCharsets.US_ASCII).trim();
-        fields.MaxAntialiasingLevel = stream.readInt();
-        fields.PropertyFields = stream.readInt();
-        fields.DisplayWidth = stream.readFloat();
-        fields.DisplayHeight = stream.readFloat();
-        fields.MachineZ = stream.readFloat();
-        fields.MaxFileVersion = stream.readInt();
-        fields.MachineBackground = stream.readInt();
+        TableLength = dis.readInt();
+        fields.MachineName = new String(dis.readNBytes(96), StandardCharsets.US_ASCII).trim();
+        fields.LayerImageFormat = new String(dis.readNBytes(16), StandardCharsets.US_ASCII).trim();
+        fields.MaxAntialiasingLevel = dis.readInt();
+        fields.PropertyFields = dis.readInt();
+        fields.DisplayWidth = dis.readFloat();
+        fields.DisplayHeight = dis.readFloat();
+        fields.MachineZ = dis.readFloat();
+        fields.MaxFileVersion = dis.readInt();
+        fields.MachineBackground = dis.readInt();
         dataRead = 156; // Assume we read 156 bytes
 
-        if (TableLength >= 160) { fields.PixelWidthUm = stream.readFloat(); dataRead += 4; }
-        if (TableLength >= 164) { fields.PixelHeightUm = stream.readFloat(); dataRead += 4; }
-        if (TableLength >= 168) { fields.Padding1 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 172) { fields.Padding2 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 176) { fields.Padding3 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 180) { fields.Padding4 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 184) { fields.Padding5 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 188) { fields.Padding6 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 192) { fields.Padding7 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 196) { fields.Padding8 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 200) { fields.DisplayCount = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 204) { fields.Padding9 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 206) { fields.ResolutionX = stream.readShort(); dataRead += 2; }
-        if (TableLength >= 208) { fields.ResolutionY = stream.readShort(); dataRead += 2; }
-        if (TableLength >= 212) { fields.Padding10 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 216) { fields.Padding11 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 220) { fields.Padding12 = stream.readInt(); dataRead += 4; }
-        if (TableLength >= 224) { fields.Padding13 = stream.readInt(); dataRead += 4; }
+        if (TableLength >= 160) { fields.PixelWidthUm = dis.readFloat(); dataRead += 4; }
+        if (TableLength >= 164) { fields.PixelHeightUm = dis.readFloat(); dataRead += 4; }
+        if (TableLength >= 168) { fields.Padding1 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 172) { fields.Padding2 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 176) { fields.Padding3 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 180) { fields.Padding4 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 184) { fields.Padding5 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 188) { fields.Padding6 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 192) { fields.Padding7 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 196) { fields.Padding8 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 200) { fields.DisplayCount = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 204) { fields.Padding9 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 206) { fields.ResolutionX = dis.readShort(); dataRead += 2; }
+        if (TableLength >= 208) { fields.ResolutionY = dis.readShort(); dataRead += 2; }
+        if (TableLength >= 212) { fields.Padding10 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 216) { fields.Padding11 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 220) { fields.Padding12 = dis.readInt(); dataRead += 4; }
+        if (TableLength >= 224) { fields.Padding13 = dis.readInt(); dataRead += 4; }
 
         if (dataRead != TableLength)
             throw new IOException("Machine was not completely read out (" + dataRead + " of " + TableLength +
@@ -130,43 +138,44 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException {
-        stream.write(Name.getBytes());
-        stream.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
+    public void write(OutputStream stream) throws IOException {
+        var dos = new LittleEndianDataOutputStream(stream);
+        dos.write(Name.getBytes());
+        dos.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
         TableLength = calculateTableLength(versionMajor, versionMinor);
-        stream.writeInt(TableLength);
+        dos.writeInt(TableLength);
 
-        stream.write(fields.MachineName.getBytes());
-        stream.write(new byte[96 - fields.MachineName.length()]);
-        stream.write(fields.LayerImageFormat.getBytes());
-        stream.write(new byte[16 - fields.LayerImageFormat.length()]);
+        dos.write(fields.MachineName.getBytes());
+        dos.write(new byte[96 - fields.MachineName.length()]);
+        dos.write(fields.LayerImageFormat.getBytes());
+        dos.write(new byte[16 - fields.LayerImageFormat.length()]);
 
-        stream.writeInt(fields.MaxAntialiasingLevel);
-        stream.writeInt(fields.PropertyFields);
-        stream.writeFloat(fields.DisplayWidth);
-        stream.writeFloat(fields.DisplayHeight);
-        stream.writeFloat(fields.MachineZ);
-        stream.writeInt(fields.MaxFileVersion);
-        stream.writeInt(fields.MachineBackground);
+        dos.writeInt(fields.MaxAntialiasingLevel);
+        dos.writeInt(fields.PropertyFields);
+        dos.writeFloat(fields.DisplayWidth);
+        dos.writeFloat(fields.DisplayHeight);
+        dos.writeFloat(fields.MachineZ);
+        dos.writeInt(fields.MaxFileVersion);
+        dos.writeInt(fields.MachineBackground);
 
-        if (TableLength >= 160) stream.writeFloat(fields.PixelWidthUm);
-        if (TableLength >= 164) stream.writeFloat(fields.PixelHeightUm);
-        if (TableLength >= 168) stream.writeInt(fields.Padding1);
-        if (TableLength >= 172) stream.writeInt(fields.Padding2);
-        if (TableLength >= 176) stream.writeInt(fields.Padding3);
-        if (TableLength >= 180) stream.writeInt(fields.Padding4);
-        if (TableLength >= 184) stream.writeInt(fields.Padding5);
-        if (TableLength >= 188) stream.writeInt(fields.Padding6);
-        if (TableLength >= 192) stream.writeInt(fields.Padding7);
-        if (TableLength >= 196) stream.writeInt(fields.Padding8);
-        if (TableLength >= 200) stream.writeInt(fields.DisplayCount);
-        if (TableLength >= 204) stream.writeInt(fields.Padding9);
-        if (TableLength >= 206) stream.writeShort(fields.ResolutionX);
-        if (TableLength >= 208) stream.writeShort(fields.ResolutionY);
-        if (TableLength >= 212) stream.writeInt(fields.Padding10);
-        if (TableLength >= 216) stream.writeInt(fields.Padding11);
-        if (TableLength >= 220) stream.writeInt(fields.Padding12);
-        if (TableLength >= 224) stream.writeInt(fields.Padding13);
+        if (TableLength >= 160) dos.writeFloat(fields.PixelWidthUm);
+        if (TableLength >= 164) dos.writeFloat(fields.PixelHeightUm);
+        if (TableLength >= 168) dos.writeInt(fields.Padding1);
+        if (TableLength >= 172) dos.writeInt(fields.Padding2);
+        if (TableLength >= 176) dos.writeInt(fields.Padding3);
+        if (TableLength >= 180) dos.writeInt(fields.Padding4);
+        if (TableLength >= 184) dos.writeInt(fields.Padding5);
+        if (TableLength >= 188) dos.writeInt(fields.Padding6);
+        if (TableLength >= 192) dos.writeInt(fields.Padding7);
+        if (TableLength >= 196) dos.writeInt(fields.Padding8);
+        if (TableLength >= 200) dos.writeInt(fields.DisplayCount);
+        if (TableLength >= 204) dos.writeInt(fields.Padding9);
+        if (TableLength >= 206) dos.writeShort(fields.ResolutionX);
+        if (TableLength >= 208) dos.writeShort(fields.ResolutionY);
+        if (TableLength >= 212) dos.writeInt(fields.Padding10);
+        if (TableLength >= 216) dos.writeInt(fields.Padding11);
+        if (TableLength >= 220) dos.writeInt(fields.Padding12);
+        if (TableLength >= 224) dos.writeInt(fields.Padding13);
     }
 
     @Override

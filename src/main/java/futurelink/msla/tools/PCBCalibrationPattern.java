@@ -1,5 +1,6 @@
 package futurelink.msla.tools;
 
+import futurelink.msla.formats.utils.Size;
 import lombok.Setter;
 
 import java.awt.*;
@@ -33,8 +34,7 @@ import java.io.IOException;
 public class PCBCalibrationPattern {
     @Setter int height; // in mm
     float pixelSize;
-    int resolutionX;
-    int resolutionY;
+    Size resolution;
 
     @Setter float startTime = 5.0f;
     @Setter float interval = 1.0f;
@@ -52,21 +52,20 @@ public class PCBCalibrationPattern {
             { 0.8f, 0.4f }, { 0.9f, 0.45f }, { 1.0f, 0.5f }
     };
 
-    public PCBCalibrationPattern(int resolutionX, int resolutionY, float pixelSize) {
-        this.resolutionX = resolutionX;
-        this.resolutionY = resolutionY;
+    public PCBCalibrationPattern(Size resolution, float pixelSize) {
+        this.resolution = resolution;
         this.pixelSize = pixelSize;
     }
 
     public final BufferedImage generate(int height, int repetition, int repetitions) {
-        var image = new BufferedImage(resolutionX, resolutionY, BufferedImage.TYPE_BYTE_GRAY);
+        var image = new BufferedImage(resolution.getWidth(), resolution.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
         var g = image.getGraphics();
 
         // Draw top one third of pattern 0.1 + 0.1 + 0.2 + 0.2 + 0.3mm = 0.9mm total
         var distancePX = 120;
         var widthPX = distancePX * repetitions;
-        var posX = resolutionX / 2 - widthPX / 2;
-        var posY = resolutionY / 2 - height / 2;
+        var posX = resolution.getWidth() / 2 - widthPX / 2;
+        var posY = resolution.getHeight() / 2 - height / 2;
         var fragmentHeight = height / 3;
         for (int i = 0; i < repetitions - repetition; i++) {
             // Draw lines

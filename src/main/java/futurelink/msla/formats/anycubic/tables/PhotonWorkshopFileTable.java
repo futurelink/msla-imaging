@@ -1,24 +1,30 @@
 package futurelink.msla.formats.anycubic.tables;
 
-import com.google.common.io.LittleEndianDataInputStream;
-import com.google.common.io.LittleEndianDataOutputStream;
+import futurelink.msla.formats.MSLAFileBlock;
 import lombok.Getter;
-
-import java.io.IOException;
 
 /**
  * Common class for section representation.
  */
-abstract public class PhotonWorkshopFileTable {
+abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {
     public static final int MarkLength = 12;
     public static final float DefaultLiftHeight = 100;
     @Getter protected String Name;
     @Getter protected int TableLength;
+    protected byte versionMajor;
+    protected byte versionMinor;
+
+    public PhotonWorkshopFileTable(byte versionMajor, byte versionMinor) {
+        setVersion(versionMajor, versionMinor);
+    }
+
+    public void setVersion(byte versionMajor, byte versionMinor) {
+        this.versionMajor = versionMajor;
+        this.versionMinor = versionMinor;
+    }
 
     abstract int calculateTableLength(byte versionMajor, byte versionMinor);
-    public int calculateDataLength(byte versionMajor, byte versionMinor) {
-        return calculateTableLength(versionMajor, versionMinor) + MarkLength + 4;
-    }
-    abstract public void read(LittleEndianDataInputStream stream) throws IOException;
-    abstract public void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException;
+
+    @Override
+    public int getDataLength() { return calculateTableLength(versionMajor, versionMinor) + MarkLength + 4; }
 }

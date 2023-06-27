@@ -1,7 +1,5 @@
 package futurelink.msla.formats;
 
-import futurelink.msla.formats.MSLAFileCodec;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -17,7 +15,6 @@ public interface MSLAEncodeReader {
      * Read layer data.
      * @param layerNumber layer number being read
      * @return InputStream of encoded data ready to be placed into an output file.
-     * @throws IOException
      */
     InputStream read(int layerNumber) throws IOException;
 

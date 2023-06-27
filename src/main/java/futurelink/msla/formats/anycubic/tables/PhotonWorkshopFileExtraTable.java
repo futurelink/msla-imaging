@@ -2,33 +2,38 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+import futurelink.msla.formats.MSLAOption;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * "EXTRA" section representation.
  */
 public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     public static final String Name = "EXTRA";
-    @Getter @Setter int BottomLiftCount = 2;
-    @Getter @Setter float BottomLiftHeight1 = 2.0f;
-    @Getter @Setter float BottomLiftSpeed1 = 1.0f;
-    @Getter @Setter float BottomRetractSpeed2 = 4.0f;
-    @Getter @Setter float BottomLiftHeight2 = 6.0f;
-    @Getter @Setter float BottomLiftSpeed2 = 4.0f;
-    @Getter @Setter float BottomRetractSpeed1 = 2.0f;
-    @Getter @Setter int NormalLiftCount = 2;
-    @Getter @Setter float LiftHeight1 = 2.0f;
-    @Getter @Setter float LiftSpeed1 = 2.0f;
-    @Getter @Setter float RetractSpeed2 = 4.0f;
-    @Getter @Setter float LiftHeight2 = 6.0f;
-    @Getter @Setter float LiftSpeed2 = 4.0f;
-    @Getter @Setter float RetractSpeed1 = 2.0f;
+    @MSLAOption @Getter @Setter Integer BottomLiftCount = 2;
+    @MSLAOption @Getter @Setter Float BottomLiftHeight1 = 2.0f;
+    @MSLAOption @Getter @Setter Float BottomLiftSpeed1 = 1.0f;
+    @MSLAOption @Getter @Setter Float BottomRetractSpeed2 = 4.0f;
+    @MSLAOption @Getter @Setter Float BottomLiftHeight2 = 6.0f;
+    @MSLAOption @Getter @Setter Float BottomLiftSpeed2 = 4.0f;
+    @MSLAOption @Getter @Setter Float BottomRetractSpeed1 = 2.0f;
+    @MSLAOption @Getter @Setter Integer NormalLiftCount = 2;
+    @MSLAOption @Getter @Setter Float LiftHeight1 = 2.0f;
+    @MSLAOption @Getter @Setter Float LiftSpeed1 = 2.0f;
+    @MSLAOption @Getter @Setter Float RetractSpeed2 = 4.0f;
+    @MSLAOption @Getter @Setter Float LiftHeight2 = 6.0f;
+    @MSLAOption @Getter @Setter Float LiftSpeed2 = 4.0f;
+    @MSLAOption @Getter @Setter Float RetractSpeed1 = 2.0f;
 
-    public PhotonWorkshopFileExtraTable() {
+    public PhotonWorkshopFileExtraTable(byte versionMajor, byte versionMinor) {
+        super(versionMajor, versionMinor);
         TableLength = 24; // Constant that doesn't mean anything...
     }
 
@@ -38,57 +43,61 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public int calculateDataLength(byte versionMajor, byte versionMinor) {
+    public int getDataLength() {
         // 14 fields of 4 bytes + Mark length + 4 bytes for table length
         return 56 + MarkLength + 4;
     }
 
     @Override
-    public void read(LittleEndianDataInputStream stream) throws IOException {
-        var headerMark = stream.readNBytes(Name.length());
+    public void read(FileInputStream stream, int position) throws IOException {
+        var fc = stream.getChannel(); fc.position(position);
+        var dis = new LittleEndianDataInputStream(stream);
+
+        var headerMark = dis.readNBytes(Name.length());
         if (!Arrays.equals(headerMark, Name.getBytes())) {
-            throw new IOException("Extra definition mark not found! Corrupted data.");
+            throw new IOException("Extra definition mark not found at " + position + "! Corrupted data.");
         }
-        stream.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
-        TableLength = stream.readInt();
+        dis.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
+        TableLength = dis.readInt();
 
-        BottomLiftCount = stream.readInt();
-        BottomLiftHeight1 = stream.readFloat();
-        BottomLiftSpeed1 = stream.readFloat();
-        BottomRetractSpeed2 = stream.readFloat();
-        BottomLiftHeight2 = stream.readFloat();
-        BottomLiftSpeed2 = stream.readFloat();
-        BottomRetractSpeed1 = stream.readFloat();
+        BottomLiftCount = dis.readInt();
+        BottomLiftHeight1 = dis.readFloat();
+        BottomLiftSpeed1 = dis.readFloat();
+        BottomRetractSpeed2 = dis.readFloat();
+        BottomLiftHeight2 = dis.readFloat();
+        BottomLiftSpeed2 = dis.readFloat();
+        BottomRetractSpeed1 = dis.readFloat();
 
-        NormalLiftCount = stream.readInt();
-        LiftHeight1 = stream.readFloat();
-        LiftSpeed1 = stream.readFloat();
-        RetractSpeed2 = stream.readFloat();
-        LiftHeight2 = stream.readFloat();
-        LiftSpeed2 = stream.readFloat();
-        RetractSpeed1 = stream.readFloat();
+        NormalLiftCount = dis.readInt();
+        LiftHeight1 = dis.readFloat();
+        LiftSpeed1 = dis.readFloat();
+        RetractSpeed2 = dis.readFloat();
+        LiftHeight2 = dis.readFloat();
+        LiftSpeed2 = dis.readFloat();
+        RetractSpeed1 = dis.readFloat();
     }
 
     @Override
-    public void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException {
-        stream.write(Name.getBytes());
-        stream.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
+    public final void write(OutputStream stream) throws IOException {
+        var dos = new LittleEndianDataOutputStream(stream);
+        dos.write(Name.getBytes());
+        dos.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
         TableLength = calculateTableLength(versionMajor, versionMinor);
-        stream.writeInt(TableLength);
-        stream.writeInt(BottomLiftCount);
-        stream.writeFloat(BottomLiftHeight1);
-        stream.writeFloat(BottomLiftSpeed1);
-        stream.writeFloat(BottomRetractSpeed2);
-        stream.writeFloat(BottomLiftHeight2);
-        stream.writeFloat(BottomLiftSpeed2);
-        stream.writeFloat(BottomRetractSpeed1);
-        stream.writeInt(NormalLiftCount);
-        stream.writeFloat(LiftHeight1);
-        stream.writeFloat(LiftSpeed1);
-        stream.writeFloat(RetractSpeed2);
-        stream.writeFloat(LiftHeight2);
-        stream.writeFloat(LiftSpeed2);
-        stream.writeFloat(RetractSpeed1);
+        dos.writeInt(TableLength);
+        dos.writeInt(BottomLiftCount);
+        dos.writeFloat(BottomLiftHeight1);
+        dos.writeFloat(BottomLiftSpeed1);
+        dos.writeFloat(BottomRetractSpeed2);
+        dos.writeFloat(BottomLiftHeight2);
+        dos.writeFloat(BottomLiftSpeed2);
+        dos.writeFloat(BottomRetractSpeed1);
+        dos.writeInt(NormalLiftCount);
+        dos.writeFloat(LiftHeight1);
+        dos.writeFloat(LiftSpeed1);
+        dos.writeFloat(RetractSpeed2);
+        dos.writeFloat(LiftHeight2);
+        dos.writeFloat(LiftSpeed2);
+        dos.writeFloat(RetractSpeed1);
     }
 
     @Override
@@ -108,5 +117,24 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
                 "LiftHeight2: " + LiftHeight2 + "\n" +
                 "LiftSpeed2: " + LiftSpeed2 + "\n" +
                 "RetractSpeed1: " + RetractSpeed1 + "\n";
+    }
+
+    public HashMap<String, Class<?>> getOptions() {
+        var map = new HashMap<String, Class<?>>();
+        map.put("BottomLiftCount", Integer.class);
+        map.put("BottomLiftHeight1", Float.class);
+        map.put("BottomLiftSpeed1", Float.class);
+        map.put("BottomRetractSpeed1", Float.class);
+        map.put("BottomLiftHeight2", Float.class);
+        map.put("BottomLiftSpeed2", Float.class);
+        map.put("BottomRetractSpeed2", Float.class);
+        map.put("NormalLiftCount", Integer.class);
+        map.put("LiftHeight1", Float.class);
+        map.put("LiftSpeed1",  Float.class);
+        map.put("RetractSpeed1", Float.class);
+        map.put("RetractSpeed2", Float.class);
+        map.put("LiftHeight2",  Float.class);
+        map.put("LiftSpeed2", Float.class);
+        return map;
     }
 }
