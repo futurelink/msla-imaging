@@ -2,11 +2,11 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+import futurelink.msla.formats.MSLAFileBlockFields;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +17,7 @@ import java.util.Arrays;
  */
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
 
-    public static class Fields {
+    public static class Fields implements MSLAFileBlockFields {
         @Getter @Setter String MachineName = null;
         @Getter @Setter String LayerImageFormat = "pw0img";
         @Getter @Setter Integer MaxAntialiasingLevel = 16;
@@ -39,29 +39,28 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
         @Getter @Setter Integer Padding8;
         @Getter @Setter Integer DisplayCount = 1;
         @Getter @Setter Integer Padding9;
-        @Getter @Setter Short ResolutionX ;
+        @Getter @Setter Short ResolutionX;
         @Getter @Setter Short ResolutionY;
         @Getter @Setter Integer Padding10;
         @Getter @Setter Integer Padding11;
         @Getter @Setter Integer Padding12;
         @Getter @Setter Integer Padding13;
 
-        public static Fields copyOf(Fields source) {
-            var f = new Fields();
-            f.MachineName = source.MachineName;
-            f.LayerImageFormat = source.LayerImageFormat;
-            f.MaxAntialiasingLevel = source.MaxAntialiasingLevel; f.PropertyFields = source.PropertyFields;
-            f.DisplayWidth = source.DisplayWidth; f.DisplayHeight = source.DisplayHeight;
-            f.MachineZ = source.MachineZ; f.MaxFileVersion = source.MaxFileVersion;
-            f.MachineBackground = source.MachineBackground;
-            f.PixelWidthUm = source.PixelWidthUm; f.PixelHeightUm = source.PixelHeightUm;
-            f.Padding1 = source.Padding1; f.Padding2 = source.Padding2; f.Padding3 = source.Padding3;
-            f.Padding4 = source.Padding4; f.Padding5 = source.Padding5; f.Padding6 = source.Padding6;
-            f.Padding7 = source.Padding7; f.Padding8 = source.Padding8; f.DisplayCount = source.DisplayCount;
-            f.Padding9 = source.Padding9; f.ResolutionX = source.ResolutionX; f.ResolutionY = source.ResolutionY;
-            f.Padding10 = source.Padding10; f.Padding11 = source.Padding11; f.Padding12 = source.Padding12;
-            f.Padding13 = source.Padding13;
-            return f;
+        public Fields() {}
+        public Fields(Fields source) {
+            MachineName = source.MachineName;
+            LayerImageFormat = source.LayerImageFormat;
+            MaxAntialiasingLevel = source.MaxAntialiasingLevel; PropertyFields = source.PropertyFields;
+            DisplayWidth = source.DisplayWidth; DisplayHeight = source.DisplayHeight;
+            MachineZ = source.MachineZ; MaxFileVersion = source.MaxFileVersion;
+            MachineBackground = source.MachineBackground;
+            PixelWidthUm = source.PixelWidthUm; PixelHeightUm = source.PixelHeightUm;
+            Padding1 = source.Padding1; Padding2 = source.Padding2; Padding3 = source.Padding3;
+            Padding4 = source.Padding4; Padding5 = source.Padding5; Padding6 = source.Padding6;
+            Padding7 = source.Padding7; Padding8 = source.Padding8; DisplayCount = source.DisplayCount;
+            Padding9 = source.Padding9; ResolutionX = source.ResolutionX; ResolutionY = source.ResolutionY;
+            Padding10 = source.Padding10; Padding11 = source.Padding11; Padding12 = source.Padding12;
+            Padding13 = source.Padding13;
         }
     }
 
@@ -74,9 +73,9 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
         super(versionMajor, versionMinor);
         fields = new Fields();
     }
-    public PhotonWorkshopFileMachineTable(Fields defaults, byte versionMajor, byte versionMinor) {
+    public PhotonWorkshopFileMachineTable(MSLAFileBlockFields defaults, byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        fields = Fields.copyOf(defaults);
+        fields = new Fields((Fields) defaults);
     }
 
     @Override

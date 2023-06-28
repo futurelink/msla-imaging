@@ -1,5 +1,7 @@
 package futurelink.msla.formats.anycubic;
 
+import futurelink.msla.formats.MSLAFileBlockFields;
+import futurelink.msla.formats.MSLAFileDefaults;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileHeaderTable;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileMachineTable;
 import futurelink.msla.formats.utils.Size;
@@ -12,12 +14,38 @@ import java.util.Set;
  * Anycubic printers default settings.
  */
 public class PhotonWorkshopFileDefaults {
-    public static class Values {
+    private static class Values implements MSLAFileDefaults {
         @Getter String FileExtension;
         @Getter byte VersionMajor;
         @Getter byte VersionMinor;
         @Getter PhotonWorkshopFileMachineTable.Fields Machine;
         @Getter PhotonWorkshopFileHeaderTable.Fields Header;
+
+        @Override
+        public float getPixelSizeUm() { return Header.getPixelSizeUm(); }
+        @Override
+        public Integer getOptionInt(String name) { return null; }
+        @Override
+        public Byte getOptionByte(String name) {
+            if ("VersionMajor".equals(name)) return getVersionMajor();
+            if ("VersionMinor".equals(name)) return getVersionMinor();
+            return null;
+        }
+        @Override
+        public Short getOptionShort(String name) { return null; }
+
+        @Override
+        public String getOptionString(String name) {
+            if ("FileExtension".equals(name)) return getFileExtension();
+            return null;
+        }
+
+        @Override
+        public MSLAFileBlockFields getOptionBlock(String name) {
+            if ("Machine".equals(name)) return Machine;
+            if ("Header".equals(name)) return Header;
+            return null;
+        }
     }
 
     public static Set<String> getSupported() {
@@ -65,7 +93,7 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setVolumeMl(0.0f);
         values.Header.setWeightG(0.0f);
         values.Header.setPrice(0.0f);
-        values.Header.setPriceCurrencySymbol(0x240000);
+        values.Header.setPriceCurrencySymbol(0x24000000);
         values.Header.setPrintTime(0);
         Settings.put(name, values);
 
@@ -110,7 +138,7 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setVolumeMl(0.0f);
         values.Header.setWeightG(0.0f);
         values.Header.setPrice(0.0f);
-        values.Header.setPriceCurrencySymbol(0x240000);
+        values.Header.setPriceCurrencySymbol(0x24000000);
         values.Header.setPrintTime(0);
         Settings.put(name, values);
     }
@@ -151,7 +179,7 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setVolumeMl(0.0f);
         values.Header.setWeightG(0.0f);
         values.Header.setPrice(0.0f);
-        values.Header.setPriceCurrencySymbol(0x240000);
+        values.Header.setPriceCurrencySymbol(0x24000000);
         values.Header.setPrintTime(0);
         Settings.put(name, values);
     }
@@ -192,7 +220,7 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setVolumeMl(0.0f);
         values.Header.setWeightG(0.0f);
         values.Header.setPrice(0.0f);
-        values.Header.setPriceCurrencySymbol(0x240000);
+        values.Header.setPriceCurrencySymbol(0x24000000);
         values.Header.setPrintTime(0);
         Settings.put(name, values);
     }
@@ -234,7 +262,7 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setVolumeMl(0.0f);
         values.Header.setWeightG(0.0f);
         values.Header.setPrice(0.0f);
-        values.Header.setPriceCurrencySymbol(0x240000);
+        values.Header.setPriceCurrencySymbol(0x24000000);
         values.Header.setPrintTime(0);
         Settings.put(name, values);
     }

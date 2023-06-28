@@ -3,6 +3,7 @@ package futurelink.msla.formats.anycubic.tables;
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
 import futurelink.msla.formats.MSLAOption;
+import futurelink.msla.formats.MSLAOptionContainer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,11 +11,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * "EXTRA" section representation.
  */
+@MSLAOptionContainer(className = PhotonWorkshopFileExtraTable.class)
 public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     public static final String Name = "EXTRA";
     @MSLAOption @Getter @Setter Integer BottomLiftCount = 2;
@@ -117,24 +118,5 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
                 "LiftHeight2: " + LiftHeight2 + "\n" +
                 "LiftSpeed2: " + LiftSpeed2 + "\n" +
                 "RetractSpeed1: " + RetractSpeed1 + "\n";
-    }
-
-    public HashMap<String, Class<?>> getOptions() {
-        var map = new HashMap<String, Class<?>>();
-        map.put("BottomLiftCount", Integer.class);
-        map.put("BottomLiftHeight1", Float.class);
-        map.put("BottomLiftSpeed1", Float.class);
-        map.put("BottomRetractSpeed1", Float.class);
-        map.put("BottomLiftHeight2", Float.class);
-        map.put("BottomLiftSpeed2", Float.class);
-        map.put("BottomRetractSpeed2", Float.class);
-        map.put("NormalLiftCount", Integer.class);
-        map.put("LiftHeight1", Float.class);
-        map.put("LiftSpeed1",  Float.class);
-        map.put("RetractSpeed1", Float.class);
-        map.put("RetractSpeed2", Float.class);
-        map.put("LiftHeight2",  Float.class);
-        map.put("LiftSpeed2", Float.class);
-        return map;
     }
 }

@@ -7,6 +7,7 @@ import futurelink.msla.formats.utils.Size;
 import java.io.*;
 
 public class ChituBoxDLPFile implements MSLAFile {
+    private final FileInputStream iStream;
     private int layerDataPosition = 0;
     private final ChituBoxDLPFileHeader header = new ChituBoxDLPFileHeader();
     private final ChituBoxDLPFileSliceInfo slicerInfo = new ChituBoxDLPFileSliceInfo();
@@ -17,19 +18,20 @@ public class ChituBoxDLPFile implements MSLAFile {
 
     public ChituBoxDLPFile(FileInputStream stream) throws IOException {
         var position = 0;
-        header.read(stream, position); position += header.getDataLength();
-        previews.read(stream, position); position += previews.getDataLength();
-        slicerInfo.read(stream, position); position += slicerInfo.getDataLength();
+        iStream = stream;
+        header.read(iStream, position); position += header.getDataLength();
+        previews.read(iStream, position); position += previews.getDataLength();
+        slicerInfo.read(iStream, position); position += slicerInfo.getDataLength();
 
         // Skip layer areas (don't know what's their purpose)
-        stream.skipNBytes(header.getLayerCount() * 4 + 2); position += header.getLayerCount() * 4 + 2;
-        if (header.getVersion() >= 3) slicerInfoV3.read(stream, position); position += slicerInfoV3.getDataLength();
+        iStream.skipNBytes(header.getLayerCount() * 4 + 2); position += header.getLayerCount() * 4 + 2;
+        if (header.getVersion() >= 3) slicerInfoV3.read(iStream, position); position += slicerInfoV3.getDataLength();
         layerDataPosition  = position;
 
         // Scan layer data and get layer data lengths and offsets
         // ------------------------------------------------------
         layers.setLayerCount((int) header.getLayerCount());
-        layers.read(stream, layerDataPosition);
+        layers.read(iStream, layerDataPosition);
     }
 
     private boolean hasOption(String option, Class<?> type) {
@@ -60,29 +62,19 @@ public class ChituBoxDLPFile implements MSLAFile {
     }
 
     @Override
-    public void addLayer(MSLAEncodeReader reader) throws IOException {
-
-    }
+    public void addLayer(MSLAEncodeReader reader) throws IOException {}
 
     @Override
-    public void addLayer(MSLAEncodeReader reader, float layerHeight, float exposureTime, float liftSpeed, float liftHeight) throws IOException {
-
-    }
+    public void addLayer(MSLAEncodeReader reader, float layerHeight, float exposureTime,
+                         float liftSpeed, float liftHeight) throws IOException {}
 
     @Override
-    public void readLayer(FileInputStream iStream, int layer, MSLADecodeWriter writer) throws IOException {
+    public void readLayer(int layer, MSLADecodeWriter writer) throws IOException {
         layers.decodeLayer(iStream, layer, writer);
     }
 
     @Override
-    public void read(FileInputStream iStream) throws IOException {
-
-    }
-
-    @Override
-    public void write(OutputStream stream) throws IOException {
-
-    }
+    public void write(OutputStream stream) throws IOException {}
 
     @Override
     public Size getResolution() { return header.getResolution(); }
@@ -92,12 +84,10 @@ public class ChituBoxDLPFile implements MSLAFile {
     public int getLayerCount() { return header.getLayerCount(); }
     @Override
     public boolean isValid() { return (header != null) && (slicerInfo != null); }
-
     @Override
     public void setOption(String option, Serializable value) throws IOException {
         optionMapper.setOption(option, value);
     }
-
     @Override
     public String toString() {
         return header.toString() + slicerInfo + slicerInfoV3 + previews;

@@ -4,8 +4,7 @@ import futurelink.Main;
 import futurelink.msla.formats.MSLAEncodeReader;
 import futurelink.msla.formats.MSLAFile;
 import futurelink.msla.formats.MSLAFileCodec;
-import futurelink.msla.formats.anycubic.PhotonWorkshopFile;
-import futurelink.msla.formats.anycubic.PhotonWorkshopFileDefaults;
+import futurelink.msla.formats.utils.FileFactory;
 
 import java.awt.*;
 import java.io.FileOutputStream;
@@ -22,12 +21,13 @@ public class PCBCalibration {
      * @param repetitions number of samples or intervals
      */
     public static void generateTestPattern(String machineName, String fileName, float startTime, float interval, int repetitions) throws IOException {
-        var defaults = PhotonWorkshopFileDefaults.get(machineName);
-        if (defaults == null) throw new IOException("Unknown machine name: " + machineName);
-        try (var fos = new FileOutputStream(fileName + "." + defaults.getFileExtension())) {
-            var wsFile = new PhotonWorkshopFile(defaults);
-            if (!wsFile.isValid()) throw new IOException("File was not initialized properly");
+        var defaults = FileFactory.defaults(machineName);
+        if (defaults == null) throw new IOException("Unknown machine name: '" + machineName + "'");
 
+        var wsFile = FileFactory.create(machineName);
+        if (wsFile == null) throw new IOException("File was not initialized properly!");
+
+        try (var fos = new FileOutputStream(fileName + "." + defaults.getFileExtension())) {
             // Set options
             wsFile.setOption("PerLayerOverride", 1);
             wsFile.setOption("BottomLayersCount", 1);

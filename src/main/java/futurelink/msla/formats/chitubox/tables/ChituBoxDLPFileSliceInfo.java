@@ -2,11 +2,13 @@ package futurelink.msla.formats.chitubox.tables;
 
 import futurelink.msla.formats.MSLAFileBlock;
 import futurelink.msla.formats.MSLAOption;
+import futurelink.msla.formats.MSLAOptionContainer;
 import lombok.Getter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
+@MSLAOptionContainer(className=ChituBoxDLPFileSliceInfo.class)
 public class ChituBoxDLPFileSliceInfo implements MSLAFileBlock {
     @Getter private Integer DisplayWidthLength;
     @Getter private String DisplayWidth;            // UTF-16

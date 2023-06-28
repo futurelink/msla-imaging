@@ -2,10 +2,12 @@ package futurelink.msla.formats.chitubox.tables;
 
 import futurelink.msla.formats.MSLAFileBlock;
 import futurelink.msla.formats.MSLAOption;
+import futurelink.msla.formats.MSLAOptionContainer;
 import lombok.Getter;
 
 import java.io.*;
 
+@MSLAOptionContainer(className=ChituBoxDLPFileSliceInfoV3.class)
 public class ChituBoxDLPFileSliceInfoV3 implements MSLAFileBlock {
     @Getter private Integer SoftwareNameLength;
     @MSLAOption @Getter private String SoftwareName = "mMSLA toolbox";

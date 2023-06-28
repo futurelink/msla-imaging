@@ -2,7 +2,6 @@ package futurelink.msla.formats;
 
 import futurelink.msla.formats.utils.Size;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -15,8 +14,7 @@ public interface MSLAFile {
     void addLayer(MSLAEncodeReader reader) throws IOException;
     void addLayer(MSLAEncodeReader reader, float layerHeight, float exposureTime,
                   float liftSpeed, float liftHeight) throws IOException;
-    void readLayer(FileInputStream iStream, int layer, MSLADecodeWriter writer) throws IOException;
-    void read(FileInputStream iStream) throws IOException;
+    void readLayer(int layer, MSLADecodeWriter writer) throws IOException;
     void write(OutputStream stream) throws IOException;
     Size getResolution();
     float getPixelSizeUm();

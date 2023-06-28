@@ -1,17 +1,20 @@
 package futurelink.msla.formats.chitubox.tables;
 
 import futurelink.msla.formats.MSLAFileBlock;
+import futurelink.msla.formats.MSLAOption;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class ChituBoxDLPFileHeader implements MSLAFileBlock {
     private static class Fields {
-        private final byte HEADER_SIZE = 9; // CXSW3DV2
-        private final String HEADER_VALUE = "CXSW3DV2";
+        public static final byte HEADER_SIZE = 9; // CXSW3DV2
+        public static  final String HEADER_VALUE = "CXSW3DV2";
         private final String HEADER_VALUE_GENERIC = "CXSW3D";
         private final byte DEFAULT_VERSION = 3;
 
@@ -58,5 +61,12 @@ public class ChituBoxDLPFileHeader implements MSLAFileBlock {
                 "LayerCount: " + fields.LayerCount + "\n" +
                 "Resolution: " + fields.Resolution + "\n" +
                 "Offset: " + new String(fields.Offset).trim() + "\n";
+    }
+    public HashMap<String, Class<?>> getOptions() {
+        var optionsMap = new HashMap<String, Class<?>>();
+        Arrays.stream(Fields.class.getDeclaredFields())
+                .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
+                .forEach((f) -> optionsMap.put(f.getName(), f.getType()));
+        return optionsMap;
     }
 }

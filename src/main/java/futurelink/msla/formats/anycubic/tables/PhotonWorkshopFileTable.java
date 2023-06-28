@@ -1,7 +1,12 @@
 package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.MSLAFileBlock;
+import futurelink.msla.formats.MSLAOption;
+import futurelink.msla.formats.MSLAOptionContainer;
 import lombok.Getter;
+
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Common class for section representation.
@@ -9,6 +14,7 @@ import lombok.Getter;
 abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {
     public static final int MarkLength = 12;
     public static final float DefaultLiftHeight = 100;
+
     @Getter protected String Name;
     @Getter protected int TableLength;
     protected byte versionMajor;
@@ -27,4 +33,16 @@ abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {
 
     @Override
     public int getDataLength() { return calculateTableLength(versionMajor, versionMinor) + MarkLength + 4; }
+
+    public HashMap<String, Class<?>> getOptions() {
+        var a = getClass().getAnnotation(MSLAOptionContainer.class);
+        if (a != null) {
+            var optionsMap = new HashMap<String, Class<?>>();
+            Arrays.stream(a.className().getDeclaredFields())
+                    .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
+                    .forEach((f) -> optionsMap.put(f.getName(), f.getType()));
+            return optionsMap;
+        }
+        return null;
+    }
 }

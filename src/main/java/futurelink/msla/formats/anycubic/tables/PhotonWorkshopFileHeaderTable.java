@@ -2,7 +2,9 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+import futurelink.msla.formats.MSLAFileBlockFields;
 import futurelink.msla.formats.MSLAOption;
+import futurelink.msla.formats.MSLAOptionContainer;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,14 +14,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * "HEADER" section representation.
  */
+@MSLAOptionContainer(className=PhotonWorkshopFileHeaderTable.Fields.class)
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     public static final String Name = "HEADER";
-    public static class Fields {
+    public static class Fields implements MSLAFileBlockFields {
         @Getter private Float PixelSizeUm;
         @MSLAOption @Setter @Getter private Float LayerHeight;
         @MSLAOption @Setter @Getter private Float ExposureTime;
@@ -38,23 +40,17 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         @MSLAOption @Setter @Getter private Integer PerLayerOverride; // boolean (80 - true, 00 - false)
         @MSLAOption @Setter @Getter private Integer PrintTime;
 
-        /*
-            Version 2.4 fields
-         */
+        /* Version 2.4 fields */
         @MSLAOption @Setter @Getter private Integer TransitionLayerCount;
         @MSLAOption @Setter @Getter private Integer TransitionLayerType;
         @MSLAOption @Setter @Getter private Integer AdvancedMode; /// 0 = Basic mode | 1 = Advanced mode which allows TSMC
 
-        /*
-            Version 2.5 fields
-         */
+        /* Version 2.5 fields */
         @MSLAOption @Setter @Getter private Short Grey;
         @MSLAOption @Setter @Getter private Short BlurLevel;
         @MSLAOption @Setter @Getter private Integer ResinType;
 
-        /*
-            Version 2.6 fields
-         */
+        /* Version 2.6 fields */
         @MSLAOption @Getter @Setter private int IntelligentMode; // boolean, when true, normal exposure time will be auto set, use false for traditional way
 
         public Fields(Float PixelSizeUm, Size Resolution) {
@@ -62,31 +58,31 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
             this.Resolution = new Size(Resolution);
         }
 
-        public static Fields copyOf(Fields source) {
-            var f = new Fields(source.PixelSizeUm, source.Resolution);
-            f.LayerHeight = source.LayerHeight;
-            f.ExposureTime = source.ExposureTime;
-            f.WaitTimeBeforeCure1 = source.WaitTimeBeforeCure1;
-            f.BottomExposureTime = source.BottomExposureTime;
-            f.BottomLayersCount = source.BottomLayersCount;
-            f.LiftHeight = source.LiftHeight;
-            f.LiftSpeed = source.LiftSpeed;
-            f.RetractSpeed = source.RetractSpeed;
-            f.VolumeMl = source.VolumeMl;
-            f.AntiAliasing = source.AntiAliasing;
-            f.WeightG = source.WeightG;
-            f.Price = source.Price;
-            f.PriceCurrencySymbol = source.PriceCurrencySymbol;
-            f.PerLayerOverride = source.PerLayerOverride;
-            f.PrintTime = source.PrintTime;
-            f.TransitionLayerCount = source.TransitionLayerCount;
-            f.TransitionLayerType = source.TransitionLayerType;
-            f.AdvancedMode = source.AdvancedMode;
-            f.Grey = source.Grey;
-            f.BlurLevel = source.BlurLevel;
-            f.ResinType = source.ResinType;
-            f.IntelligentMode = source.IntelligentMode;
-            return f;
+        public Fields(Fields source) {
+            PixelSizeUm = source.PixelSizeUm;
+            Resolution = new Size(source.Resolution);
+            LayerHeight = source.LayerHeight;
+            ExposureTime = source.ExposureTime;
+            WaitTimeBeforeCure1 = source.WaitTimeBeforeCure1;
+            BottomExposureTime = source.BottomExposureTime;
+            BottomLayersCount = source.BottomLayersCount;
+            LiftHeight = source.LiftHeight;
+            LiftSpeed = source.LiftSpeed;
+            RetractSpeed = source.RetractSpeed;
+            VolumeMl = source.VolumeMl;
+            AntiAliasing = source.AntiAliasing;
+            WeightG = source.WeightG;
+            Price = source.Price;
+            PriceCurrencySymbol = source.PriceCurrencySymbol;
+            PerLayerOverride = source.PerLayerOverride;
+            PrintTime = source.PrintTime;
+            TransitionLayerCount = source.TransitionLayerCount;
+            TransitionLayerType = source.TransitionLayerType;
+            AdvancedMode = source.AdvancedMode;
+            Grey = source.Grey;
+            BlurLevel = source.BlurLevel;
+            ResinType = source.ResinType;
+            IntelligentMode = source.IntelligentMode;
         }
     }
 
@@ -97,9 +93,9 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         fields = new Fields(0.0f, new Size(0, 0));
     }
 
-    public PhotonWorkshopFileHeaderTable(Fields defaults, byte versionMajor, byte versionMinor) {
+    public PhotonWorkshopFileHeaderTable(MSLAFileBlockFields defaults, byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        fields = Fields.copyOf(defaults);
+        fields = new Fields((Fields) defaults);
     }
 
     @Override
@@ -234,38 +230,4 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
 
         return b.toString();
     }
-
-    public HashMap<String, Class<?>> getOptions() {
-        var optionsMap = new HashMap<String, Class<?>>();
-        optionsMap.put("LayerHeight", Float.class);
-        optionsMap.put("ExposureTime", Float.class);
-        optionsMap.put("WaitTimeBeforeCure1", Float.class);
-        optionsMap.put("BottomExposureTime", Float.class);
-        optionsMap.put("BottomLayersCount", Integer.class);
-        optionsMap.put("LiftHeight", Float.class);
-        optionsMap.put("LiftSpeed", Float.class);
-        optionsMap.put("RetractSpeed", Float.class);
-        optionsMap.put("VolumeMl", Float.class);
-        optionsMap.put("AntiAliasing", Float.class);
-        optionsMap.put("WeightG", Float.class);
-        optionsMap.put("Price", Float.class);
-        optionsMap.put("PriceCurrencySymbol", String.class);
-        optionsMap.put("PerLayerOverride", Integer.class);
-        optionsMap.put("PrintTime", Float.class);
-
-        /* Version 2.4 fields */
-        optionsMap.put("TransitionLayerCount", Integer.class);
-        optionsMap.put("TransitionLayerType", Integer.class);
-        optionsMap.put("AdvancedMode", Integer.class);
-
-        /* Version 2.5 fields */
-        optionsMap.put("Grey", Short.class);
-        optionsMap.put("BlurLevel", Short.class);
-        optionsMap.put("ResinType", Integer.class);
-
-        /* Version 2.6 fields */
-        optionsMap.put("IntelligentMode", Integer.class);
-        return optionsMap;
-    }
-
 }

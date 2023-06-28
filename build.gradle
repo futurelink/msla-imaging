@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 }
 
 group 'futurelink'
@@ -9,11 +10,17 @@ repositories {
     mavenCentral()
 }
 
+javafx {
+    version = "20"
+    modules = [ 'javafx.controls' ]
+}
+
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
     implementation("com.google.guava:guava:32.0.1-jre")
+    implementation 'org.apache.xmlgraphics:batik-all:1.16'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.28'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
