@@ -6,6 +6,8 @@ import java.io.IOException;
 
 public interface MSLADecodeWriter {
 
+    enum WriteDirection { WRITE_ROW, WRITE_COLUMN };
+
     /**
      * Should be implemented to return MSLAFileCodec object.
      * @return codec to be used
@@ -23,9 +25,9 @@ public interface MSLADecodeWriter {
      * @param color pixel color
      * @param position position in a sequence of pixels
      * @param length number of pixels of the same color
-     * @param vertical specifies if stripes should be aligned vertically
+     * @param direction specifies if stripes should be aligned vertically
      */
-    void stripe(int layerNumber, int color, int position, int length, boolean vertical);
+    void stripe(int layerNumber, int color, int position, int length, WriteDirection direction);
 
     /**
      * Method is being called when decoding process starts.

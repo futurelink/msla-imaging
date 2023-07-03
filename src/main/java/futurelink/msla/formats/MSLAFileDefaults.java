@@ -1,6 +1,7 @@
 package futurelink.msla.formats;
 
 public interface MSLAFileDefaults {
+    String getName();
     String getFileExtension();
     float getPixelSizeUm();
     Integer getOptionInt(String name);

@@ -31,16 +31,18 @@ public class ImageWriter implements MSLADecodeWriter {
         return file.getCodec();
     }
     @Override public Size getLayerResolution() { return file.getResolution(); }
-    @Override public void stripe(int layerNumber, int color, int position, int length, boolean isVertical) {
+    @Override public void stripe(int layerNumber, int color, int position, int length, WriteDirection direction) {
         img.get(layerNumber).getGraphics().setColor(new Color(color));
-        if (isVertical) {
+        if (direction == WriteDirection.WRITE_COLUMN) {
             var y = position / file.getResolution().getWidth();
             var x = position % file.getResolution().getWidth();
-            img.get(layerNumber).getGraphics().drawLine(x, y, x, y + length);
+            img.get(layerNumber).getGraphics().drawLine(
+                    x, file.getResolution().getHeight() - y, x,
+                    file.getResolution().getHeight() - y - length);
         } else {
             var y = position / file.getResolution().getWidth();
             var x = position % file.getResolution().getWidth();
-            img.get(layerNumber).getGraphics().drawLine(x, y, x + length, y);
+            img.get(layerNumber).getGraphics().drawLine(x, y, x + length - 1, y);
         }
     }
 

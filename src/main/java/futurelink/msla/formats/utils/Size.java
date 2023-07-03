@@ -14,6 +14,6 @@ public class Size {
 
     @Override
     public String toString() {
-        return "Size { " + width + " x " + height + " }";
+        return width + " x " + height;
     }
 }

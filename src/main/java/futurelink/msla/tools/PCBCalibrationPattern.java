@@ -4,6 +4,7 @@ import futurelink.msla.formats.utils.Size;
 import lombok.Setter;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -57,25 +58,34 @@ public class PCBCalibrationPattern {
         this.pixelSize = pixelSize;
     }
 
-    public final BufferedImage generate(int height, int repetition, int repetitions) {
+    public final BufferedImage generate(int size, int repetition, int repetitions) {
         var image = new BufferedImage(resolution.getWidth(), resolution.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
         var g = image.getGraphics();
 
+        boolean vertical = resolution.getWidth() < resolution.getHeight();
+
         // Draw top one third of pattern 0.1 + 0.1 + 0.2 + 0.2 + 0.3mm = 0.9mm total
         var distancePX = 120;
-        var widthPX = distancePX * repetitions;
-        var posX = resolution.getWidth() / 2 - widthPX / 2;
-        var posY = resolution.getHeight() / 2 - height / 2;
-        var fragmentHeight = height / 3;
+        var sizePX = distancePX * repetitions;
+        int posX, posY;
+        if (vertical) {
+            posX = resolution.getWidth() / 2 - size / 2;
+            posY = resolution.getHeight() / 2 - sizePX / 2;
+        } else {
+            posX = resolution.getWidth() / 2 - sizePX / 2;
+            posY = resolution.getHeight() / 2 - size / 2;
+        }
+        int fragmentSize = size / 3;
         for (int i = 0; i < repetitions - repetition; i++) {
             // Draw lines
             g.setColor(Color.WHITE);
             for (int p = 0; p < 3; p++) {
                 var offset = i * distancePX;
                 for (int j = 0; j < pattern[p].length; j++) {
-                    var w = pattern[p][j] / pixelSize * 1000;
+                    var w = (int) (pattern[p][j] / pixelSize * 1000);
                     if ((j % 2) == 0) { // Draw road
-                        g.fillRect(offset + posX, posY + fragmentHeight * p, (int) Math.floor(w), fragmentHeight);
+                        if (vertical) g.fillRect(posX + fragmentSize * p, posY + offset, fragmentSize, w);
+                        else g.fillRect(offset + posX, posY + fragmentSize * p, w, fragmentSize);
                     }
                     offset += w;
                 }
@@ -84,8 +94,14 @@ public class PCBCalibrationPattern {
             // Draw circles
             for (int p = 0; p < circles.length; p++) {
                 var ro = (int) Math.floor(circles[p][0] * 500 / pixelSize); // A circle radius
-                var x = posX + i * distancePX + 80 - ro;
-                var y = posY + p * 50 - ro + 100;
+                int x, y;
+                if (vertical) {
+                    y = posY + i * distancePX + 80 - ro;
+                    x = posX + p * 50 - ro + 100;
+                } else {
+                    x = posX + i * distancePX + 80 - ro;
+                    y = posY + p * 50 - ro + 100;
+                }
                 g.setColor(Color.WHITE);
                 g.fillOval(x, y, ro * 2, ro * 2);
 
@@ -96,7 +112,11 @@ public class PCBCalibrationPattern {
             // Add text
             g.setColor(Color.WHITE);
             g.setFont(g.getFont().deriveFont(40.0f));
-            g.drawString((startTime + interval * (repetitions - i - 1) )+ "s", posX + i * distancePX, posY + height + 40);
+            if (vertical) {
+                g.drawString((startTime + interval * (repetitions - i - 1)) + "s", posX + size + 10, posY + i * distancePX + 40);
+            } else {
+                g.drawString((startTime + interval * (repetitions - i - 1)) + "s", posX + i * distancePX, posY + size + 40);
+            }
         }
 
         return image;

@@ -62,6 +62,8 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
             Padding10 = source.Padding10; Padding11 = source.Padding11; Padding12 = source.Padding12;
             Padding13 = source.Padding13;
         }
+        //@Override
+        //public int getDataLength() { return 0; }
     }
 
     public static final String Name = "MACHINE";

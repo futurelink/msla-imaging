@@ -1,10 +1,10 @@
 package futurelink.msla.tools;
 
-import futurelink.Main;
 import futurelink.msla.formats.MSLAEncodeReader;
 import futurelink.msla.formats.MSLAFile;
 import futurelink.msla.formats.MSLAFileCodec;
 import futurelink.msla.formats.utils.FileFactory;
+import futurelink.msla.formats.utils.Size;
 
 import java.awt.*;
 import java.io.FileOutputStream;
@@ -29,17 +29,20 @@ public class PCBCalibration {
 
         try (var fos = new FileOutputStream(fileName + "." + defaults.getFileExtension())) {
             // Set options
-            wsFile.setOption("PerLayerOverride", 1);
             wsFile.setOption("BottomLayersCount", 1);
             wsFile.setOption("BottomExposureTime", startTime);
             wsFile.setOption("ExposureTime", interval);
             wsFile.setOption("LiftHeight", 0.5f);
-            wsFile.setOption("TransitionLayerCount", 0);
 
-            wsFile.setOption("LiftHeight1", 0.5f);
-            wsFile.setOption("LiftHeight2", 0.5f);
-            wsFile.setOption("BottomLiftHeight1", 0.5f);
-            wsFile.setOption("BottomLiftHeight2", 0.5f);
+            //wsFile.setOption("PerLayerOverride", 0);
+            //wsFile.setOption("TransitionLayerCount", 0);
+
+            //wsFile.setOption("LiftHeight", 0.5f);
+            //wsFile.setOption("BottomLiftHeight", 0.5f);
+            //wsFile.setOption("LiftHeight1", 0.5f);
+            //wsFile.setOption("LiftHeight2", 0.5f);
+            //wsFile.setOption("BottomLiftHeight1", 0.5f);
+            //wsFile.setOption("BottomLiftHeight2", 0.5f);
 
             // Create preview image
             createPreview(wsFile);
@@ -52,10 +55,12 @@ public class PCBCalibration {
                 @Override public MSLAFileCodec getCodec() {
                     return wsFile.getCodec();
                 }
-                @Override public InputStream read(int layerNumber) throws IOException {
-                    var image = pattern.generate(wsFile.getResolution().getWidth() / 3, layerNumber, repetitions);
-                    var raster = image.getRaster();
-                    return new Main.RasterBytesInputStream(raster);
+                @Override public Size getResolution() { return wsFile.getResolution(); }
+                @Override public InputStream read(int layerNumber, MSLAEncodeReader.ReadDirection direction) {
+                    return new BufferedImageInputStream(
+                            pattern.generate(wsFile.getResolution().getWidth() / 3, layerNumber, repetitions),
+                            direction
+                    );
                 }
                 @Override public void onStart(int layerNumber) {}
                 @Override public void onFinish(int layerNumber, int pixels, int length) {

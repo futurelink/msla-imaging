@@ -57,7 +57,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         new Thread(() -> {
             synchronized(this) { encoders++; }
             try {
-                var input = reader.read(number);
+                var input = reader.read(number, MSLAEncodeReader.ReadDirection.READ_ROW);
                 var iSize = input.available();
                 var output = new ByteArrayOutputStream();
                 var oSize = reader.getCodec().Encode(input, output);

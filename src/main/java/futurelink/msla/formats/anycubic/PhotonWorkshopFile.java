@@ -16,7 +16,7 @@ import lombok.Getter;
 public class PhotonWorkshopFile implements MSLAFile {
     private FileInputStream iStream;
     @Getter private MSLAFileCodec codec;
-    private final PhotonWorkshopFileDescriptor descriptor;
+    private PhotonWorkshopFileDescriptor descriptor;
     PhotonWorkshopFileHeaderTable header;
     private PhotonWorkshopFilePreviewTable preview;
     private PhotonWorkshopFileLayerDefTable layerDef;
@@ -46,9 +46,8 @@ public class PhotonWorkshopFile implements MSLAFile {
 
     public PhotonWorkshopFile(FileInputStream stream) throws IOException {
         this.iStream = stream;
+        this.readTables(iStream);
         this.optionMapper = new PhotonWorkshopFileOptionMapper(this);
-        this.descriptor = PhotonWorkshopFileDescriptor.read(new LittleEndianDataInputStream(iStream));
-        readTables(iStream);
         initCodec();
     }
 
@@ -100,6 +99,8 @@ public class PhotonWorkshopFile implements MSLAFile {
     }
 
     private void readTables(FileInputStream stream) throws IOException {
+        descriptor = PhotonWorkshopFileDescriptor.read(new LittleEndianDataInputStream(iStream));
+
         if (descriptor.getFields().getHeaderAddress() > 0) {
             header = new PhotonWorkshopFileHeaderTable(descriptor.getVersionMajor(), descriptor.getVersionMinor());
             header.read(stream, descriptor.getFields().getHeaderAddress());

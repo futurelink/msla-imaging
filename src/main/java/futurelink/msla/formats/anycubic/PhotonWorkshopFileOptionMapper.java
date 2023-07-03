@@ -27,14 +27,16 @@ class PhotonWorkshopFileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    protected boolean hasOption(String option, Serializable aClass) {
+    protected boolean hasOption(String option, Class<? extends Serializable> aClass) {
         if (!this.optionsMap.containsKey(option)) return false;
-        if (aClass != null) return (this.optionsMap.get(option).aClass.equals(aClass));
-        return true;
+        //if (aClass != null) return (this.optionsMap.get(option).aClass.equals(aClass));
+        return this.optionsMap.get(option).aClass.isAssignableFrom(aClass);
+        //return aClass.isAssignableFrom(this.optionsMap.get(option).aClass);
+        //return true;
     }
 
     @Override
-    protected boolean hasLayerOption(String option, Serializable aClass) {
+    protected boolean hasLayerOption(String option, Class<? extends Serializable> aClass) {
         return false;
     }
 

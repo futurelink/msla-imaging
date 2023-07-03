@@ -4,18 +4,17 @@ import futurelink.msla.formats.MSLAFile;
 import futurelink.msla.formats.MSLAFileDefaults;
 import futurelink.msla.formats.MSLAFileFactory;
 import futurelink.msla.formats.anycubic.PhotonWorkshopFileFactory;
-import futurelink.msla.formats.chitubox.ChituboxDLPFileFactory;
+import futurelink.msla.formats.creality.CXDLPFileFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Optional;
 
 public class FileFactory {
     private static final ArrayList<MSLAFileFactory> supportedFiles = new ArrayList<>();
     static {
         supportedFiles.add(new PhotonWorkshopFileFactory());
-        supportedFiles.add(new ChituboxDLPFileFactory());
+        supportedFiles.add(new CXDLPFileFactory());
     }
 
     public static MSLAFileDefaults defaults(String machineName) {

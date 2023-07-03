@@ -15,12 +15,30 @@ import java.util.Set;
  */
 public class PhotonWorkshopFileDefaults {
     private static class Values implements MSLAFileDefaults {
-        @Getter String FileExtension;
-        @Getter byte VersionMajor;
-        @Getter byte VersionMinor;
+        @Getter private String Name;
+        @Getter private String FileExtension;
+        @Getter private byte VersionMajor;
+        @Getter private byte VersionMinor;
         @Getter PhotonWorkshopFileMachineTable.Fields Machine;
         @Getter PhotonWorkshopFileHeaderTable.Fields Header;
 
+        Values(String name, String fileExtension, byte versionMajor, byte versionMinor,  Float PixelSizeUm, Size Resolution) {
+            Name = name;
+            FileExtension = fileExtension;
+            VersionMajor = versionMajor;
+            VersionMinor = versionMinor;
+
+            Machine = new PhotonWorkshopFileMachineTable.Fields();
+            Machine.setMachineName(name);
+            Header = new PhotonWorkshopFileHeaderTable.Fields(PixelSizeUm, Resolution);
+            Header.setVolumeMl(0.0f);
+            Header.setWeightG(0.0f);
+            Header.setPrice(0.0f);
+            Header.setPriceCurrencySymbol(0x24000000);
+            Header.setPrintTime(0);
+            Header.setPriceCurrencySymbol(36);
+            Header.setPerLayerOverride(0);
+        }
         @Override
         public float getPixelSizeUm() { return Header.getPixelSizeUm(); }
         @Override
@@ -47,26 +65,17 @@ public class PhotonWorkshopFileDefaults {
             return null;
         }
     }
-
     public static Set<String> getSupported() {
         return Settings.keySet();
     }
-
     public static Values get(String machineName) {
         return Settings.get(machineName);
     }
 
     private static final HashMap<String, Values> Settings = new HashMap<>();
     static {
-        var name = "Anycubic Photon Mono X 6K";
-        var values = new Values();
-        values.FileExtension = "pwmb";
-        values.VersionMajor = 0x02;
-        values.VersionMinor = 0x04;
-        values.Machine = new PhotonWorkshopFileMachineTable.Fields();
-        values.Header = new PhotonWorkshopFileHeaderTable.Fields(34.399998f, new Size(5760,3600));
-
-        values.Machine.setMachineName(name);
+        var values = new Values("Anycubic Photon Mono X 6K", "pwmb", (byte) 0x02, (byte )0x04,
+                34.399998f, new Size(5760,3600));
         values.Machine.setLayerImageFormat("pw0Img");
         values.Machine.setMaxAntialiasingLevel(16);
         values.Machine.setPropertyFields(7);
@@ -86,32 +95,18 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setLiftSpeed(2.0f);
         values.Header.setRetractSpeed(2.0f);
         values.Header.setAntiAliasing(2);
-        values.Header.setPerLayerOverride(0);
         values.Header.setTransitionLayerCount(10);
         values.Header.setTransitionLayerType(0);
         values.Header.setAdvancedMode(1);
-        values.Header.setVolumeMl(0.0f);
-        values.Header.setWeightG(0.0f);
-        values.Header.setPrice(0.0f);
-        values.Header.setPriceCurrencySymbol(0x24000000);
-        values.Header.setPrintTime(0);
-        Settings.put(name, values);
+        Settings.put(values.getName(), values);
 
-        var name2 = "Anycubic Photon M3 Plus";
-        Settings.put(name2, values);
+        Settings.put("Anycubic Photon M3 Plus", values);
     }
 
     static {
-        var name = "Anycubic Photon Mono 4K";
-        var values = new Values();
+        var values = new Values("Anycubic Photon Mono 4K", "pwma", (byte) 0x02, (byte )0x04,
+                35.0f, new Size(3840, 2400));
 
-        values.FileExtension = "pwma";
-        values.VersionMajor = 0x02;
-        values.VersionMinor = 0x04;
-        values.Machine = new PhotonWorkshopFileMachineTable.Fields();
-        values.Header = new PhotonWorkshopFileHeaderTable.Fields(35.0f, new Size(3840, 2400));
-
-        values.Machine.setMachineName(name);
         values.Machine.setLayerImageFormat("pw0Img");
         values.Machine.setMaxAntialiasingLevel(16);
         values.Machine.setPropertyFields(7);
@@ -130,29 +125,16 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setLiftSpeed(2.0f);
         values.Header.setRetractSpeed(2.0f);
         values.Header.setAntiAliasing(1);
-        values.Header.setPriceCurrencySymbol(36);
-        values.Header.setPerLayerOverride(0);
         values.Header.setTransitionLayerCount(0);
         values.Header.setTransitionLayerType(0);
         values.Header.setAdvancedMode(1);
-        values.Header.setVolumeMl(0.0f);
-        values.Header.setWeightG(0.0f);
-        values.Header.setPrice(0.0f);
-        values.Header.setPriceCurrencySymbol(0x24000000);
-        values.Header.setPrintTime(0);
-        Settings.put(name, values);
+        Settings.put(values.getName(), values);
     }
 
     static {
-        var name = "Anycubic Photon Mono X";
-        var values = new Values();
-        values.FileExtension = "pwmx";
-        values.VersionMajor = 0x02;
-        values.VersionMinor = 0x04;
-        values.Machine = new PhotonWorkshopFileMachineTable.Fields();
-        values.Header = new PhotonWorkshopFileHeaderTable.Fields(50.0f, new Size(3840, 2400));
+        var values = new Values("Anycubic Photon Mono X", "pwmx", (byte) 0x02, (byte )0x04,
+                50.0f, new Size(3840, 2400));
 
-        values.Machine.setMachineName("Anycubic Photon Mono X");
         values.Machine.setLayerImageFormat("pw0Img");
         values.Machine.setMaxAntialiasingLevel(16);
         values.Machine.setPropertyFields(7);
@@ -171,29 +153,16 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setLiftSpeed(1.0f);
         values.Header.setRetractSpeed(1.5f);
         values.Header.setAntiAliasing(1);
-        values.Header.setPriceCurrencySymbol(36);
-        values.Header.setPerLayerOverride(0);
         values.Header.setTransitionLayerCount(10);
         values.Header.setTransitionLayerType(0);
         values.Header.setAdvancedMode(1);
-        values.Header.setVolumeMl(0.0f);
-        values.Header.setWeightG(0.0f);
-        values.Header.setPrice(0.0f);
-        values.Header.setPriceCurrencySymbol(0x24000000);
-        values.Header.setPrintTime(0);
-        Settings.put(name, values);
+        Settings.put(values.getName(), values);
     }
 
     static {
-        var name = "Anycubic Photon M3";
-        var values = new Values();
-        values.FileExtension = "pm3";
-        values.VersionMajor = 0x02;
-        values.VersionMinor = 0x04;
-        values.Machine = new PhotonWorkshopFileMachineTable.Fields();
-        values.Header = new PhotonWorkshopFileHeaderTable.Fields(40.0f, new Size(4096, 2560));
+        var values = new Values("Anycubic Photon M3", "pm3", (byte) 0x02, (byte )0x04,
+                40.0f, new Size(4096, 2560));
 
-        values.Machine.setMachineName(name);
         values.Machine.setLayerImageFormat("pw0Img");
         values.Machine.setMaxAntialiasingLevel(16);
         values.Machine.setPropertyFields(7);
@@ -212,29 +181,16 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setLiftSpeed(3.0f);
         values.Header.setRetractSpeed(4.0f);
         values.Header.setAntiAliasing(1);
-        values.Header.setPriceCurrencySymbol(36);
-        values.Header.setPerLayerOverride(0);
         values.Header.setTransitionLayerCount(10);
         values.Header.setTransitionLayerType(0);
         values.Header.setAdvancedMode(0);
-        values.Header.setVolumeMl(0.0f);
-        values.Header.setWeightG(0.0f);
-        values.Header.setPrice(0.0f);
-        values.Header.setPriceCurrencySymbol(0x24000000);
-        values.Header.setPrintTime(0);
-        Settings.put(name, values);
+        Settings.put(values.getName(), values);
     }
 
     static {
-        var name = "Anycubic Photon M3 Max";
-        var values = new Values();
-        values.FileExtension = "pm3m";
-        values.VersionMajor = 0x02;
-        values.VersionMinor = 0x04;
-        values.Machine = new PhotonWorkshopFileMachineTable.Fields();
-        values.Header = new PhotonWorkshopFileHeaderTable.Fields(45.999996f, new Size(6480, 3600));
+        var values = new Values("Anycubic Photon M3 Max", "pm3m", (byte) 0x02, (byte )0x04,
+                45.999996f, new Size(6480, 3600));
 
-        values.Machine.setMachineName(name);
         values.Machine.setLayerImageFormat("pw0Img");
         values.Machine.setMaxAntialiasingLevel(16);
         values.Machine.setPropertyFields(7);
@@ -254,16 +210,9 @@ public class PhotonWorkshopFileDefaults {
         values.Header.setLiftSpeed(4.0f);
         values.Header.setRetractSpeed(4.0f);
         values.Header.setAntiAliasing(1);
-        values.Header.setPriceCurrencySymbol(36);
-        values.Header.setPerLayerOverride(0);
         values.Header.setTransitionLayerCount(10);
         values.Header.setTransitionLayerType(0);
         values.Header.setAdvancedMode(0);
-        values.Header.setVolumeMl(0.0f);
-        values.Header.setWeightG(0.0f);
-        values.Header.setPrice(0.0f);
-        values.Header.setPriceCurrencySymbol(0x24000000);
-        values.Header.setPrintTime(0);
-        Settings.put(name, values);
+        Settings.put(values.getName(), values);
     }
 }

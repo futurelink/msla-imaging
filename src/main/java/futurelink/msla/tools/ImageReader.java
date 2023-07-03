@@ -1,9 +1,9 @@
 package futurelink.msla.tools;
 
-import futurelink.Main;
 import futurelink.msla.formats.MSLAEncodeReader;
 import futurelink.msla.formats.MSLAFile;
 import futurelink.msla.formats.MSLAFileCodec;
+import futurelink.msla.formats.utils.Size;
 
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
@@ -22,7 +22,8 @@ public class ImageReader implements MSLAEncodeReader {
     @Override public MSLAFileCodec getCodec() {
         return file.getCodec();
     }
-    @Override public InputStream read(int layerNumber) throws IOException {
+    @Override public Size getResolution() { return file.getResolution(); }
+    @Override public InputStream read(int layerNumber, MSLAEncodeReader.ReadDirection direction) throws IOException {
         var w = file.getResolution().getWidth();
         var h = file.getResolution().getHeight();
         var outImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
@@ -30,7 +31,7 @@ public class ImageReader implements MSLAEncodeReader {
                 (w - image.getWidth()) / 2,
                 (h - image.getHeight()) / 2,
                 null);
-        return new Main.RasterBytesInputStream(outImage.getRaster());
+        return new BufferedImageInputStream(outImage, direction);
     }
     @Override public void onStart(int layerNumber) {
         System.out.print("Encoding layer " + layerNumber + "... ");
