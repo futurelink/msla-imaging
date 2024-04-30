@@ -2,7 +2,8 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
-import futurelink.msla.formats.MSLAPreview;
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.MSLAPreview;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
@@ -41,11 +42,11 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable impl
         Image = new BufferedImage(getResolution().getWidth(), getResolution().getHeight(), BufferedImage.TYPE_USHORT_GRAY);
     }
 
-    public void updateImageData() throws IOException{
+    public void updateImageData() throws MSLAException {
         var buffer = getImage().getData().getDataBuffer();
         var size = buffer.getSize() * 2;
         if (getDataSize() != size)
-            throw new IOException("Preview size " + size + " does not match resolution size " + getDataSize());
+            throw new MSLAException("Preview size " + size + " does not match resolution size " + getDataSize());
 
         ImageData = new byte[size];
         for (int i = 0; i < size; i+=2) {

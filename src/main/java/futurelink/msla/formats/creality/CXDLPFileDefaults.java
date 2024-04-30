@@ -1,7 +1,7 @@
 package futurelink.msla.formats.creality;
 
-import futurelink.msla.formats.MSLAFileBlockFields;
-import futurelink.msla.formats.MSLAFileDefaults;
+import futurelink.msla.formats.iface.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.creality.tables.CXDLPFileHeader;
 import futurelink.msla.formats.creality.tables.CXDLPFileSliceInfo;
 import futurelink.msla.formats.creality.tables.CXDLPFileSliceInfoV3;

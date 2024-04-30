@@ -2,6 +2,7 @@ package futurelink.msla.formats.anycubic;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileTable;
 import lombok.Getter;
 import lombok.Setter;
@@ -127,11 +128,12 @@ public class PhotonWorkshopFileDescriptor {
         stream.flush();
     }
 
-    public static PhotonWorkshopFileDescriptor read(LittleEndianDataInputStream stream) throws IOException {
+    public static PhotonWorkshopFileDescriptor read(LittleEndianDataInputStream stream)
+            throws IOException, MSLAException {
         byte[] markPattern = Arrays.copyOf(PhotonWorkshopFileDescriptor.Mark.getBytes(), PhotonWorkshopFileTable.MarkLength);
         byte[] mark = stream.readNBytes(PhotonWorkshopFileTable.MarkLength);
         if (!Arrays.equals(mark, markPattern))
-            throw new IOException("Not a Photon Workshop file : " + Arrays.toString(mark) + " not equal to " +
+            throw new MSLAException("Not a Photon Workshop file : " + Arrays.toString(mark) + " not equal to " +
                     Arrays.toString(markPattern));
 
         // Read version
@@ -141,7 +143,7 @@ public class PhotonWorkshopFileDescriptor {
         stream.readByte(); // Skip a byte
         if ((PhotonWorkshopFileDescriptor.versions.get(versionMajor) == null) ||
                 (PhotonWorkshopFileDescriptor.versions.get(versionMajor).get(versionMinor) == null)) {
-            throw new IOException("Unknown file version: " + versionMajor + "." + versionMinor);
+            throw new MSLAException("Unknown file version: " + versionMajor + "." + versionMinor);
         }
 
         var descriptor = new PhotonWorkshopFileDescriptor(versionMajor, versionMinor);

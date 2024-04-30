@@ -1,8 +1,8 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.MSLAFileBlock;
-import futurelink.msla.formats.MSLAOption;
-import futurelink.msla.formats.MSLAOptionContainer;
+import futurelink.msla.formats.iface.MSLAFileBlock;
+import futurelink.msla.formats.iface.MSLAOption;
+import futurelink.msla.formats.iface.MSLAOptionContainer;
 
 import java.util.Arrays;
 import java.util.HashMap;

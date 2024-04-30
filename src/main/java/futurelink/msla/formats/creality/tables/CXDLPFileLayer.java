@@ -1,6 +1,6 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.MSLAEncodeReader;
+import futurelink.msla.formats.iface.MSLALayerEncodeReader;
 import futurelink.msla.tools.BufferedImageInputStream;
 import lombok.Getter;
 
@@ -9,11 +9,13 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Objects;
 
+@Getter
 public class CXDLPFileLayer {
-    static class LayerLine {
+    @Getter
+    public static class LayerLine {
         static public final byte CoordinateCount = 5;
-        @Getter private byte[] Coordinates = new byte[CoordinateCount];
-        @Getter private byte Gray;
+        private final byte[] Coordinates = new byte[CoordinateCount];
+        private byte Gray;
 
         public short getStartY() {
             var c1 = Byte.toUnsignedInt(Coordinates[0]) << 8;
@@ -87,13 +89,13 @@ public class CXDLPFileLayer {
     }
 
     // Used to position in a file when read
-    @Getter Integer DataOffset = 0;
-    @Getter Integer DataLength = 0;
+    Integer DataOffset = 0;
+    Integer DataLength = 0;
 
     // Layer data
-    @Getter Integer LayerArea = 0;
-    @Getter Integer LineCount = 0;
-    @Getter private LayerLine[] Lines = new LayerLine[0];
+    Integer LayerArea = 0;
+    Integer LineCount = 0;
+    private LayerLine[] Lines = new LayerLine[0];
 
     private void addLine(LayerLine line) {
         Lines = Arrays.copyOf(Lines, LineCount+1);
@@ -129,7 +131,7 @@ public class CXDLPFileLayer {
     }
 
     public CXDLPFileLayer(BufferedImage img) throws IOException {
-        var st = new BufferedImageInputStream(img, MSLAEncodeReader.ReadDirection.READ_COLUMN);
+        var st = new BufferedImageInputStream(img, MSLALayerEncodeReader.ReadDirection.READ_COLUMN);
         readStream(img.getWidth(), img.getHeight(), st);
     }
 

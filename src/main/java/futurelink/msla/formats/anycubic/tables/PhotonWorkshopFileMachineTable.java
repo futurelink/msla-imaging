@@ -2,7 +2,8 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
-import futurelink.msla.formats.MSLAFileBlockFields;
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -93,13 +94,13 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public void read(FileInputStream stream, int position) throws IOException {
+    public void read(FileInputStream stream, int position) throws IOException, MSLAException {
         var fc = stream.getChannel(); fc.position(position);
         var dis = new LittleEndianDataInputStream(stream);
         int dataRead;
         var headerMark = stream.readNBytes(Name.length());
         if (!Arrays.equals(headerMark, Name.getBytes())) {
-            throw new IOException("Machine mark not found! Corrupted data.");
+            throw new MSLAException("Machine mark not found! Corrupted data.");
         }
         stream.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
         TableLength = dis.readInt();
@@ -134,7 +135,7 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
         if (TableLength >= 224) { fields.Padding13 = dis.readInt(); dataRead += 4; }
 
         if (dataRead != TableLength)
-            throw new IOException("Machine was not completely read out (" + dataRead + " of " + TableLength +
+            throw new MSLAException("Machine was not completely read out (" + dataRead + " of " + TableLength +
                     "), some extra data left unread");
     }
 

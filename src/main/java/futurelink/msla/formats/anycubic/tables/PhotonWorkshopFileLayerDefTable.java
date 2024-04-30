@@ -2,8 +2,8 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
-import futurelink.msla.formats.MSLADecodeWriter;
-import futurelink.msla.formats.MSLAEncodeReader;
+import futurelink.msla.formats.*;
+import futurelink.msla.formats.iface.MSLALayerEncodeReader;
 import lombok.Getter;
 
 import java.io.*;
@@ -31,91 +31,82 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         }
     }
 
-    private final Integer maxDecoders;
-    private volatile Integer decoders = 0;
-    private final Integer maxEncoders;
-    private volatile Integer encoders = 0;
-
     @Getter private Integer LayerCount;
     private final ArrayList<PhotonWorkshopFileLayerDef> layers = new ArrayList<>();
     private final ArrayList<byte[]> layerData = new ArrayList<>();
 
     public PhotonWorkshopFileLayerDefTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        maxDecoders = 4;
-        maxEncoders = 4;
+        this.LayerCount = 0;
     }
 
-    public final void encodeLayer(PhotonWorkshopFileLayerDef def, MSLAEncodeReader reader) throws IOException {
-        if (reader.getCodec() == null) throw new IOException("No codec defined for layer data");
+    /**
+     * Asynchronously encodes a layer.
+     *
+     * @param def PhotonWorkshopFileLayerDef instance
+     * @param reader MSLAEncodeReader instance
+     * @return true if encode process successfully started, otherwise - false
+     * @throws MSLAException if no codec defined or something went wrong
+     */
+    public final boolean encodeLayer(PhotonWorkshopFileLayerDef def,
+                                     MSLALayerEncodeReader reader,
+                                     MSLALayerEncoders encoders) throws MSLAException {
+        if (reader.getCodec() == null) throw new MSLAException("No codec defined for layer data");
+        if (encoders.isBusy()) return false;
 
+        // Add empty layer
         var number = layers.size();
         layers.add(def);
         layerData.add(null);
         LayerCount = layers.size();
-        while (!canEncode()); // Wait while decoders available
-        new Thread(() -> {
-            synchronized(this) { encoders++; }
-            try {
-                var input = reader.read(number, MSLAEncodeReader.ReadDirection.READ_ROW);
-                var iSize = input.available();
-                var output = new ByteArrayOutputStream();
-                var oSize = reader.getCodec().Encode(input, output);
-                reader.onStart(number);
-                if (output.size() > 0) {
-                    layers.get(number).DataLength = oSize;
-                    layerData.set(number, output.toByteArray());
-                    reader.onFinish(number, iSize, oSize);
-                } else
-                    reader.onError(number, "empty image");
-            } catch (IOException e) {
-                reader.onError(number, "Encoder error " + e.getMessage());
-            }
-            synchronized(this) { encoders--; }
-        }).start();
+
+        // Encode layer data
+        return encoders.encode(number, reader, (size, data) -> {
+            layers.get(number).DataLength = size;
+            layerData.set(number, data);
+        });
     }
 
-    public final void decodeLayer(DataInputStream stream, int layer, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
-        var encodedDataLength = getLayer(layer).DataLength;
-        var data = stream.readNBytes(encodedDataLength);
-        if (writer.getCodec() == null) throw new IOException("No codec defined for layer data");
-
-        while (!canDecode()); // Wait while decoders available
-        new Thread(() -> {
-            synchronized(this) { decoders++; }
-            try {
-                writer.onStart(layer);
-                var pixels = writer.getCodec().Decode(data, layer, decodedDataLength, writer);
-                writer.onFinish(layer, pixels);
-            } catch (IOException e) {
-                writer.onError(layer, e.getMessage());
-            }
-            synchronized(this) { decoders--; }
-        }).start();
+    /**
+     * Asynchronously decodes a layer.
+     *
+     * @param stream input stream
+     * @param layer layer number
+     * @param decodedDataLength expected decoded data length
+     * @param decoders decoders pool
+     * @return true if encode process successfully started, otherwise - false
+     */
+    public final boolean decodeLayer(DataInputStream stream, int layer, int decodedDataLength, MSLALayerDecoders decoders)
+            throws MSLAException {
+        return decoders.decode(layer, stream, getLayer(layer).DataLength, decodedDataLength);
     }
 
-    private boolean canDecode() {
-        return (decoders < maxDecoders);
-    }
-
-    private boolean canEncode() {
-        return (encoders < maxEncoders);
-    }
-
-    public final void addLayer(PhotonWorkshopFileLayerDef def, byte[] data) throws IOException {
+    /**
+     * Adds raw encoded data layer.
+     * @param def layer definition
+     * @param data bytes
+     */
+    public final void addLayer(PhotonWorkshopFileLayerDef def, byte[] data) throws MSLAException {
         if ((data != null) && (def != null)) {
-            if (data.length != def.DataLength) throw new IOException("DataLength in layer definition does not match data size");
+            if (data.length != def.DataLength) throw new MSLAException("DataLength in layer definition does not match data size");
             layers.add(def);
             layerData.add(data);
             LayerCount = layers.size();
         }
     }
 
-    public final void addLayer(PhotonWorkshopFileLayerDef def, InputStream stream) throws IOException {
+    /**
+     * Adds raw encoded data layer from InputStream.
+     * @param def layer definition
+     * @param stream stream
+     */
+    public final void addLayer(PhotonWorkshopFileLayerDef def, InputStream stream) throws MSLAException {
         if ((stream != null) && (def != null)) {
-            layers.add(def);
-            layerData.add(stream.readAllBytes());
-            LayerCount = layers.size();
+            try {
+                addLayer(def, stream.readAllBytes());
+            } catch (IOException e) {
+                throw new MSLAException("Error reading layer", e);
+            }
         }
     }
 
@@ -201,4 +192,3 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         return b.toString();
     }
 }
-

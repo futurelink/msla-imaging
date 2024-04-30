@@ -2,6 +2,7 @@ package futurelink.msla.formats.creality;
 
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.creality.tables.*;
+import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
@@ -45,18 +46,14 @@ public class CXDLPFile implements MSLAFile {
         layers.read(iStream, position);
     }
 
-    private boolean hasOption(String option, Class<?> type) {
-        return false;
-    }
-
     /**
      * Codec is not needed for Chitubox DLP format. The data structure is fairly straightforward,
      * so it decodes when it's read.
      * @return null
      */
     @Override
-    public MSLAFileCodec getCodec() {
-        return null;
+    public Class<? extends MSLAFileCodec> getCodec() {
+        return CXDPLFileCodec.class;
     }
 
     @Override
@@ -65,7 +62,7 @@ public class CXDLPFile implements MSLAFile {
     }
 
     @Override
-    public void updatePreviewImage() throws IOException {}
+    public void updatePreviewImage() throws MSLAException {}
 
     @Override
     public float getDPI() {
@@ -73,20 +70,21 @@ public class CXDLPFile implements MSLAFile {
     }
 
     @Override
-    public void addLayer(MSLAEncodeReader reader) throws IOException {
-        throw new IOException("AddLayer defaults not supported yet");
+    public boolean addLayer(MSLALayerEncodeReader reader, MSLALayerEncoders encoders) throws MSLAException {
+        throw new MSLAException("AddLayer defaults not supported yet");
     }
 
     @Override
-    public void addLayer(MSLAEncodeReader reader, float layerHeight, float exposureTime,
-                         float liftSpeed, float liftHeight) throws IOException {
-        layers.encodeLayer(reader);
-        header.setLayerCount(layers.getLayerCount().shortValue());
+    public boolean addLayer(MSLALayerEncodeReader reader, MSLALayerEncoders encoders, float layerHeight,
+                            float exposureTime, float liftSpeed, float liftHeight) throws IOException {
+        var layerEncoded = layers.encodeLayer(reader);
+        if (layerEncoded) header.setLayerCount(layers.getLayerCount().shortValue());
+        return layerEncoded;
     }
 
     @Override
-    public void readLayer(int layer, MSLADecodeWriter writer) throws IOException {
-        layers.decodeLayer(iStream, layer, writer);
+    public boolean readLayer(MSLALayerDecoders decoders, int layer) throws MSLAException {
+        return layers.decodeLayer(iStream, layer, decoders);
     }
 
     @Override
@@ -107,10 +105,12 @@ public class CXDLPFile implements MSLAFile {
     public int getLayerCount() { return header.getLayerCount(); }
     @Override
     public boolean isValid() { return (header != null) && (sliceInfo != null); }
+
     @Override
-    public void setOption(String option, Serializable value) throws IOException {
-        optionMapper.setOption(option, value);
+    public MSLAOptionMapper options() {
+        return optionMapper;
     }
+
     @Override
     public String toString() {
         return header.toString() + sliceInfo + sliceInfoV3 + previews;

@@ -1,4 +1,4 @@
-package futurelink.msla.formats;
+package futurelink.msla.formats.iface;
 
 public interface MSLAFileDefaults {
     String getName();

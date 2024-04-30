@@ -1,11 +1,10 @@
 package futurelink.msla.formats.anycubic;
 
-import futurelink.msla.formats.MSLADecodeWriter;
-import futurelink.msla.formats.MSLAFileCodec;
+import futurelink.msla.formats.iface.MSLALayerDecodeWriter;
 
 import java.io.*;
 
-public class PhotonWorkshopCodecPW0 implements MSLAFileCodec {
+public class PhotonWorkshopCodecPW0 implements PhotonWorkshopCodec {
     public final byte RLE1EncodingLimit = 0x7d;
     public final short RLE4EncodingLimit = 0xfff;
     public static int[] CRC16Table = {
@@ -75,12 +74,7 @@ public class PhotonWorkshopCodecPW0 implements MSLAFileCodec {
     }
 
     @Override
-    public int Decode(DataInputStream stream, int layerNumber, int encodedDataLength, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
-        return Decode(stream.readNBytes(encodedDataLength), layerNumber, decodedDataLength, writer);
-    }
-
-    @Override
-    public int Decode(byte[] data, int layerNumber, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
+    public int Decode(byte[] data, int layerNumber, int decodedDataLength, MSLALayerDecodeWriter writer) throws IOException {
         int pixelPos = 0;
         int pixels = 0;
         for (int i = 0; i < data.length; i++) {
@@ -108,7 +102,7 @@ public class PhotonWorkshopCodecPW0 implements MSLAFileCodec {
              * Set pixels or something like this...
              */
             if (color != 0) {
-                writer.stripe(layerNumber, color, pixelPos, repeat, MSLADecodeWriter.WriteDirection.WRITE_ROW);
+                writer.stripe(layerNumber, color, pixelPos, repeat, MSLALayerDecodeWriter.WriteDirection.WRITE_ROW);
                 pixels += repeat;
             }
             pixelPos += repeat;
@@ -117,7 +111,7 @@ public class PhotonWorkshopCodecPW0 implements MSLAFileCodec {
         }
 
         if ((pixelPos > 0) && (pixelPos != decodedDataLength))
-            throw new IOException("Image ended short: " + pixelPos + ", expecting: " + decodedDataLength);
+            throw new IOException("Image ended too early: " + pixelPos + ", expecting: " + decodedDataLength);
 
         return pixels;
     }

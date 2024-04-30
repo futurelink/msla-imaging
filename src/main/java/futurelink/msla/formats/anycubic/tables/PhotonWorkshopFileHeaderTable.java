@@ -2,9 +2,9 @@ package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
-import futurelink.msla.formats.MSLAFileBlockFields;
-import futurelink.msla.formats.MSLAOption;
-import futurelink.msla.formats.MSLAOptionContainer;
+import futurelink.msla.formats.iface.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.MSLAOption;
+import futurelink.msla.formats.iface.MSLAOptionContainer;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.Setter;

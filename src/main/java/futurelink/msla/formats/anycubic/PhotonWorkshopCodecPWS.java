@@ -1,14 +1,12 @@
 package futurelink.msla.formats.anycubic;
 
-import futurelink.msla.formats.MSLADecodeWriter;
-import futurelink.msla.formats.MSLAFileCodec;
+import futurelink.msla.formats.iface.MSLALayerDecodeWriter;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class PhotonWorkshopCodecPWS implements MSLAFileCodec {
+public class PhotonWorkshopCodecPWS implements PhotonWorkshopCodec {
     @Override
     public byte[] Encode(byte[] pixels) {
         return new byte[0];
@@ -25,13 +23,7 @@ public class PhotonWorkshopCodecPWS implements MSLAFileCodec {
     }
 
     @Override
-    public int Decode(byte[] data, int layerNumber, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
-        return 0;
-    }
-
-    @Override
-    public int Decode(DataInputStream stream, int layerNumber,
-                      int encodedDataLength, int decodedDataLength, MSLADecodeWriter writer) throws IOException {
+    public int Decode(byte[] data, int layerNumber, int decodedDataLength, MSLALayerDecodeWriter writer) throws IOException {
         return 0;
     }
 }

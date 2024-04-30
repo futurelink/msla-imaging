@@ -1,10 +1,10 @@
-package futurelink.msla.formats;
+package futurelink.msla.formats.iface;
 
 import futurelink.msla.formats.utils.Size;
 
 import java.io.IOException;
 
-public interface MSLADecodeWriter {
+public interface MSLALayerDecodeWriter {
 
     enum WriteDirection { WRITE_ROW, WRITE_COLUMN };
 
@@ -12,7 +12,7 @@ public interface MSLADecodeWriter {
      * Should be implemented to return MSLAFileCodec object.
      * @return codec to be used
      */
-    MSLAFileCodec getCodec();
+    Class<? extends MSLAFileCodec> getCodec();
 
     /**
      * Must be implemented to get printer specific image size.
@@ -46,5 +46,5 @@ public interface MSLADecodeWriter {
      * Method is being called when decoding process encounters an error.
      * @param layerNumber layer number that had been being decoded
      */
-    void onError(int layerNumber, String error);
+    void onError(int layerNumber, String error) throws IOException;
 }

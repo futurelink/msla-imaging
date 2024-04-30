@@ -1,41 +1,57 @@
 package futurelink.msla.formats;
 
-import java.io.IOException;
 import java.io.Serializable;
+import java.util.Set;
 
+/**
+ * Generic option mapper.
+ * Each mSLA printer has its own set of options and its own file format.
+ * This mapper aims to manage all possible print options in one place.
+ */
 public abstract class MSLAOptionMapper {
-    protected abstract boolean hasOption(String option, Class<? extends Serializable> aClass);
-    protected abstract boolean hasLayerOption(String option, Class<? extends Serializable> aClass);
-    protected abstract void populateOption(String option, Serializable value);
-    protected abstract void populateLayerOption(String option, int layer, Serializable value);
-    public void setOption(String option, Serializable value) throws IOException {
+    abstract protected boolean hasOption(String option, Class<? extends Serializable> aClass);
+    abstract protected Class<?> optionClass(String option);
+    abstract protected boolean hasLayerOption(String option, Class<? extends Serializable> aClass);
+    abstract protected void populateOption(String option, Serializable value) throws MSLAException;
+    abstract protected Serializable fetchOption(String option) throws MSLAException;
+    abstract protected void populateLayerOption(String option, int layer, Serializable value);
+    abstract protected Serializable fetchLayerOption(String option, int layer);
+    abstract public Set<String> getAvailable();
+
+    public final void set(String option, Serializable value) throws MSLAException {
         if (value == null) {
-            if (hasOption(option, null)) {
-                populateOption(option, null);
-            } else {
-                throw new IOException("Option '" + option + "' is not available");
-            }
+            if (!hasOption(option, null)) throw new MSLAException("Option '" + option + "' is not available");
+            populateOption(option, null);
         } else {
-            if (hasOption(option, value.getClass())) {
-                populateOption(option, value);
-            } else {
-                throw new IOException("Option '" + option + "' of type " + value.getClass() + " is not available");
+            if (!hasOption(option, value.getClass())) {
+                if (!hasOption(option, null)) {
+                    throw new MSLAException("Option '" + option + " is not available at all");
+                } else {
+                    throw new MSLAException("Option '" + option + "' of type " + value.getClass() +
+                            " is not available, it has " + optionClass(option));
+                }
             }
+            populateOption(option, value);
         }
     }
 
-    public void setLayerOption(String option, int layer, Serializable value) throws IOException {
+    public final Serializable get(String option) throws MSLAException {
+        if (!hasOption(option, null)) throw new MSLAException("Option '" + option + "' is not available");
+        return fetchOption(option);
+    }
+
+    public final void setLayerOption(String option, int layer, Serializable value) throws MSLAException {
         if (value == null) {
             if (hasOption(option, null)) {
                 populateLayerOption(option, layer, null);
             } else {
-                throw new IOException("Layer option '" + option + "' is not available");
+                throw new MSLAException("Layer option '" + option + "' is not available");
             }
         } else {
             if (hasOption(option, value.getClass())) {
                 populateLayerOption(option, layer, value);
             } else {
-                throw new IOException("Layer option '" + option + "' of type " + value.getClass() + " is not available");
+                throw new MSLAException("Layer option '" + option + "' of type " + value.getClass() + " is not available");
             }
         }
     }

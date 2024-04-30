@@ -1,8 +1,9 @@
 package futurelink.msla.formats.creality;
 
-import futurelink.msla.formats.MSLAFile;
-import futurelink.msla.formats.MSLAFileDefaults;
-import futurelink.msla.formats.MSLAFileFactory;
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.MSLAFile;
+import futurelink.msla.formats.iface.MSLAFileDefaults;
+import futurelink.msla.formats.iface.MSLAFileFactory;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -20,7 +21,7 @@ public class CXDLPFileFactory implements MSLAFileFactory {
         return new CXDLPFile(new FileInputStream(fileName));
     }
 
-    @Override public boolean checkType(FileInputStream stream) throws IOException {
+    @Override public boolean checkType(FileInputStream stream) throws MSLAException, IOException {
         var fc = stream.getChannel();
         fc.position(0);
         var dis = new DataInputStream(stream);

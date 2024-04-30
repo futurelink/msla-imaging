@@ -1,5 +1,9 @@
 package futurelink.msla.tools;
 
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.MSLALayerDecoders;
+import futurelink.msla.formats.MSLALayerEncoders;
+import futurelink.msla.formats.anycubic.PhotonWorkshopCodec;
 import futurelink.msla.formats.utils.FileFactory;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -11,23 +15,23 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 public class ImageTools {
-    public static void exportLayers(String fileName, String destinationDir, String format) throws IOException {
-        var wsFile = FileFactory.load(fileName);
+    public static void exportLayers(String fileName, String destinationDir, String format)
+            throws IOException, MSLAException {
+        var wsFile = FileFactory.instance.load(fileName);
         if (wsFile != null) {
             System.out.println(wsFile);
 
             if (wsFile.isValid()) {
-                var decodeWriter = new ImageWriter(wsFile, destinationDir, "png");
-
-                // Start decoding layers
+                var decoders = new MSLALayerDecoders(new ImageWriter(wsFile, destinationDir, "png"));
                 for (int i = 0; i < wsFile.getLayerCount(); i++)
-                    wsFile.readLayer(i, decodeWriter);
+                    while (!wsFile.readLayer(decoders, i)) {}; // Wait while layer can be read (returns false when busy)
             }
         }
     }
 
-    public static void createFromSVG(String machineName, String svgFileName, String outputFileName) throws IOException {
-        var defaults = FileFactory.defaults(machineName);
+    public static void createFromSVG(String machineName, String svgFileName, String outputFileName)
+            throws IOException, MSLAException {
+        var defaults = FileFactory.instance.defaults(machineName);
         if (defaults == null) throw new IOException("Machine name '" + machineName + "' is incorrect");
         try (var stream = new FileInputStream(svgFileName)) {
             var reader = new BufferedReader(new InputStreamReader(stream));
@@ -47,20 +51,23 @@ public class ImageTools {
         }
     }
 
-    public static void createFromPNG(String machineName, String pngFileName, String outputFileName) throws IOException  {
+    public static void createFromPNG(String machineName, String pngFileName, String outputFileName)
+            throws MSLAException, IOException  {
         try (var pngImage = new FileInputStream(pngFileName)) {
             var image = ImageIO.read(pngImage);
             createFromBufferedImage(machineName, image, outputFileName);
         }
     }
 
-    public static void createFromBufferedImage(String machineName, BufferedImage image, String outputFileName) throws IOException  {
-        var defaults = FileFactory.defaults(machineName);
-        var wsFile = FileFactory.create(machineName);
+    public static void createFromBufferedImage(String machineName, BufferedImage image, String outputFileName)
+            throws MSLAException  {
+        var defaults = FileFactory.instance.defaults(machineName);
+        var wsFile = FileFactory.instance.create(machineName);
         if (wsFile != null) {
-            if (!wsFile.isValid()) throw new IOException("File header has no resolution info");
-            wsFile.setOption("BottomExposureTime", 12);
-            wsFile.addLayer(new ImageReader(wsFile, outputFileName + "." + defaults.getFileExtension(), image));
+            if (!wsFile.isValid()) throw new MSLAException("File header has no resolution info");
+            var encoders = new MSLALayerEncoders();
+            wsFile.options().set("BottomExposureTime", 12);
+            while (!wsFile.addLayer(new ImageReader(wsFile, image), encoders)) {};
         }
     }
 }

@@ -1,5 +1,7 @@
 package futurelink.msla.formats.anycubic.tables;
 
+import futurelink.msla.formats.MSLAException;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,7 +26,7 @@ public class PhotonWorkshopFileSoftwareTable extends PhotonWorkshopFileTable {
     public int getDataLength() { return 0; }
 
     @Override
-    public void read(FileInputStream stream, int position) throws IOException {}
+    public void read(FileInputStream stream, int position) throws MSLAException {}
 
     @Override
     public void write(OutputStream stream) throws IOException {}

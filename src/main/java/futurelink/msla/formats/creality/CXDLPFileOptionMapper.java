@@ -1,9 +1,11 @@
 package futurelink.msla.formats.creality;
 
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAOptionMapper;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Set;
 
 class CXDLPFileOptionMapper extends MSLAOptionMapper {
     private final CXDLPFile file;
@@ -25,6 +27,11 @@ class CXDLPFileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
+    public Set<String> getAvailable() {
+        throw new RuntimeException("Options list is not implemented yet");
+    }
+
+    @Override
     protected boolean hasOption(String option, Class<? extends Serializable> aClass) {
         if (!this.optionsMap.containsKey(option)) return false;
         if (aClass != null) return this.optionsMap.get(option).aClass.isAssignableFrom(aClass);
@@ -32,13 +39,24 @@ class CXDLPFileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    protected boolean hasLayerOption(String option, Class<? extends Serializable> value) {
-        return false;
+    protected Class<?> optionClass(String option) {
+        return this.optionsMap.get(option).aClass;
     }
 
     @Override
+    protected boolean hasLayerOption(String option, Class<? extends Serializable> value) {
+        return false;
+    }
+    @Override
     protected void populateOption(String option, Serializable value) {}
-
+    @Override
+    protected Serializable fetchOption(String option) throws MSLAException {
+        return null;
+    }
     @Override
     protected void populateLayerOption(String option, int layer, Serializable value) {}
+    @Override
+    protected Serializable fetchLayerOption(String option, int layer) {
+        return null;
+    }
 }

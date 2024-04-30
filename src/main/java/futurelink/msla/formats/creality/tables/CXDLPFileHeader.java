@@ -1,6 +1,6 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.experimental.Delegate;

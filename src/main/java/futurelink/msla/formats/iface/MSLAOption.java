@@ -1,4 +1,4 @@
-package futurelink.msla.formats;
+package futurelink.msla.formats.iface;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -1,7 +1,7 @@
 package futurelink.msla.formats.anycubic;
 
-import futurelink.msla.formats.MSLAFileBlockFields;
-import futurelink.msla.formats.MSLAFileDefaults;
+import futurelink.msla.formats.iface.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileHeaderTable;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileMachineTable;
 import futurelink.msla.formats.utils.Size;

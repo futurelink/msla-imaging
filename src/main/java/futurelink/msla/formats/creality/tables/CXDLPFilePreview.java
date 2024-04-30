@@ -1,6 +1,6 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.MSLAPreview;
+import futurelink.msla.formats.iface.MSLAPreview;
 import futurelink.msla.formats.utils.Size;
 
 import java.awt.image.BufferedImage;

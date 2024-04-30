@@ -1,7 +1,8 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.MSLADecodeWriter;
-import futurelink.msla.formats.MSLAEncodeReader;
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.MSLALayerDecoders;
+import futurelink.msla.formats.iface.MSLALayerEncodeReader;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -50,11 +51,11 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
         stream.write(0x0d); stream.write(0x0a);
     }
 
-    public final void encodeLayer(MSLAEncodeReader reader) throws IOException {
+    public final boolean encodeLayer(MSLALayerEncodeReader reader) throws IOException {
         var number = layers.size();
         LayerCount = number;
 
-        var iStream = reader.read(number, MSLAEncodeReader.ReadDirection.READ_COLUMN);
+        var iStream = reader.read(number, MSLALayerEncodeReader.ReadDirection.READ_COLUMN);
         var iSize = iStream.available();
         reader.onStart(number);
         if (iStream.available() > 0) { // Encode pixel data into lines
@@ -66,6 +67,8 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
             reader.onFinish(number, iSize, layer.DataLength);
         } else
             reader.onError(number, "empty image");
+
+        return true;
     }
 
     /**
@@ -74,27 +77,21 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
      * Layers stored as a set of lines of particular color, each line consists of 6 bytes - 5 bytes of geometry
      * and 1 byte of grey shade (0 - black, 0xff - white).
      */
-    public void decodeLayer(FileInputStream iStream, int layer, MSLADecodeWriter writer) throws IOException {
+    public boolean decodeLayer(FileInputStream iStream, int layer, MSLALayerDecoders decoders) throws MSLAException {
         var position = layers.get(layer).getDataOffset();
+        var decodedDataLength = layers.get(layer).DataLength;
         var dis = new DataInputStream(iStream);
-        var fc = iStream.getChannel();
-        fc.position(position);
-
-        // Layer: 4 bytes + 4 bytes line count + (6 * line count) bytes
-        writer.onStart(layer);
-        dis.readInt();
-        var lineCount = dis.readInt();
-        var pos = 0;
-        var count = 0;
-        var pixelsCount = 0;
-        for (int i = 0; i < lineCount; i++) {
-            var line = CXDLPFileLayer.LayerLine.fromByteArray(dis.readNBytes(6));
-            count = line.getLength();
-            pos = line.getStartX() + line.getStartY() * writer.getLayerResolution().getWidth();
-            writer.stripe(layer, line.getGray(), pos, count, MSLADecodeWriter.WriteDirection.WRITE_COLUMN);
-            pixelsCount += count;
+        try {
+            var fc = iStream.getChannel();
+            fc.position(position);
+        } catch (IOException e) {
+            throw new MSLAException("Can't go to layer data position", e);
         }
-        dis.readShort(); // 0x0d 0x0a - page break
-        writer.onFinish(layer, pixelsCount);
+
+        var encodedDataLength = layers.get(layer).DataLength;
+        System.out.println("CXDLP file position " + position +
+                ", data length is " + encodedDataLength +
+                ", expected data length " + decodedDataLength);
+        return decoders.decode(layer, dis, encodedDataLength, decodedDataLength);
     }
 }
