@@ -4,12 +4,12 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAOptionMapper;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Set;
 
 class CXDLPFileOptionMapper extends MSLAOptionMapper {
     private final CXDLPFile file;
-
     private record Option(Class<?> aClass, String location) {}
     private final HashMap<String, Option> optionsMap;
 
@@ -51,6 +51,16 @@ class CXDLPFileOptionMapper extends MSLAOptionMapper {
     protected void populateOption(String option, Serializable value) {}
     @Override
     protected Serializable fetchOption(String option) throws MSLAException {
+        try {
+            var loc = this.optionsMap.get(option).location;
+            if (loc.equals("SliceInfo")) {
+                return (Serializable) file.sliceInfo.getClass().getMethod("get" + option).invoke(file.sliceInfo);
+            } else if (loc.equals("SliceInfoV3")) {
+                return (Serializable) file.sliceInfoV3.getClass().getMethod("get" + option).invoke(file.sliceInfoV3);
+            }
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new MSLAException("Error while getting option", e);
+        }
         return null;
     }
     @Override

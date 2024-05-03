@@ -3,6 +3,7 @@ package futurelink.msla.formats.utils;
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.PhotonWorkshopFileFactory;
 import futurelink.msla.formats.creality.CXDLPFileFactory;
+import futurelink.msla.formats.elegoo.GOOFileFactory;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
@@ -10,17 +11,21 @@ import futurelink.msla.formats.iface.MSLAFileFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.logging.Logger;
 
 /**
  * Common entry point for mSLA file manipulation.
  */
 public final class FileFactory {
+    private static final Logger logger = Logger.getLogger(FileFactory.class.getName());
     private static final ArrayList<MSLAFileFactory> supportedFiles = new ArrayList<>();
     public static FileFactory instance = new FileFactory();
 
     private FileFactory() {
         addFileTypeFactory(new PhotonWorkshopFileFactory());
         addFileTypeFactory(new CXDLPFileFactory());
+        addFileTypeFactory(new GOOFileFactory());
     }
 
     public void addFileTypeFactory(MSLAFileFactory factory) {
@@ -34,12 +39,13 @@ public final class FileFactory {
      * @return MSLAFileDefaults
      */
     public MSLAFileDefaults defaults(String machineName) {
-        return supportedFiles
-                .stream()
-                .filter((f) -> f.checkDefaults(machineName))
-                .findFirst()
+        return getMachine(machineName)
                 .map(f -> f.defaults(machineName))
                 .orElse(null);
+    }
+
+    private Optional<MSLAFileFactory> getMachine(String machineName) {
+        return supportedFiles.stream().filter((f) -> f.checkDefaults(machineName)).findFirst();
     }
 
     /**
@@ -48,15 +54,14 @@ public final class FileFactory {
      * @param machineName machine name (can be obtained with getSupportedMachines)
      * @return MSLAFile
      */
-    public MSLAFile create(String machineName) {
-        return supportedFiles
-                .stream()
-                .filter((f) -> f.checkDefaults(machineName))
-                .findFirst()
-                .map(f -> {
-                    try { return f.create(machineName); } catch (Exception e) { throw new RuntimeException(e); }
-                })
-                .orElse(null);
+    public MSLAFile create(String machineName) throws MSLAException {
+        var machine = getMachine(machineName);
+        if (machine.isPresent()) {
+            logger.info("Creating file for " + machineName + " using " + machine.get().getClass().getName());
+            return machine.get().create(machineName);
+        } else {
+            throw new MSLAException("Machine '" + machineName + "' is not supported");
+        }
     }
 
     /**
@@ -64,7 +69,6 @@ public final class FileFactory {
      *
      * @param fileName data file to load
      * @return MSLAFile
-     * @throws IOException on IO errors
      * @throws MSLAException on mSLA format related errors
      */
     public MSLAFile load(String fileName) throws MSLAException {
@@ -72,7 +76,7 @@ public final class FileFactory {
             return supportedFiles.stream().filter((t) -> {
                 try {
                     if (t.checkType(stream)) {
-                        System.out.println("Found file of type " + t.getClass());
+                        logger.info("Found file of type " + t.getClass());
                         return true;
                     }
                     return false;

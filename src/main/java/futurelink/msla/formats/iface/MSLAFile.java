@@ -1,108 +1,111 @@
 package futurelink.msla.formats.iface;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.MSLALayerDecoders;
-import futurelink.msla.formats.MSLALayerEncoders;
 import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.utils.Size;
 
-import java.io.IOException;
 import java.io.OutputStream;
+import java.util.UUID;
 
 /**
  * General interface for all MSLA printer files.
+ * @param <T> is a layer decode output or encode input data type
  */
-public interface MSLAFile {
+public interface MSLAFile<T> {
     /**
      * Returns {@code MSLAFileCodec} codec class.
-     * @return
      */
-    Class<? extends MSLAFileCodec> getCodec();
+    Class<? extends MSLALayerCodec<T>> getCodec();
+
+    /**
+     * Get encoders pool object.
+     */
+    MSLALayerEncoder<T> getEncodersPool() throws MSLAException;
+
+    /**
+     * Get decoders pool object.
+     * @param writer object to be used as output channel
+     */
+    MSLALayerDecoder<T> getDecodersPool(MSLALayerDecodeWriter writer) throws MSLAException;
 
     /**
      * Returns {@code MSLAPreview} object.
-     * @return
      */
     MSLAPreview getPreview();
 
     /**
      * Updates preview image.
-     * @throws MSLAException
      */
     void updatePreviewImage() throws MSLAException;
 
     /**
+     * Gets file UUID
+     */
+    UUID getUUID();
+
+    /**
      * Returns DPI value of a file.
-     * @return
      */
     float getDPI();
 
     /**
      * Returns file layer size.
-     * @return
      */
     Size getResolution();
 
     /**
      * Returns pixel size in um.
-     * @return
      */
     float getPixelSizeUm();
 
     /**
      * Returns file layers count.
-     * @return
      */
     int getLayerCount();
 
     /**
-     * Adds new empty layer to a file.
-     * @param encoders
-     * @return
-     * @throws MSLAException
+     * Adds new layer to a file.
+     * @param reader is {@link MSLALayerEncodeReader} object to be used as data input channel
+     * @param callback is {@link MSLALayerEncoder.Callback} to be executed when encoding is done
      */
-    boolean addLayer(MSLALayerEncodeReader reader, MSLALayerEncoders encoders) throws MSLAException;
+    void addLayer(
+            MSLALayerEncodeReader reader,
+            MSLALayerEncoder.Callback<T> callback) throws MSLAException;
 
     /**
      * Adds new layer to a file using {@code MSLAEncodeReader} reader and parameters.
-     * @param encoders
-     * @param layerHeight
-     * @param exposureTime
-     * @param liftSpeed
-     * @param liftHeight
-     * @return
-     * @throws MSLAException
-     * @throws IOException
+     * @param reader is {@link MSLALayerEncodeReader} object to be used as data input channel
+     * @param callback is {@link MSLALayerEncoder.Callback} to be executed when encoding is done
+     * @param layerHeight is layer height
+     * @param exposureTime is a time to expose a layer
+     * @param liftSpeed is a lift speed in mm/min after layer was exposed
+     * @param liftHeight is a lift height mm after layer was exposed
      */
-    boolean addLayer(MSLALayerEncodeReader reader, MSLALayerEncoders encoders, float layerHeight,
-                     float exposureTime, float liftSpeed, float liftHeight) throws MSLAException, IOException;
+    void addLayer(
+            MSLALayerEncodeReader reader,
+            MSLALayerEncoder.Callback<T> callback,
+            float layerHeight, float exposureTime, float liftSpeed, float liftHeight) throws MSLAException;
 
     /**
      * Reads layer from a file.
-     * @param layer
-     * @param decoders
-     * @return
-     * @throws MSLAException
-     * @throws IOException
+     * @param decoders  {@code MSLALayerDecoder} decoders pool object
+     * @param layer layer number
      */
-    boolean readLayer(MSLALayerDecoders decoders, int layer) throws MSLAException;
+    boolean readLayer(MSLALayerDecoder<T> decoders, int layer) throws MSLAException;
 
     /**
      * Writes file data to a stream.
-     * @param stream
-     * @throws IOException
+     * @param stream output stream (usually a file)
      */
-    void write(OutputStream stream) throws IOException;
+    void write(OutputStream stream) throws MSLAException;
 
     /**
      * Checks if a file is valid.
-     * @return
      */
     boolean isValid();
 
     /**
      * Returns file- and printer-specific option mapper.
-     * @return
      */
     MSLAOptionMapper options();
 }

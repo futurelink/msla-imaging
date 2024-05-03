@@ -1,6 +1,7 @@
 package futurelink.msla.tools;
 
 import futurelink.msla.formats.iface.MSLALayerEncodeReader;
+import lombok.Getter;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class BufferedImageInputStream extends InputStream {
-    private final BufferedImage image;
+    @Getter private BufferedImage image;
     private DataBuffer rotatedBuffer;
     private int position;
     private MSLALayerEncodeReader.ReadDirection readDirection;
@@ -17,9 +18,7 @@ public class BufferedImageInputStream extends InputStream {
     public final void setReadDirection(MSLALayerEncodeReader.ReadDirection direction) {
         readDirection = direction;
         BufferedImage rotatedImage;
-        if (readDirection == MSLALayerEncodeReader.ReadDirection.READ_ROW) {
-            rotatedImage = image;
-        } else {
+        if (readDirection == MSLALayerEncodeReader.ReadDirection.READ_COLUMN) {
             rotatedImage = new BufferedImage(image.getHeight(), image.getWidth(), BufferedImage.TYPE_USHORT_GRAY);
             var g = rotatedImage.createGraphics();
             var at = new AffineTransform();
@@ -31,8 +30,9 @@ public class BufferedImageInputStream extends InputStream {
             g.setTransform(at);
             g.drawImage(image, 0, 0, null);
             g.dispose();
+            image = rotatedImage;
         }
-        rotatedBuffer = rotatedImage.getRaster().getDataBuffer();
+        rotatedBuffer = image.getRaster().getDataBuffer();
     }
 
     public BufferedImageInputStream(BufferedImage img, MSLALayerEncodeReader.ReadDirection mode) {
@@ -45,8 +45,14 @@ public class BufferedImageInputStream extends InputStream {
     }
 
     @Override
+    public synchronized void reset() throws IOException {
+        position = 0;
+    }
+
+    @Override
     public int read() throws IOException {
-        return rotatedBuffer.getElem(position++);
+        if (rotatedBuffer.getSize() > position) return rotatedBuffer.getElem(position++);
+        return -1;
     }
 
     @Override

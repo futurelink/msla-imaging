@@ -11,6 +11,6 @@ public interface MSLAFileBlock {
      * @return block length in bytes.
      */
     int getDataLength();
-    void read(FileInputStream stream, int position) throws MSLAException, IOException;
-    void write(OutputStream stream) throws MSLAException, IOException;
+    void read(FileInputStream stream, int position) throws MSLAException;
+    void write(OutputStream stream) throws MSLAException;
 }

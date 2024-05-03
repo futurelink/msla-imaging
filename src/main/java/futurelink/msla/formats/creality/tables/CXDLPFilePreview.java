@@ -1,5 +1,6 @@
 package futurelink.msla.formats.creality.tables;
 
+import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAPreview;
 import futurelink.msla.formats.utils.Size;
 
@@ -22,6 +23,7 @@ public class CXDLPFilePreview implements MSLAPreview {
     @Override public Size getResolution() {
         return new Size(image.getWidth(), image.getHeight());
     }
+
 
     @Override
     public String toString() {

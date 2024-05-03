@@ -1,10 +1,15 @@
 package futurelink.msla.formats.anycubic;
 
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.MSLALayerDecodeInput;
 import futurelink.msla.formats.iface.MSLALayerDecodeWriter;
+import futurelink.msla.formats.iface.MSLALayerEncodeOutput;
+import futurelink.msla.formats.iface.MSLALayerEncodeReader;
+import futurelink.msla.tools.BufferedImageInputStream;
 
 import java.io.*;
 
-public class PhotonWorkshopCodecPW0 implements PhotonWorkshopCodec {
+public class PhotonWorkshopCodecPW0 extends PhotonWorkshopCodec {
     public final byte RLE1EncodingLimit = 0x7d;
     public final short RLE4EncodingLimit = 0xfff;
     public static int[] CRC16Table = {
@@ -31,53 +36,51 @@ public class PhotonWorkshopCodecPW0 implements PhotonWorkshopCodec {
     };
 
     @Override
-    public byte[] Encode(InputStream iStream) throws IOException {
-        var oStream = new ByteArrayOutputStream();
-        Encode(iStream, oStream);
-        return oStream.toByteArray();
-    }
-
-    @Override
-    public int Encode(InputStream iStream, OutputStream oStream) throws IOException {
-        var lastColor = (byte) 0xff;
-        int reps = 0;
-        int oSize = 0;
-        while (iStream.available() > 0) {
-            var b = iStream.readNBytes(1);
-            var color = (byte) (((b[0] & 0xf0) >> 4));
-            if (color == lastColor) {
-                reps++;
-            } else {
-                oSize += EncodePW0PutReps(oStream, reps, lastColor);
-                lastColor = color;
-                reps = 1;
+    public final MSLALayerEncodeOutput<byte[]> Encode(
+            int layerNumber,
+            MSLALayerEncodeReader reader) throws MSLAException
+    {
+        if (reader == null) throw new MSLAException("Reader can't be null");
+        var output = new PhotonWorkshopCodec.Output();
+        try (var input = new BufferedImageInputStream(reader.read(layerNumber), MSLALayerEncodeReader.ReadDirection.READ_ROW)) {
+            var lastColor = (byte) 0xff;
+            int reps = 0;
+            while (input.available() > 0) {
+                var b = input.read();
+                var color = (byte) (((b & 0xf0) >> 4));
+                if (color == lastColor) {
+                    reps++;
+                } else {
+                    EncodePW0PutReps(output, reps, lastColor);
+                    lastColor = color;
+                    reps = 1;
+                }
             }
-        }
 
-        // Put the remainder
-        oSize += EncodePW0PutReps(oStream, reps, lastColor);
+            // Put the remainder
+            EncodePW0PutReps(output, reps, lastColor);
 
-        //short crc = CRCRle4(stream.toByteArray());
-        //stream.write((byte)(crc >> 8));
-        //stream.write((byte)crc);
-        return oSize;
-    }
-
-    @Override
-    public byte[] Encode(byte[] pixels) {
-        var iStream = new ByteArrayInputStream(pixels);
-        try {
-            return Encode(iStream);
+            //short crc = CRCRle4(stream.toByteArray());
+            //stream.write((byte)(crc >> 8));
+            //stream.write((byte)crc);
+            return output;
         } catch (IOException e) {
-            return null;
+            throw new MSLAException("Error reading input data", e);
         }
     }
 
     @Override
-    public int Decode(byte[] data, int layerNumber, int decodedDataLength, MSLALayerDecodeWriter writer) throws IOException {
+    public final int Decode(
+            int layerNumber,
+            MSLALayerDecodeInput<byte[]> input,
+            int decodedDataLength,
+            MSLALayerDecodeWriter writer) throws MSLAException {
+        if (input == null) throw new MSLAException("Input data can't be null");
+        if (writer == null) throw new MSLAException("Writer can't be null");
         int pixelPos = 0;
         int pixels = 0;
-        for (int i = 0; i < data.length; i++) {
+        var data = input.data();
+        for (int i = 0; i < input.size(); i++) {
             byte b = data[i];
             byte code = (byte) ((b & 0xf0) >> 4);         // 1st 4 bits is a code
             int repeat = Byte.toUnsignedInt((byte) (b & 0x0f)); // 2nd 4 bits is repetitions
@@ -95,7 +98,7 @@ public class PhotonWorkshopCodecPW0 implements PhotonWorkshopCodec {
             }
 
             if (pixelPos + repeat > decodedDataLength)
-                throw new IOException("Image ran off the end: " + pixelPos + " + " + repeat +
+                throw new MSLAException("Image ran off the end: " + pixelPos + " + " + repeat +
                         " = " + (pixelPos + repeat) + ", expecting: " + decodedDataLength);
 
             /*
@@ -111,7 +114,7 @@ public class PhotonWorkshopCodecPW0 implements PhotonWorkshopCodec {
         }
 
         if ((pixelPos > 0) && (pixelPos != decodedDataLength))
-            throw new IOException("Image ended too early: " + pixelPos + ", expecting: " + decodedDataLength);
+            throw new MSLAException("Image ended too early: " + pixelPos + ", expecting: " + decodedDataLength);
 
         return pixels;
     }
@@ -125,24 +128,28 @@ public class PhotonWorkshopCodecPW0 implements PhotonWorkshopCodec {
         return crc16;
     }
 
-    private int EncodePW0PutReps(OutputStream stream, int reps, byte lastColor) throws IOException {
-        var size = 0;
-        while (reps > 0) {
-            int done = reps;
-            if ((lastColor == 0x00) || (lastColor == 0x0f)) {
-                if (done > RLE4EncodingLimit) done = RLE4EncodingLimit;
-                short more = (short) (done | (lastColor << 12));
-                stream.write((byte) (more >> 8));
-                stream.write((byte) more);
-                size += 2;
-            } else {
-                if (done > 0xf) done = 0xf;
-                stream.write((byte) (done | (lastColor << 4)));
-                size++;
+    @SuppressWarnings("UnusedReturnValue")
+    private int EncodePW0PutReps(MSLALayerEncodeOutput<byte[]> output, int reps, byte lastColor) throws MSLAException {
+        try {
+            var size = 0;
+            while (reps > 0) {
+                int done = reps;
+                if ((lastColor == 0x00) || (lastColor == 0x0f)) {
+                    if (done > RLE4EncodingLimit) done = RLE4EncodingLimit;
+                    short more = (short) (done | (lastColor << 12));
+                    output.write(new byte[]{(byte) (more >> 8), (byte) more});
+                    size += 2;
+                } else {
+                    if (done > 0xf) done = 0xf;
+                    output.write(new byte[]{(byte) (done | (lastColor << 4))});
+                    size++;
+                }
+                reps -= done;
             }
-            reps -= done;
+            return size;
+        } catch (IOException e) {
+            throw new MSLAException("Error encoding PW0", e);
         }
-        return size;
     }
 
 }

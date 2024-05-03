@@ -1,8 +1,8 @@
 package futurelink.msla.tools;
 
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLALayerDecodeWriter;
-import futurelink.msla.formats.iface.MSLAFileCodec;
 import futurelink.msla.formats.utils.Size;
 import lombok.Setter;
 
@@ -12,29 +12,44 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /**
  * Generic image writer implementation.
  * MSLADecodeWriter is necessary to get the data from mSLA data file layer and put
  * it into an image file.
+ * This writer needs an {@link MSLAFile} file in order to get image resolution and write graphics properly.
  */
 public class ImageWriter implements MSLALayerDecodeWriter {
-    @Setter private MSLAFile file;
+    @Setter private MSLAFile<?> file;
     @Setter private String destinationDir;
     @Setter private String format;
-    @Setter private OutputStream messageStream;
+    @Setter private Callback callback;
+
     private final ConcurrentHashMap<Integer, BufferedImage> img = new ConcurrentHashMap<>();
-    public ImageWriter(MSLAFile file, String destinationDir, String format) {
+    private final String prefix;
+    private static final Logger logger = Logger.getLogger(ImageWriter.class.getName());
+
+    public interface Callback {
+        void onStart(int layerNumber);
+        void onFinish(int layerNumber, String fileName);
+        void onError(int layerNumber, String error);
+    }
+
+    public ImageWriter(MSLAFile<?> file, String destinationDir, String prefix, String format) {
         this.file = file;
-        this.destinationDir = destinationDir;
+        this.destinationDir = destinationDir.endsWith(File.separator) ?
+                destinationDir :
+                destinationDir + File.separator;
         this.format = format;
-        this.messageStream = System.out;
+        this.prefix = prefix;
     }
-    @Override public Class<? extends MSLAFileCodec> getCodec() {
-        return file.getCodec();
+
+    public ImageWriter(MSLAFile<?> file, String destinationDir, String format) {
+        this(file, destinationDir, "", format);
     }
+
     @Override public Size getLayerResolution() { return file.getResolution(); }
     @Override public void stripe(int layerNumber, int color, int position, int length, WriteDirection direction) {
         img.get(layerNumber).getGraphics().setColor(new Color(color));
@@ -52,28 +67,37 @@ public class ImageWriter implements MSLALayerDecodeWriter {
     }
 
     @Override public void onStart(int layerNumber) {
-        try { messageStream.write(("Layer " + layerNumber + " started\n").getBytes()); } catch (IOException ignored) {}
+        logger.info("Layer " + layerNumber + " write started");
         img.put(layerNumber,new BufferedImage(
                 file.getResolution().getWidth(),
                 file.getResolution().getHeight(),
                 BufferedImage.TYPE_BYTE_GRAY
         ));
+        if (callback != null) callback.onStart(layerNumber);
     }
 
-    @Override public void onFinish(int layerNumber, int pixels) throws IOException {
-        messageStream.write(("Layer " + layerNumber + " done pixels: " + pixels + "\n").getBytes());
-        var d = new File(destinationDir);
-        if (!d.exists() && !d.mkdirs()) throw new IOException("Unable to create destination directory!");
-        try (var f = new FileOutputStream(destinationDir + "/" + layerNumber + "." + format)) {
-            ImageIO.write(img.get(layerNumber), format, f);
-            f.flush();
+    @Override public void onFinish(int layerNumber, int pixels) throws MSLAException {
+        try {
+            var fileName = destinationDir + prefix + layerNumber + "." + format;
+            logger.info("Layer " + layerNumber + " writing pixels: " + pixels);
+            logger.info("File name is " + fileName);
+            var d = new File(destinationDir);
+            if (!d.exists() && !d.mkdirs()) throw new IOException("Unable to create destination directory!");
+            try (var f = new FileOutputStream(fileName)) {
+                ImageIO.write(img.get(layerNumber), format, f);
+                f.flush();
+            }
+            img.remove(layerNumber);
+            if (callback != null) callback.onFinish(layerNumber, fileName);
+        } catch (IOException e) {
+            throw new MSLAException("Error finalizing image file!", e);
         }
-        img.remove(layerNumber);
     }
 
     @Override
-    public void onError(int layerNumber, String error) throws IOException  {
-        messageStream.write(("Layer " + layerNumber + " error: " + error + "\n").getBytes());
+    public void onError(int layerNumber, String error) {
+        logger.info("Layer " + layerNumber + " write error: " + error);
         img.remove(layerNumber);
+        if (callback != null) callback.onError(layerNumber, error);
     }
 }

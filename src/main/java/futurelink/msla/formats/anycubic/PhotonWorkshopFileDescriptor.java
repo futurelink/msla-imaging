@@ -15,31 +15,33 @@ import java.util.HashMap;
  * File descriptor section representation.
  * This descriptor is located at the beginning of a file and starts with 'ANYCUBIC' padded up to 12 bytes.
  */
+@Getter
 public class PhotonWorkshopFileDescriptor {
+    @Setter @Getter
     public static class PhotonWorkshopFileDescriptorFields {
         /**
          * 4 for v1, 5 for v2.3, 8 for v2.4 etc.
          */
-        public int NumberOfTables;
+        private int NumberOfTables;
 
         /**
          * Gets the header start address
          */
-        @Getter @Setter private int HeaderAddress;
-        @Getter @Setter private int SoftwareAddress;
+        private int HeaderAddress;
+        private int SoftwareAddress;
 
         /**
          * Gets the preview start offset
          */
-        @Getter @Setter private int PreviewAddress;
-        @Getter @Setter private int LayerImageColorTableAddress; // v2.3 and greater
-        @Getter @Setter private int LayerDefinitionAddress;
-        @Getter @Setter private int ExtraAddress;               // v2.4 and greater
-        @Getter @Setter private int MachineAddress;             // v2.4 and greater
-        @Getter @Setter private int LayerImageAddress;
-        @Getter @Setter private int ModelAddress;               // v2.6 and greater
-        @Getter @Setter private int SubLayerDefinitionAddress;  // v2.6 and greater
-        @Getter @Setter private int Preview2Address;            // v2.6 and greater
+        private int PreviewAddress;
+        private int LayerImageColorTableAddress; // v2.3 and greater
+        private int LayerDefinitionAddress;
+        private int ExtraAddress;               // v2.4 and greater
+        private int MachineAddress;             // v2.4 and greater
+        private int LayerImageAddress;
+        private int ModelAddress;               // v2.6 and greater
+        private int SubLayerDefinitionAddress;  // v2.6 and greater
+        private int Preview2Address;            // v2.6 and greater
     }
 
     static final HashMap<Byte, HashMap<Byte, String>> versions = new HashMap<>();
@@ -59,9 +61,8 @@ public class PhotonWorkshopFileDescriptor {
      */
     static public final String Mark = "ANYCUBIC";
 
-    @Getter
     private final byte[] version;
-    @Getter private final PhotonWorkshopFileDescriptorFields fields;
+    private final PhotonWorkshopFileDescriptorFields fields;
 
     public byte getVersionMajor() {
         return version[0];
@@ -92,40 +93,44 @@ public class PhotonWorkshopFileDescriptor {
         return PhotonWorkshopFileTable.MarkLength + fields.NumberOfTables * 4 + 8;
     }
 
-    public void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws IOException {
-        stream.write(PhotonWorkshopFileDescriptor.Mark.getBytes());
-        stream.write(new byte[PhotonWorkshopFileTable.MarkLength - PhotonWorkshopFileDescriptor.Mark.length()]);
-        stream.write(versionMinor);
-        stream.write(versionMajor);
-        stream.write(0); // Skip a byte
-        stream.write(0); // Skip a byte
-        stream.writeInt(fields.NumberOfTables);
+    public void write(LittleEndianDataOutputStream stream, byte versionMajor, byte versionMinor) throws MSLAException {
+        try {
+            stream.write(PhotonWorkshopFileDescriptor.Mark.getBytes());
+            stream.write(new byte[PhotonWorkshopFileTable.MarkLength - PhotonWorkshopFileDescriptor.Mark.length()]);
+            stream.write(versionMinor);
+            stream.write(versionMajor);
+            stream.write(0); // Skip a byte
+            stream.write(0); // Skip a byte
+            stream.writeInt(fields.NumberOfTables);
 
-        stream.writeInt(fields.HeaderAddress);
-        stream.writeInt(fields.SoftwareAddress);
-        stream.writeInt(fields.PreviewAddress);
-        stream.writeInt(fields.LayerImageColorTableAddress);
-        stream.writeInt(fields.LayerDefinitionAddress);
+            stream.writeInt(fields.HeaderAddress);
+            stream.writeInt(fields.SoftwareAddress);
+            stream.writeInt(fields.PreviewAddress);
+            stream.writeInt(fields.LayerImageColorTableAddress);
+            stream.writeInt(fields.LayerDefinitionAddress);
 
-        // Version 2.3 and greater
-        if ((versionMajor >= 2) && (versionMinor >= 4)) {
-            stream.writeInt(fields.ExtraAddress);
+            // Version 2.3 and greater
+            if ((versionMajor >= 2) && (versionMinor >= 4)) {
+                stream.writeInt(fields.ExtraAddress);
+            }
+
+            stream.writeInt(fields.MachineAddress);
+            stream.writeInt(fields.LayerImageAddress);
+
+            // Version 2.5 and greater
+            if ((versionMajor >= 2) && (versionMinor >= 5)) {
+                stream.writeInt(fields.ModelAddress);
+            }
+
+            // Version 2.6 and greater
+            if ((versionMajor >= 2) && (versionMinor >= 6)) {
+                stream.writeInt(fields.SubLayerDefinitionAddress);
+                stream.writeInt(fields.Preview2Address);
+            }
+            stream.flush();
+        } catch (IOException e) {
+            throw new MSLAException("Can't write descriptor", e);
         }
-
-        stream.writeInt(fields.MachineAddress);
-        stream.writeInt(fields.LayerImageAddress);
-
-        // Version 2.5 and greater
-        if ((versionMajor >= 2) && (versionMinor >= 5)) {
-            stream.writeInt(fields.ModelAddress);
-        }
-
-        // Version 2.6 and greater
-        if ((versionMajor >= 2) && (versionMinor >= 6)) {
-            stream.writeInt(fields.SubLayerDefinitionAddress);
-            stream.writeInt(fields.Preview2Address);
-        }
-        stream.flush();
     }
 
     public static PhotonWorkshopFileDescriptor read(LittleEndianDataInputStream stream)

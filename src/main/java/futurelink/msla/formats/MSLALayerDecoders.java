@@ -1,71 +1,95 @@
 package futurelink.msla.formats;
 
-import futurelink.msla.formats.iface.MSLALayerDecodeWriter;
+import futurelink.msla.formats.iface.*;
 
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public final class MSLALayerDecoders {
+public final class MSLALayerDecoders<D> extends ThreadPoolExecutor implements MSLALayerDecoder<D> {
     private final Integer maxDecoders;
-    private volatile Integer decoders = 0;
     private final MSLALayerDecodeWriter writer;
+    private final Class<? extends MSLALayerCodec<D>> codec;
+    private static final HashMap<UUID, MSLALayerDecoders<?>> instances = new HashMap<>();
+    private final AtomicInteger counter = new AtomicInteger(0);
 
-    public MSLALayerDecoders(MSLALayerDecodeWriter writer) {
+    public static <T> MSLALayerDecoders<?> getInstance(
+            MSLALayerDecodeWriter writer,
+            MSLAFile<T> file) throws MSLAException
+    {
+        var uuid = file.getUUID();
+        if (uuid == null) throw new MSLAException("No UUID was found");
+        if (instances.containsKey(uuid)) {
+            return instances.get(uuid);
+        } else {
+            var pool = new MSLALayerDecoders<>(writer, file.getCodec());
+            instances.put(uuid, pool);
+            return pool;
+        }
+    }
+
+    private MSLALayerDecoders(
+            MSLALayerDecodeWriter writer,
+            Class<? extends MSLALayerCodec<D>> codec) throws MSLAException
+    {
+        this(5, writer, codec);
+    }
+
+    private MSLALayerDecoders(
+            int maxDecoders,
+            MSLALayerDecodeWriter writer, Class<? extends MSLALayerCodec<D>> codec) throws MSLAException
+    {
+        super(maxDecoders, maxDecoders, 1000000L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        if (codec == null) throw new MSLAException("No codec defined for layer data");
         this.writer = writer;
-        this.maxDecoders = 5;
+        this.maxDecoders = maxDecoders;
+        this.codec = codec;
     }
 
-    private synchronized boolean isBusy() {
-        synchronized (this) {
-            return (decoders >= maxDecoders);
-        }
+    @Override
+    public boolean isBusy() {
+        return counter.get() >= maxDecoders;
     }
 
-    public synchronized boolean isDecoding() {
-        synchronized (this) {
-            return decoders > 0;
-        }
+    @Override
+    public boolean isDecoding() {
+        return counter.get() > 0;
     }
 
-    public boolean decode(int layer, byte[] data, int decodedDataLength) throws MSLAException {
-        if (writer.getCodec() == null) throw new MSLAException("No codec defined for layer data");
-
+    @Override
+    public boolean decode(int layer, MSLALayerDecodeInput<D> data, int decodedDataLength) throws MSLAException {
+        if (data == null) throw new MSLAException("No data to decode");
         if (isBusy()) return false; // No decoder slots available
-
+        counter.getAndIncrement();
         try {
-            synchronized (this) { decoders++; }
-            var codecObj = writer.getCodec().getDeclaredConstructor().newInstance();
+            // Create codec object, one per encoding process
+            var codecObj = codec.getDeclaredConstructor().newInstance();
 
             // Start decode thread
-            new Thread(() -> {
+            submit(() -> {
                 try {
                     writer.onStart(layer);
-                    var pixels = codecObj.Decode(data, layer, decodedDataLength, writer);
+                    var pixels = codecObj.Decode(layer, data, decodedDataLength, writer);
                     writer.onFinish(layer, pixels);
-                } catch (IOException e) {
+                    counter.decrementAndGet();
+                } catch (MSLAException e) {
                     try {
                         writer.onError(layer, e.getMessage());
-                    } catch (IOException e2) {
+                        counter.decrementAndGet();
+                    } catch (MSLAException e2) {
+                        counter.decrementAndGet();
                         throw new RuntimeException(e2);
                     }
                 }
-                synchronized (this) { decoders--; }
-            }).start();
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
-                 NoSuchMethodException e) {
+            });
+        } catch (InvocationTargetException | InstantiationException |
+                 IllegalAccessException | NoSuchMethodException e) {
             throw new MSLAException("Can't proceed with decoding", e);
         }
-
         return true;
-    }
-
-    public boolean decode(int layer, DataInputStream stream, int encodedDataLength, int decodedDataLength)
-            throws MSLAException {
-        try {
-            return decode(layer, stream.readNBytes(encodedDataLength), decodedDataLength);
-        } catch (IOException e) {
-            throw new MSLAException("Can't proceed with decoding as couldn't read data from stream", e);
-        }
     }
 }

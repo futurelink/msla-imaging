@@ -1,6 +1,9 @@
 package futurelink.msla.formats.creality.tables;
 
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.MSLAFileDefaults;
+import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.experimental.Delegate;
@@ -9,85 +12,43 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+@Getter
 public class CXDLPFileHeader extends CXDLPFileTable {
+
+    @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
-        public static final byte HEADER_SIZE = 9; // CXSW3DV2
-        public static  final String HEADER_VALUE = "CXSW3DV2";
-        private final String HEADER_VALUE_GENERIC = "CXSW3D";
-        private final byte DEFAULT_VERSION = 3;
+        public static final String HEADER_VALUE = "CXSW3DV2";
+        public static final String HEADER_VALUE_GENERIC = "CXSW3D";
+        public static final Short DEFAULT_VERSION = 3;
 
-        @Getter private int HeaderSize = HEADER_SIZE;
-        @Getter private String HeaderValue = HEADER_VALUE;
-        @Getter private short Version = DEFAULT_VERSION;
-        @Getter private int PrinterModelSize = 6;
-        @Getter private byte[] PrinterModelArray;
-        @Getter private short LayerCount;
-        @Getter private Size Resolution;
+        @Getter private Size Resolution = new Size(0, 0);
+        @Getter private Float PixelSizeUm;
+
+        @MSLAFileField() @Getter private Integer HeaderSize = 9;
+        @MSLAFileField(order = 1, lengthAt = "HeaderSize") @Getter private String HeaderValue = HEADER_VALUE;
+        @MSLAFileField(order = 2) @Getter private Short Version = DEFAULT_VERSION;
+        @MSLAFileField(order = 3) @Getter private Integer PrinterModelSize = 6;
+        @MSLAFileField(order = 4, lengthAt = "PrinterModelSize") @Getter private String PrinterModel = "";
+        @MSLAFileField(order = 5) @Getter private Short LayerCount = 0;
+        @MSLAFileField(order = 6) private Short ResolutionX() { return (short) Resolution.getWidth(); }
+        private void setResolutionX(Short width) { Resolution = new Size(width, Resolution.getHeight()); }
+        @MSLAFileField(order = 7) private Short ResolutionY() { return (short) Resolution.getHeight(); }
+        private void setResolutionY(Short height) { Resolution = new Size(Resolution.getWidth(), height); }
+        @MSLAFileField(order = 8, length = 64) byte[] Padding = new byte[64];
+
         public int getDataLength() { return HeaderSize + PrinterModelSize + 16 + 64; }
-
-        public Fields() {
-            PrinterModelArray = new byte[PrinterModelSize];
-        }
-
-        public Fields(Size resolution, String printerModel) {
-            Resolution = new Size(resolution);
-            PrinterModelSize = printerModel.length()+1;
-            PrinterModelArray = Arrays.copyOf(printerModel.getBytes(), PrinterModelSize);
-        }
-
-        public Fields(Fields defaults) {
-            HeaderSize = defaults.HeaderSize;
-            HeaderValue = defaults.HeaderValue;
-            Version = defaults.getVersion();
-            PrinterModelSize = defaults.PrinterModelSize;
-            PrinterModelArray = defaults.PrinterModelArray;
-            LayerCount = 0;
-            Resolution = new Size(defaults.getResolution());
-        }
-
-        public void setPrinterModel(String model) {
-            PrinterModelSize = model.length();
-            PrinterModelArray = model.getBytes();
-        }
     }
 
-    @Delegate private Fields fields = new Fields();;
+    @Delegate private Fields fields;
 
-    public CXDLPFileHeader() {}
-
-    public CXDLPFileHeader(MSLAFileBlockFields defaults) {
-        fields = new Fields((Fields) defaults);
+    public CXDLPFileHeader() { fields = new Fields(); }
+    public CXDLPFileHeader(MSLAFileDefaults defaults) throws MSLAException {
+        this();
+        defaults.setFields("Header", fields);
     }
 
     public void setLayerCount(short count) {
         fields.LayerCount = count;
-    }
-
-    @Override
-    public void read(FileInputStream stream, int position) throws IOException {
-        var dis = new DataInputStream(stream);
-        fields.HeaderSize = dis.readInt();
-        fields.HeaderValue = new String(stream.readNBytes(fields.HeaderSize), StandardCharsets.US_ASCII).trim();
-        fields.Version = dis.readShort();
-        fields.PrinterModelSize = dis.readInt();
-        fields.PrinterModelArray = dis.readNBytes(fields.PrinterModelSize);
-        fields.LayerCount = dis.readShort();
-        fields.Resolution = new Size(dis.readShort(), dis.readShort());
-        dis.readNBytes(64);
-    }
-
-    @Override
-    public void write(OutputStream stream) throws IOException {
-        var dos = new DataOutputStream(stream);
-        dos.writeInt(fields.HeaderSize);
-        dos.write(fields.HeaderValue.getBytes()); dos.write(0);
-        dos.writeShort(fields.Version);
-        dos.writeInt(fields.PrinterModelSize);
-        dos.write(fields.PrinterModelArray);
-        dos.writeShort(fields.LayerCount);
-        dos.writeShort(fields.Resolution.getWidth());
-        dos.writeShort(fields.Resolution.getHeight());
-        for (int i = 0; i < 64; i++) dos.write(0); // Offset zeroes
     }
 
     @Override
@@ -97,7 +58,7 @@ public class CXDLPFileHeader extends CXDLPFileTable {
                 "HeaderValue: " + fields.HeaderValue + "\n" +
                 "Version: " + fields.Version + "\n" +
                 "PrinterModelSize: " + fields.PrinterModelSize + "\n" +
-                "PrinterModelArray: " + new String(fields.PrinterModelArray).trim() + "\n" +
+                "PrinterModelArray: " + fields.PrinterModel + "\n" +
                 "LayerCount: " + fields.LayerCount + "\n" +
                 "Resolution: " + fields.Resolution + "\n";
     }

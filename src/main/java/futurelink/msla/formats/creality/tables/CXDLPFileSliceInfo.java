@@ -1,134 +1,76 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAOption;
-import futurelink.msla.formats.iface.MSLAOptionContainer;
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Delegate;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-@MSLAOptionContainer(className= CXDLPFileSliceInfo.Fields.class)
+@MSLAOptionContainer(className = CXDLPFileSliceInfo.Fields.class)
+@Getter
 public class CXDLPFileSliceInfo extends CXDLPFileTable {
+    @Delegate private final Fields fields;
+    @Getter
     public static class Fields implements MSLAFileBlockFields {
-        @Getter private Integer DisplayWidthLength;
-        @Getter private String DisplayWidth;            // UTF-16
-        @Getter private Integer DisplayHeightLength;
-        @Getter private String DisplayHeight;           // UTF-16
-        @Getter private Integer LayerHeightLength = 8;
-        @MSLAOption(type=String.class) @Getter private String LayerHeight = "0.05";    // UTF-16
-        @MSLAOption @Getter @Setter private Short ExposureTime;
-        @MSLAOption @Getter @Setter private Short WaitTimeBeforeCure = 1;   // 1 as minimum or it won't print!
-        @MSLAOption @Getter @Setter private Short BottomExposureTime;
-        @MSLAOption @Getter @Setter private Short BottomLayersCount;
-        @MSLAOption @Getter @Setter private Short BottomLiftHeight;
-        @MSLAOption @Getter @Setter private Short BottomLiftSpeed;
-        @MSLAOption @Getter @Setter private Short LiftHeight;
-        @MSLAOption @Getter @Setter private Short LiftSpeed;
-        @MSLAOption @Getter @Setter private Short RetractSpeed;
-        @MSLAOption @Getter @Setter private Short BottomLightPWM = 255;
-        @MSLAOption @Getter @Setter private Short LightPWM = 255;
+        @MSLAFileField()
+        private Integer DisplayWidthLength = 0;
+        @MSLAFileField(order = 1, lengthAt = "DisplayWidthLength", charset = "UTF-16BE")
+        private String DisplayWidth;
+        @MSLAFileField(order = 2) private Integer DisplayHeightLength = 0;
+        @MSLAFileField(order = 3, lengthAt = "DisplayHeightLength", charset = "UTF-16BE")
+        private String DisplayHeight;
+        @MSLAFileField(order = 4) private Integer LayerHeightLength = 8;
+        @MSLAFileField(order = 5, lengthAt = "LayerHeightLength", charset = "UTF-16BE")
+        @MSLAOption(type=String.class) private String LayerHeight = "0.05";
+        @MSLAFileField(order = 6) @MSLAOption @Setter private Short ExposureTime;
+        @MSLAFileField(order = 7) @MSLAOption @Setter private Short WaitTimeBeforeCure = 1;   // 1 as minimum or it won't print!
+        @MSLAFileField(order = 8) @MSLAOption @Setter private Short BottomExposureTime;
+        @MSLAFileField(order = 9) @MSLAOption @Setter private Short BottomLayersCount;
+        @MSLAFileField(order = 10) @MSLAOption @Setter private Short BottomLiftHeight;
+        @MSLAFileField(order = 11) @MSLAOption @Setter private Short BottomLiftSpeed;
+        @MSLAFileField(order = 12) @MSLAOption @Setter private Short LiftHeight;
+        @MSLAFileField(order = 13) @MSLAOption @Setter private Short LiftSpeed;
+        @MSLAFileField(order = 14) @MSLAOption @Setter private Short RetractSpeed;
+        @MSLAFileField(order = 15) @MSLAOption @Setter private Short BottomLightPWM = 255;
+        @MSLAFileField(order = 16) @MSLAOption @Setter private Short LightPWM = 255;
 
         public Fields() {}
 
-        public Fields(Fields defaults) {
-            DisplayWidthLength = defaults.DisplayWidthLength;
-            DisplayWidth = defaults.DisplayWidth;
-            DisplayHeightLength = defaults.DisplayHeightLength;
-            DisplayHeight = defaults.DisplayHeight;
-            LayerHeightLength = defaults.LayerHeightLength;
-            LayerHeight = defaults.LayerHeight;
-            ExposureTime = defaults.ExposureTime;
-            WaitTimeBeforeCure = defaults.WaitTimeBeforeCure;
-            BottomExposureTime = defaults.BottomExposureTime;
-            BottomLayersCount = defaults.BottomLayersCount;
-            BottomLiftHeight = defaults.BottomLiftHeight;
-            BottomLiftSpeed = defaults.BottomLiftSpeed;
-            LiftHeight = defaults.LiftHeight;
-            LiftSpeed = defaults.LiftSpeed;
-            RetractSpeed = defaults.RetractSpeed;
-            BottomLightPWM = defaults.BottomLightPWM;
-            LightPWM = defaults.LightPWM;
-        }
-
         public int getDataLength() { return DisplayWidthLength + DisplayHeightLength + LayerHeightLength + 22 + 12; }
 
+        @SuppressWarnings("unused")
         public void setDisplayHeight(String displayHeight) {
             DisplayHeight = displayHeight;
             DisplayHeightLength = displayHeight.length() * 2;
         }
 
+        @SuppressWarnings("unused")
         public void setDisplayWidth(String displayWidth) {
             DisplayWidth = displayWidth;
             DisplayWidthLength = displayWidth.length() * 2;
         }
 
+        @SuppressWarnings("unused")
         public void setLayerHeight(String layerHeight) {
             LayerHeight = layerHeight;
             LayerHeightLength = layerHeight.length() * 2;
         }
     }
 
-    private final Fields fields;
-
     public CXDLPFileSliceInfo() {
         fields = new Fields();
     }
-
-    public CXDLPFileSliceInfo(MSLAFileBlockFields defaults) {
-        fields = new Fields((Fields) defaults);
+    public CXDLPFileSliceInfo(MSLAFileDefaults defaults) throws MSLAException {
+        this();
+        defaults.setFields("SliceInfo", fields);
     }
 
     @Override
     public int getDataLength() { return fields.getDataLength(); }
-
-    @Override
-    public void read(FileInputStream stream, int position) throws IOException {
-        var fc = stream.getChannel();
-        fc.position(position);
-
-        var dis = new DataInputStream(stream);
-        fields.DisplayWidthLength = dis.readInt();
-        fields.DisplayWidth = new String(dis.readNBytes(fields.DisplayWidthLength), StandardCharsets.UTF_16BE);
-        fields.DisplayHeightLength = dis.readInt();
-        fields.DisplayHeight = new String(dis.readNBytes(fields.DisplayHeightLength), StandardCharsets.UTF_16BE);
-        fields.LayerHeightLength = dis.readInt();
-        fields.LayerHeight = new String(dis.readNBytes(fields.LayerHeightLength), StandardCharsets.UTF_16BE);
-        fields.ExposureTime = dis.readShort();
-        fields.WaitTimeBeforeCure = dis.readShort();
-        fields.BottomExposureTime = dis.readShort();
-        fields.BottomLayersCount = dis.readShort();
-        fields.BottomLiftHeight = dis.readShort();
-        fields.BottomLiftSpeed = dis.readShort();
-        fields.LiftHeight = dis.readShort();
-        fields.LiftSpeed = dis.readShort();
-        fields.RetractSpeed = dis.readShort();
-        fields.BottomLightPWM = dis.readShort();
-        fields.LightPWM = dis.readShort();
-    }
-
-    @Override
-    public void write(OutputStream stream) throws IOException {
-        var dos = new DataOutputStream(stream);
-        dos.writeInt(fields.DisplayWidthLength);
-        dos.write(fields.DisplayWidth.getBytes(StandardCharsets.UTF_16BE));
-        dos.writeInt(fields.DisplayHeightLength);
-        dos.write(fields.DisplayHeight.getBytes(StandardCharsets.UTF_16BE));
-        dos.writeInt(fields.LayerHeightLength);
-        dos.write(fields.LayerHeight.getBytes(StandardCharsets.UTF_16BE));
-        dos.writeShort(fields.ExposureTime);
-        dos.writeShort(fields.WaitTimeBeforeCure);
-        dos.writeShort(fields.BottomExposureTime);
-        dos.writeShort(fields.BottomLayersCount);
-        dos.writeShort(fields.BottomLiftHeight);
-        dos.writeShort(fields.BottomLiftSpeed);
-        dos.writeShort(fields.LiftHeight);
-        dos.writeShort(fields.LiftSpeed);
-        dos.writeShort(fields.RetractSpeed);
-        dos.writeShort(fields.BottomLightPWM);
-        dos.writeShort(fields.LightPWM);
-    }
 
     @Override
     public String toString() {

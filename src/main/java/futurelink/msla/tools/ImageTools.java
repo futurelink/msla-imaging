@@ -1,9 +1,6 @@
 package futurelink.msla.tools;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.MSLALayerDecoders;
-import futurelink.msla.formats.MSLALayerEncoders;
-import futurelink.msla.formats.anycubic.PhotonWorkshopCodec;
 import futurelink.msla.formats.utils.FileFactory;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -14,17 +11,17 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
+@SuppressWarnings("unused")
 public class ImageTools {
-    public static void exportLayers(String fileName, String destinationDir, String format)
-            throws IOException, MSLAException {
+
+    @SuppressWarnings("unchecked")
+    public static void exportLayers(String fileName, String destinationDir, String format) throws MSLAException {
         var wsFile = FileFactory.instance.load(fileName);
         if (wsFile != null) {
-            System.out.println(wsFile);
-
             if (wsFile.isValid()) {
-                var decoders = new MSLALayerDecoders(new ImageWriter(wsFile, destinationDir, "png"));
+                var decoders = wsFile.getDecodersPool(new ImageWriter(wsFile, destinationDir, "png"));
                 for (int i = 0; i < wsFile.getLayerCount(); i++)
-                    while (!wsFile.readLayer(decoders, i)) {}; // Wait while layer can be read (returns false when busy)
+                    while (!wsFile.readLayer(decoders, i)) {} // Wait while layer can be read (returns false when busy)
             }
         }
     }
@@ -59,15 +56,14 @@ public class ImageTools {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static void createFromBufferedImage(String machineName, BufferedImage image, String outputFileName)
             throws MSLAException  {
-        var defaults = FileFactory.instance.defaults(machineName);
         var wsFile = FileFactory.instance.create(machineName);
         if (wsFile != null) {
             if (!wsFile.isValid()) throw new MSLAException("File header has no resolution info");
-            var encoders = new MSLALayerEncoders();
             wsFile.options().set("BottomExposureTime", 12);
-            while (!wsFile.addLayer(new ImageReader(wsFile, image), encoders)) {};
+            wsFile.addLayer(new ImageReader(wsFile, image), null);
         }
     }
 }

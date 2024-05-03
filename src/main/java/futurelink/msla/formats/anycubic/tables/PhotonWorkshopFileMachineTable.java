@@ -1,183 +1,148 @@
 package futurelink.msla.formats.anycubic.tables;
 
-import com.google.common.io.LittleEndianDataInputStream;
-import com.google.common.io.LittleEndianDataOutputStream;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.MSLAFileDefaults;
+import futurelink.msla.formats.iface.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAOptionContainer;
+import futurelink.msla.formats.utils.FileFieldsReader;
+import futurelink.msla.formats.utils.FileFieldsWriter;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Delegate;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 /**
  * "MACHINE" section representation.
  */
+@MSLAOptionContainer(className = PhotonWorkshopFileMachineTable.Fields.class)
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
-
-    public static class Fields implements MSLAFileBlockFields {
-        @Getter @Setter String MachineName = null;
-        @Getter @Setter String LayerImageFormat = "pw0img";
-        @Getter @Setter Integer MaxAntialiasingLevel = 16;
-        @Getter @Setter Integer PropertyFields = 7;
-        @Getter @Setter Float DisplayWidth;
-        @Getter @Setter Float DisplayHeight;
-        @Getter @Setter Float MachineZ;
-        @Getter @Setter Integer MaxFileVersion = 0x0206;
-        @Getter @Setter Integer MachineBackground = 6506241;
-        @Getter @Setter Float PixelWidthUm;
-        @Getter @Setter Float PixelHeightUm;
-        @Getter @Setter Integer Padding1;
-        @Getter @Setter Integer Padding2;
-        @Getter @Setter Integer Padding3;
-        @Getter @Setter Integer Padding4;
-        @Getter @Setter Integer Padding5;
-        @Getter @Setter Integer Padding6;
-        @Getter @Setter Integer Padding7;
-        @Getter @Setter Integer Padding8;
-        @Getter @Setter Integer DisplayCount = 1;
-        @Getter @Setter Integer Padding9;
-        @Getter @Setter Short ResolutionX;
-        @Getter @Setter Short ResolutionY;
-        @Getter @Setter Integer Padding10;
-        @Getter @Setter Integer Padding11;
-        @Getter @Setter Integer Padding12;
-        @Getter @Setter Integer Padding13;
-
-        public Fields() {}
-        public Fields(Fields source) {
-            MachineName = source.MachineName;
-            LayerImageFormat = source.LayerImageFormat;
-            MaxAntialiasingLevel = source.MaxAntialiasingLevel; PropertyFields = source.PropertyFields;
-            DisplayWidth = source.DisplayWidth; DisplayHeight = source.DisplayHeight;
-            MachineZ = source.MachineZ; MaxFileVersion = source.MaxFileVersion;
-            MachineBackground = source.MachineBackground;
-            PixelWidthUm = source.PixelWidthUm; PixelHeightUm = source.PixelHeightUm;
-            Padding1 = source.Padding1; Padding2 = source.Padding2; Padding3 = source.Padding3;
-            Padding4 = source.Padding4; Padding5 = source.Padding5; Padding6 = source.Padding6;
-            Padding7 = source.Padding7; Padding8 = source.Padding8; DisplayCount = source.DisplayCount;
-            Padding9 = source.Padding9; ResolutionX = source.ResolutionX; ResolutionY = source.ResolutionY;
-            Padding10 = source.Padding10; Padding11 = source.Padding11; Padding12 = source.Padding12;
-            Padding13 = source.Padding13;
-        }
-        //@Override
-        //public int getDataLength() { return 0; }
-    }
-
     public static final String Name = "MACHINE";
-    private final Fields fields;
+    @Delegate private final Fields fields;
+
+    @Getter @Setter
+    @SuppressWarnings("unused")
+    public static class Fields implements MSLAFileBlockFields {
+        private final PhotonWorkshopFileTable parent;
+
+        @MSLAFileField(length = MarkLength) private String Name() { return PhotonWorkshopFileMachineTable.Name; }
+        // Validation setter checks for what's been read from file
+        // and throws an exception when that is something unexpected.
+        private void setName(String name) throws MSLAException {
+            if (!PhotonWorkshopFileMachineTable.Name.equals(name))
+                throw new MSLAException("Table name '" + name + "' is invalid");
+        }
+        @MSLAFileField(order = 1) private Integer TableLength() { return parent.calculateTableLength(); }
+        private void setTableLength(Integer length) { parent.TableLength = length; }
+        @MSLAFileField(order = 2, length = 96) private String MachineName = "";
+        @MSLAFileField(order = 3, length = 16) private String LayerImageFormat = "pw0img";
+        @MSLAFileField(order = 4) private Integer MaxAntialiasingLevel = 16;
+        @MSLAFileField(order = 5) private Integer PropertyFields = 7;
+        @MSLAFileField(order = 6) private Float DisplayWidth;
+        @MSLAFileField(order = 7) private Float DisplayHeight;
+        @MSLAFileField(order = 8) private Float MachineZ;
+        @MSLAFileField(order = 9) private Integer MaxFileVersion = 0x0206;
+        @MSLAFileField(order = 10) private Integer MachineBackground = 6506241;
+        @MSLAFileField(order = 11) private Float PixelWidthUm;
+        @MSLAFileField(order = 12) private Float PixelHeightUm;
+        @MSLAFileField(order = 13) private Integer Padding1 = 0;
+        @MSLAFileField(order = 14) private Integer Padding2 = 0;
+        @MSLAFileField(order = 15) private Integer Padding3 = 0;
+        @MSLAFileField(order = 16) private Integer Padding4 = 0;
+        @MSLAFileField(order = 17) private Integer Padding5 = 0;
+        @MSLAFileField(order = 18) private Integer Padding6 = 0;
+        @MSLAFileField(order = 19) private Integer Padding7 = 0;
+        @MSLAFileField(order = 20) private Integer Padding8 = 0;
+        @MSLAFileField(order = 21) private Integer DisplayCount = 1;
+        @MSLAFileField(order = 22) private Integer Padding9 = 0;
+        @MSLAFileField(order = 23) private Short ResolutionX;
+        @MSLAFileField(order = 24) private Short ResolutionY;
+        @MSLAFileField(order = 25) private Integer Padding10 = 0;
+        @MSLAFileField(order = 26) private Integer Padding11 = 0;
+        @MSLAFileField(order = 27) private Integer Padding12 = 0;
+        @MSLAFileField(order = 28) private Integer Padding13 = 0;
+
+        public Fields(PhotonWorkshopFileTable parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public boolean isFieldExcluded(String fieldName) {
+            return ((TableLength() < 224) && "Padding13".equals(fieldName)) ||
+                    ((TableLength() < 220) && "Padding12".equals(fieldName)) ||
+                    ((TableLength() < 216) && "Padding11".equals(fieldName)) ||
+                    ((TableLength() < 212) && "Padding10".equals(fieldName)) ||
+                    ((TableLength() < 208) && "ResolutionY".equals(fieldName)) ||
+                    ((TableLength() < 206) && "ResolutionX".equals(fieldName)) ||
+                    ((TableLength() < 204) && "Padding9".equals(fieldName)) ||
+                    ((TableLength() < 200) && "DisplayCount".equals(fieldName)) ||
+                    ((TableLength() < 196) && "Padding8".equals(fieldName)) ||
+                    ((TableLength() < 192) && "Padding7".equals(fieldName)) ||
+                    ((TableLength() < 188) && "Padding6".equals(fieldName)) ||
+                    ((TableLength() < 184) && "Padding5".equals(fieldName)) ||
+                    ((TableLength() < 180) && "Padding4".equals(fieldName)) ||
+                    ((TableLength() < 176) && "Padding3".equals(fieldName)) ||
+                    ((TableLength() < 172) && "Padding2".equals(fieldName)) ||
+                    ((TableLength() < 168) && "Padding1".equals(fieldName)) ||
+                    ((TableLength() < 164) && "PixelHeightUm".equals(fieldName)) ||
+                    ((TableLength() < 160) && "PixelWidthUm".equals(fieldName));
+        }
+    }
 
     public String getLayerImageFormat() { return fields.getLayerImageFormat(); }
 
     public PhotonWorkshopFileMachineTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        fields = new Fields();
+        fields = new Fields(this);
     }
-    public PhotonWorkshopFileMachineTable(MSLAFileBlockFields defaults, byte versionMajor, byte versionMinor) {
-        super(versionMajor, versionMinor);
-        fields = new Fields((Fields) defaults);
+    public PhotonWorkshopFileMachineTable(
+            MSLAFileDefaults defaults,
+            byte versionMajor,
+            byte versionMinor) throws MSLAException
+    {
+        this(versionMajor, versionMinor);
+        defaults.setFields("Machine", fields);
     }
 
     @Override
-    int calculateTableLength(byte versionMajor, byte versionMinor) {
+    int calculateTableLength() {
         return 156; // for the time being make it constant
     }
 
     @Override
     public int getDataLength() {
-        // Need to subtract 16 to data length because for some reason
+        // Need to subtract 16 from data length because for some reason
         // the value of TableLength is 16 bytes greater than factual table length...
-        return calculateTableLength(versionMajor, versionMinor) + MarkLength + 4 - 16;
+        return calculateTableLength() + MarkLength + 4 - 16;
     }
 
     @Override
-    public void read(FileInputStream stream, int position) throws IOException, MSLAException {
-        var fc = stream.getChannel(); fc.position(position);
-        var dis = new LittleEndianDataInputStream(stream);
-        int dataRead;
-        var headerMark = stream.readNBytes(Name.length());
-        if (!Arrays.equals(headerMark, Name.getBytes())) {
-            throw new MSLAException("Machine mark not found! Corrupted data.");
+    public void read(FileInputStream stream, int position) throws MSLAException {
+        try {
+            var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
+            var dataRead = reader.read(fields);
+            if (dataRead != TableLength) throw new MSLAException(
+                    "Machine table was not completely read out (" + dataRead + " of " + TableLength +
+                            "), some extra data left unread"
+            );
+        } catch (IOException e) {
+            throw new MSLAException("Error reading Machine table", e);
         }
-        stream.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
-        TableLength = dis.readInt();
-        fields.MachineName = new String(dis.readNBytes(96), StandardCharsets.US_ASCII).trim();
-        fields.LayerImageFormat = new String(dis.readNBytes(16), StandardCharsets.US_ASCII).trim();
-        fields.MaxAntialiasingLevel = dis.readInt();
-        fields.PropertyFields = dis.readInt();
-        fields.DisplayWidth = dis.readFloat();
-        fields.DisplayHeight = dis.readFloat();
-        fields.MachineZ = dis.readFloat();
-        fields.MaxFileVersion = dis.readInt();
-        fields.MachineBackground = dis.readInt();
-        dataRead = 156; // Assume we read 156 bytes
-
-        if (TableLength >= 160) { fields.PixelWidthUm = dis.readFloat(); dataRead += 4; }
-        if (TableLength >= 164) { fields.PixelHeightUm = dis.readFloat(); dataRead += 4; }
-        if (TableLength >= 168) { fields.Padding1 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 172) { fields.Padding2 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 176) { fields.Padding3 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 180) { fields.Padding4 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 184) { fields.Padding5 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 188) { fields.Padding6 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 192) { fields.Padding7 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 196) { fields.Padding8 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 200) { fields.DisplayCount = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 204) { fields.Padding9 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 206) { fields.ResolutionX = dis.readShort(); dataRead += 2; }
-        if (TableLength >= 208) { fields.ResolutionY = dis.readShort(); dataRead += 2; }
-        if (TableLength >= 212) { fields.Padding10 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 216) { fields.Padding11 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 220) { fields.Padding12 = dis.readInt(); dataRead += 4; }
-        if (TableLength >= 224) { fields.Padding13 = dis.readInt(); dataRead += 4; }
-
-        if (dataRead != TableLength)
-            throw new MSLAException("Machine was not completely read out (" + dataRead + " of " + TableLength +
-                    "), some extra data left unread");
     }
 
     @Override
-    public void write(OutputStream stream) throws IOException {
-        var dos = new LittleEndianDataOutputStream(stream);
-        dos.write(Name.getBytes());
-        dos.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
-        TableLength = calculateTableLength(versionMajor, versionMinor);
-        dos.writeInt(TableLength);
-
-        dos.write(fields.MachineName.getBytes());
-        dos.write(new byte[96 - fields.MachineName.length()]);
-        dos.write(fields.LayerImageFormat.getBytes());
-        dos.write(new byte[16 - fields.LayerImageFormat.length()]);
-
-        dos.writeInt(fields.MaxAntialiasingLevel);
-        dos.writeInt(fields.PropertyFields);
-        dos.writeFloat(fields.DisplayWidth);
-        dos.writeFloat(fields.DisplayHeight);
-        dos.writeFloat(fields.MachineZ);
-        dos.writeInt(fields.MaxFileVersion);
-        dos.writeInt(fields.MachineBackground);
-
-        if (TableLength >= 160) dos.writeFloat(fields.PixelWidthUm);
-        if (TableLength >= 164) dos.writeFloat(fields.PixelHeightUm);
-        if (TableLength >= 168) dos.writeInt(fields.Padding1);
-        if (TableLength >= 172) dos.writeInt(fields.Padding2);
-        if (TableLength >= 176) dos.writeInt(fields.Padding3);
-        if (TableLength >= 180) dos.writeInt(fields.Padding4);
-        if (TableLength >= 184) dos.writeInt(fields.Padding5);
-        if (TableLength >= 188) dos.writeInt(fields.Padding6);
-        if (TableLength >= 192) dos.writeInt(fields.Padding7);
-        if (TableLength >= 196) dos.writeInt(fields.Padding8);
-        if (TableLength >= 200) dos.writeInt(fields.DisplayCount);
-        if (TableLength >= 204) dos.writeInt(fields.Padding9);
-        if (TableLength >= 206) dos.writeShort(fields.ResolutionX);
-        if (TableLength >= 208) dos.writeShort(fields.ResolutionY);
-        if (TableLength >= 212) dos.writeInt(fields.Padding10);
-        if (TableLength >= 216) dos.writeInt(fields.Padding11);
-        if (TableLength >= 220) dos.writeInt(fields.Padding12);
-        if (TableLength >= 224) dos.writeInt(fields.Padding13);
+    public void write(OutputStream stream) throws MSLAException {
+        TableLength = calculateTableLength();
+        try {
+            var writer = new FileFieldsWriter(stream, FileFieldsWriter.Endianness.LittleEndian);
+            writer.write(fields);
+            stream.flush();
+        } catch (IOException e) {
+            throw new MSLAException("Error writing Machine table", e);
+        }
     }
 
     @Override

@@ -1,7 +1,5 @@
 package futurelink.msla.ui;
 
-import futurelink.msla.formats.anycubic.PhotonWorkshopFileDefaults;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -30,7 +28,7 @@ public class MainWindow extends JFrame {
         toolBar.add(addPNGBtn);
         add(toolBar, BorderLayout.PAGE_START);
         var printerChoice = new JComboBox<String>();
-        PhotonWorkshopFileDefaults.getSupported().forEach(printerChoice::addItem);
+        // PhotonWorkshopFileDefaults.getSupported().forEach(printerChoice::addItem);
         add(printerChoice);
         toolBar.add(printerChoice);
         var exportBtn = new JButton("Export");

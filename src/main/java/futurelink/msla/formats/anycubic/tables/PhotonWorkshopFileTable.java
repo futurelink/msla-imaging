@@ -29,10 +29,10 @@ abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {
         this.versionMinor = versionMinor;
     }
 
-    abstract int calculateTableLength(byte versionMajor, byte versionMinor);
+    abstract int calculateTableLength();
 
     @Override
-    public int getDataLength() { return calculateTableLength(versionMajor, versionMinor) + MarkLength + 4; }
+    public int getDataLength() { return calculateTableLength() + MarkLength + 4; }
 
     public HashMap<String, Class<?>> getOptions() {
         var a = getClass().getAnnotation(MSLAOptionContainer.class);

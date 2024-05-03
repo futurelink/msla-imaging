@@ -6,7 +6,6 @@ import futurelink.msla.formats.MSLAOptionMapper;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 class PhotonWorkshopFileOptionMapper extends MSLAOptionMapper {
@@ -20,7 +19,7 @@ class PhotonWorkshopFileOptionMapper extends MSLAOptionMapper {
         this.file = file;
         this.optionsMap = new HashMap<>();
 
-        file.extra.getOptions().forEach((name, type) -> { // EXTRA options (version 2.4 and greater)
+        if (file.extra != null) file.extra.getOptions().forEach((name, type) -> { // EXTRA options (version 2.4 and greater)
             this.optionsMap.put(name, new Option(type, "EXTRA"));
         });
 
@@ -81,7 +80,7 @@ class PhotonWorkshopFileOptionMapper extends MSLAOptionMapper {
                 return (Serializable) m.invoke(file.header);
             }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            throw new MSLAException(e.getMessage());
+            throw new MSLAException("Error while getting option", e);
         }
 
         return null;

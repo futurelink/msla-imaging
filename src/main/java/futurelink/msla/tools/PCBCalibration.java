@@ -2,45 +2,50 @@ package futurelink.msla.tools;
 
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.iface.MSLAFile;
-import futurelink.msla.formats.iface.MSLAFileCodec;
+import futurelink.msla.formats.iface.MSLALayerEncodeOutput;
 import futurelink.msla.formats.iface.MSLALayerEncodeReader;
 import futurelink.msla.formats.utils.FileFactory;
 import futurelink.msla.formats.utils.Size;
+import lombok.Setter;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.logging.Logger;
 
 public class PCBCalibration {
-
+    private static final Logger logger = Logger.getLogger(PCBCalibration.class.getName());
     private static class EncodeReader implements MSLALayerEncodeReader {
-        private final MSLAFile wsFile;
+        private final MSLAFile<?> wsFile;
         private final PCBCalibrationPattern pattern;
-        private int repetitions = 0;
-        public EncodeReader(MSLAFile file, PCBCalibrationPattern pattern, int repetitions) {
+        private int size;
+        @Setter private ReadDirection readDirection = ReadDirection.READ_ROW;
+        private int repetitions;
+        public EncodeReader(MSLAFile<?> file, PCBCalibrationPattern pattern, int repetitions) {
             this.wsFile = file;
             this.pattern = pattern;
             this.repetitions = repetitions;
         }
         volatile int layersLeft = repetitions;
-        @Override public Class<? extends MSLAFileCodec> getCodec() {
-            return wsFile.getCodec();
-        }
         @Override public Size getResolution() { return wsFile.getResolution(); }
-        @Override public InputStream read(int layerNumber, MSLALayerEncodeReader.ReadDirection direction) {
-            return new BufferedImageInputStream(
-                    pattern.generate(wsFile.getResolution().getWidth() / 3, layerNumber, repetitions),
-                    direction
-            );
+        @Override public int getSize() { return size; }
+        @Override public BufferedImage read(int layerNumber) throws MSLAException {
+            var image = pattern.generate(wsFile.getResolution().getWidth() / 3, layerNumber, repetitions);
+            try (var out = new BufferedImageInputStream(image, readDirection)) {
+                this.size = out.available();
+                return image;
+            } catch (IOException e) {
+                throw new MSLAException("Error reading PCBCalibration image", e);
+            }
         }
         @Override public void onStart(int layerNumber) {}
-        @Override public void onFinish(int layerNumber, int pixels, int length) {
-            System.out.println("Layer " + layerNumber + " done: " + pixels + " pixels, " + length + " bytes");
+        @Override public void onFinish(int layerNumber, int pixels, MSLALayerEncodeOutput<?> output) {
+            logger.info("Layer " + layerNumber + " done: " + pixels + " pixels, " + output.sizeInBytes() + " bytes");
             synchronized (wsFile) { layersLeft--; }
         }
         @Override public void onError(int layerNumber, String error) {
-            System.out.println("Layer " + layerNumber + " error: " + error);
+            logger.info("Layer " + layerNumber + " error: " + error);
             synchronized (wsFile) { layersLeft--; }
         }
     }
@@ -49,19 +54,29 @@ public class PCBCalibration {
      * Creates a PCB photo resistive film calibration pattern.
      *
      * @param machineName model of a mSLA 3D printing machine
+     * @param filePath file path and name to store calibration pattern
      * @param startTime initial curing time
      * @param interval curing time interval
      * @param repetitions number of samples or intervals
      */
-    public static void generateTestPattern(String machineName, String fileName, float startTime, float interval, int repetitions)
-            throws IOException, MSLAException {
+    @SuppressWarnings("unchecked")
+    public static String generateTestPattern(
+            String machineName,
+            String filePath,
+            float startTime,
+            float interval,
+            int repetitions) throws MSLAException
+    {
         var defaults = FileFactory.instance.defaults(machineName);
-        if (defaults == null) throw new IOException("Unknown machine name: '" + machineName + "'");
+        if (defaults == null) throw new MSLAException("Unknown machine name: '" + machineName + "'");
 
         var wsFile = FileFactory.instance.create(machineName);
-        if (wsFile == null) throw new IOException("File was not initialized properly!");
+        if (wsFile == null) throw new MSLAException("File was not initialized properly!");
 
-        try (var fos = new FileOutputStream(fileName + "." + defaults.getFileExtension())) {
+        filePath = filePath.endsWith(defaults.getFileExtension()) ?
+                filePath :
+                filePath + "." + defaults.getFileExtension();
+        try (var fos = new FileOutputStream(filePath)) {
             // Set options
             wsFile.options().set("BottomLayersCount", 1);
             wsFile.options().set("BottomExposureTime", startTime);
@@ -85,17 +100,20 @@ public class PCBCalibration {
             var pattern = new PCBCalibrationPattern(wsFile.getResolution(), wsFile.getPixelSizeUm());
             pattern.setStartTime(startTime);
             var reader = new EncodeReader(wsFile, pattern, repetitions);
-            var encoders = new MSLALayerEncoders();
-            for (int i = 0; i < repetitions; i++) {
-                // Wait while layer can be added
-                while (!wsFile.addLayer(reader, encoders, 0.05f, interval, 10.0f, 0.5f)) {}
-            }
-            while (encoders.isEncoding()); // Wait until all layers are encoded
+            for (int i = 0; i < repetitions; i++)
+                wsFile.addLayer(reader, null,  0.05f, interval, 10.0f, 0.5f);
+            while (wsFile.getEncodersPool().isEncoding()); // Wait until all layers are encoded
+            logger.info("Encoding done, writing a file");
             wsFile.write(fos);
+            fos.flush();
+
+            return filePath;
+        } catch (IOException e) {
+            throw new MSLAException("Error writing PCBCalibration image", e);
         }
     }
 
-    public static void createPreview(MSLAFile file) throws MSLAException {
+    public static void createPreview(MSLAFile<?> file) throws MSLAException {
         var preview = file.getPreview();
         if (preview != null) {
             var graphics = preview.getImage().getGraphics();

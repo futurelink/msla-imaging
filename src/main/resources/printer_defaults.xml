@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<printers>
+    <printer manufacturer="Anycubic" name="Photon M3 Max" extension="pm3m" file="PhotonWorkshopFile">
+        <file_options>
+            <option name="VersionMajor" value="2"/>
+            <option name="VersionMinor" value="4"/>
+        </file_options>
+        <options name="Header">
+            <option name="Resolution" value="6480x3600"/>
+            <option name="PixelSizeUm" value="34.399998"/>
+            <option name="PriceCurrencySymbol" value="36"/>
+            <option name="LayerHeight" value="0.05"/>
+            <option name="ExposureTime" value="3.0"/>
+            <option name="WaitTimeBeforeCure1" value="2.0"/>
+            <option name="BottomExposureTime" value="30.0"/>
+            <option name="BottomLayersCount" value="6"/>
+            <option name="LiftHeight" value="10.0"/>
+            <option name="LiftSpeed" value="4.0"/>
+            <option name="RetractSpeed" value="4.0"/>
+            <option name="AntiAliasing" value="1"/>
+            <option name="TransitionLayerCount" value="10"/>
+            <option name="TransitionLayerType" value="0"/>
+            <option name="AdvancedMode" value="0"/>
+        </options>
+        <options name="Machine">
+            <option name="LayerImageFormat" value="pw0Img"/>
+            <option name="MaxAntialiasingLevel" value="16"/>
+            <option name="PropertyFields" value="7"/>
+            <option name="DisplayWidth" value="298.08"/>
+            <option name="DisplayHeight" value="165.6"/>
+            <option name="MachineZ" value="300.0"/>
+            <option name="MaxFileVersion" value="516"/>
+            <option name="MachineBackground" value="6506241"/>
+        </options>
+    </printer>
+
+    <printer manufacturer="Anycubic" name="Photon Mono X 6K" extension="pwmb" file="PhotonWorkshopFile">
+        <file_options>
+            <option name="VersionMajor" value="2"/>
+            <option name="VersionMinor" value="4"/>
+        </file_options>
+        <options name="Header">
+            <option name="Resolution" value="5760x3600"/>
+            <option name="PixelSizeUm" value="34.399998"/>
+            <option name="PriceCurrencySymbol" value="36"/>
+            <option name="LayerHeight" value="0.05"/>
+            <option name="ExposureTime" value="2.0f"/>
+            <option name="WaitTimeBeforeCure1" value="0.0f"/>
+            <option name="BottomExposureTime" value="28.0f"/>
+            <option name="BottomLayersCount" value="6"/>
+            <option name="LiftHeight" value="8.0"/>
+            <option name="LiftSpeed" value="2.0"/>
+            <option name="RetractSpeed" value="2.0"/>
+            <option name="AntiAliasing" value="2"/>
+            <option name="TransitionLayerCount" value="10"/>
+            <option name="TransitionLayerType" value="0"/>
+            <option name="AdvancedMode" value="1"/>
+        </options>
+        <options name="Machine">
+            <option name="LayerImageFormat" value="pw0Img"/>
+            <option name="MaxAntialiasingLevel" value="16"/>
+            <option name="PropertyFields" value="7"/>
+            <option name="DisplayWidth" value="198.144f"/>
+            <option name="DisplayHeight" value="123.84f"/>
+            <option name="MachineZ" value="245.0f"/>
+            <option name="MaxFileVersion" value="516"/>
+            <option name="MachineBackground" value="6506241"/>
+        </options>
+    </printer>
+
+    <printer manufacturer="Anycubic" name="Photon Mono 4K" extension="pwma" file="PhotonWorkshopFile">
+        <file_options>
+            <option name="VersionMajor" value="2"/>
+            <option name="VersionMinor" value="4"/>
+        </file_options>
+        <options name="Header">
+            <option name="Resolution" value="3840x2400"/>
+            <option name="PixelSizeUm" value="35.0f"/>
+            <option name="PriceCurrencySymbol" value="36"/>
+            <option name="LayerHeight" value="0.05"/>
+            <option name="ExposureTime" value="2.0f"/>
+            <option name="WaitTimeBeforeCure1" value="0.5f"/>
+            <option name="BottomExposureTime" value="40.0f"/>
+            <option name="BottomLayersCount" value="6"/>
+            <option name="LiftHeight" value="6.0f"/>
+            <option name="LiftSpeed" value="2.0"/>
+            <option name="RetractSpeed" value="2.0"/>
+            <option name="AntiAliasing" value="1"/>
+            <option name="TransitionLayerCount" value="0"/>
+            <option name="TransitionLayerType" value="0"/>
+            <option name="AdvancedMode" value="1"/>
+        </options>
+        <options name="Machine">
+            <option name="LayerImageFormat" value="pw0Img"/>
+            <option name="MaxAntialiasingLevel" value="16"/>
+            <option name="PropertyFields" value="7"/>
+            <option name="DisplayWidth" value="134.4f"/>
+            <option name="DisplayHeight" value="84.0f"/>
+            <option name="MachineZ" value="165.0f"/>
+            <option name="MaxFileVersion" value="516"/>
+            <option name="MachineBackground" value="6506241"/>
+        </options>
+    </printer>
+
+    <printer manufacturer="Anycubic" name="Photon Mono X" extension="pwmx" file="PhotonWorkshopFile">
+        <file_options>
+            <option name="VersionMajor" value="2"/>
+            <option name="VersionMinor" value="4"/>
+        </file_options>
+        <options name="Header">
+            <option name="Resolution" value="3840x2400"/>
+            <option name="PixelSizeUm" value="50.0f"/>
+            <option name="PriceCurrencySymbol" value="36"/>
+            <option name="LayerHeight" value="0.05"/>
+            <option name="ExposureTime" value="2.0f"/>
+            <option name="WaitTimeBeforeCure1" value="0.5f"/>
+            <option name="BottomExposureTime" value="28.0f"/>
+            <option name="BottomLayersCount" value="4"/>
+            <option name="LiftHeight" value="8.0f"/>
+            <option name="LiftSpeed" value="1.0"/>
+            <option name="RetractSpeed" value="1.5"/>
+            <option name="AntiAliasing" value="1"/>
+            <option name="TransitionLayerCount" value="10"/>
+            <option name="TransitionLayerType" value="0"/>
+            <option name="AdvancedMode" value="1"/>
+        </options>
+        <options name="Machine">
+            <option name="LayerImageFormat" value="pw0Img"/>
+            <option name="MaxAntialiasingLevel" value="16"/>
+            <option name="PropertyFields" value="7"/>
+            <option name="DisplayWidth" value="192.0f"/>
+            <option name="DisplayHeight" value="120.0f"/>
+            <option name="MachineZ" value="245.0f"/>
+            <option name="MaxFileVersion" value="516"/>
+            <option name="MachineBackground" value="6506241"/>
+        </options>
+    </printer>
+
+    <printer manufacturer="Anycubic" name="Photon M3" extension="pm3" file="PhotonWorkshopFile">
+        <file_options>
+            <option name="VersionMajor" value="2"/>
+            <option name="VersionMinor" value="4"/>
+        </file_options>
+        <options name="Header">
+            <option name="Resolution" value="4096x2560"/>
+            <option name="PixelSizeUm" value="40.0f"/>
+            <option name="PriceCurrencySymbol" value="36"/>
+            <option name="LayerHeight" value="0.05"/>
+            <option name="ExposureTime" value="2.0f"/>
+            <option name="WaitTimeBeforeCure1" value="0.5f"/>
+            <option name="BottomExposureTime" value="23.0f"/>
+            <option name="BottomLayersCount" value="4"/>
+            <option name="LiftHeight" value="6.0f"/>
+            <option name="LiftSpeed" value="3.0"/>
+            <option name="RetractSpeed" value="4.0"/>
+            <option name="AntiAliasing" value="1"/>
+            <option name="TransitionLayerCount" value="10"/>
+            <option name="TransitionLayerType" value="0"/>
+            <option name="AdvancedMode" value="0"/>
+        </options>
+        <options name="Machine">
+            <option name="LayerImageFormat" value="pw0Img"/>
+            <option name="MaxAntialiasingLevel" value="16"/>
+            <option name="PropertyFields" value="7"/>
+            <option name="DisplayWidth" value="163.92f"/>
+            <option name="DisplayHeight" value="102.4f"/>
+            <option name="MachineZ" value="180.0f"/>
+            <option name="MaxFileVersion" value="516"/>
+            <option name="MachineBackground" value="6506241"/>
+        </options>
+    </printer>
+
+    <printer manufacturer="CREALITY" name="HALOT-ONE PLUS" extension="cxdlp" file="CXDLPFile">
+        <options name="Header">
+            <option name="Resolution" value="4320x2560"/>
+            <option name="PixelSizeUm" value="40.0f"/>
+            <option name="PrinterModel" value="CL-79"/>
+        </options>
+        <options name="SliceInfo">
+            <option name="DisplayWidth" value="172.8"/>
+            <option name="DisplayHeight" value="102.4"/>
+            <option name="LayerHeight" value="0.05"/>
+            <option name="ExposureTime" value="30"/>
+            <option name="WaitTimeBeforeCure" value="4"/>
+            <option name="BottomExposureTime" value="40"/>
+            <option name="BottomLayersCount" value="2"/>
+            <option name="BottomLiftHeight" value="6"/>
+            <option name="BottomLiftSpeed" value="1"/>
+            <option name="LiftHeight" value="6"/>
+            <option name="LiftSpeed" value="1"/>
+            <option name="RetractSpeed" value="1"/>
+        </options>
+        <options name="SliceInfoV3">
+            <option name="DistortionCompensationEnabled" value="0"/>
+            <option name="DistortionCompensationThickness" value="0"/>
+            <option name="DistortionCompensationFocalLength" value="0"/>
+            <option name="XYAxisProfileCompensationEnabled" value="0"/>
+            <option name="XYAxisProfileCompensationValue" value="0"/>
+            <option name="ZPenetrationCompensationEnabled" value="0"/>
+            <option name="ZPenetrationCompensationLevel" value="0"/>
+            <option name="AntiAliasEnabled" value="0"/>
+        </options>
+    </printer>
+
+    <printer manufacturer="CREALITY" name="HALOT-ONE PRO" extension="cxdlp" file="CXDLPFile">
+        <options name="Header">
+            <option name="Resolution" value="2560x2400"/>
+            <option name="PixelSizeUm" value="40.0f"/>
+            <option name="PrinterModel" value="CL-70"/>
+        </options>
+        <options name="SliceInfo">
+            <option name="DisplayWidth" value="130.56"/>
+            <option name="DisplayHeight" value="122.4"/>
+            <option name="LayerHeight" value="0.05"/>
+            <option name="ExposureTime" value="30"/>
+            <option name="WaitTimeBeforeCure" value="4"/>
+            <option name="BottomExposureTime" value="40"/>
+            <option name="BottomLayersCount" value="2"/>
+            <option name="BottomLiftHeight" value="6"/>
+            <option name="BottomLiftSpeed" value="1"/>
+            <option name="LiftHeight" value="6"/>
+            <option name="LiftSpeed" value="1"/>
+            <option name="RetractSpeed" value="1"/>
+        </options>
+        <options name="SliceInfoV3">
+            <option name="DistortionCompensationEnabled" value="0"/>
+            <option name="DistortionCompensationThickness" value="0"/>
+            <option name="DistortionCompensationFocalLength" value="0"/>
+            <option name="XYAxisProfileCompensationEnabled" value="0"/>
+            <option name="XYAxisProfileCompensationValue" value="0"/>
+            <option name="ZPenetrationCompensationEnabled" value="0"/>
+            <option name="ZPenetrationCompensationLevel" value="0"/>
+            <option name="AntiAliasEnabled" value="0"/>
+        </options>
+    </printer>
+
+    <printer manufacturer="CREALITY" name="HALOT-ONE" extension="cxdlp" file="CXDLPFile">
+        <options name="Header">
+            <option name="Resolution" value="1620x2560"/>
+            <option name="PixelSizeUm" value="50.0f"/>
+            <option name="PrinterModel" value="CL-60"/>
+        </options>
+        <options name="SliceInfo">
+            <option name="DisplayWidth" value="81.0"/>
+            <option name="DisplayHeight" value="128.0"/>
+            <option name="LayerHeight" value="0.05"/>
+            <option name="ExposureTime" value="30"/>
+            <option name="WaitTimeBeforeCure" value="4"/>
+            <option name="BottomExposureTime" value="40"/>
+            <option name="BottomLayersCount" value="2"/>
+            <option name="BottomLiftHeight" value="6"/>
+            <option name="BottomLiftSpeed" value="1"/>
+            <option name="LiftHeight" value="6"/>
+            <option name="LiftSpeed" value="1"/>
+            <option name="RetractSpeed" value="1"/>
+        </options>
+        <options name="SliceInfoV3">
+            <option name="DistortionCompensationEnabled" value="0"/>
+            <option name="DistortionCompensationThickness" value="0"/>
+            <option name="DistortionCompensationFocalLength" value="0"/>
+            <option name="XYAxisProfileCompensationEnabled" value="0"/>
+            <option name="XYAxisProfileCompensationValue" value="0"/>
+            <option name="ZPenetrationCompensationEnabled" value="0"/>
+            <option name="ZPenetrationCompensationLevel" value="0"/>
+            <option name="AntiAliasEnabled" value="0"/>
+        </options>
+    </printer>
+
+    <printer manufacturer="CREALITY" name="HALOT-RAY" extension="cxdlp" file="CXDLPFile">
+        <options name="Header">
+            <option name="Resolution" value="5760x3600"/>
+            <option name="PixelSizeUm" value="34.39f"/>
+            <option name="PrinterModel" value="CL925"/>
+        </options>
+        <options name="SliceInfo">
+            <option name="DisplayWidth" value="198.14"/>
+            <option name="DisplayHeight" value="123.838"/>
+            <option name="LayerHeight" value="0.05"/>
+            <option name="ExposureTime" value="30"/>
+            <option name="WaitTimeBeforeCure" value="4"/>
+            <option name="BottomExposureTime" value="40"/>
+            <option name="BottomLayersCount" value="2"/>
+            <option name="BottomLiftHeight" value="6"/>
+            <option name="BottomLiftSpeed" value="1"/>
+            <option name="LiftHeight" value="6"/>
+            <option name="LiftSpeed" value="1"/>
+            <option name="RetractSpeed" value="1"/>
+        </options>
+        <options name="SliceInfoV3">
+            <option name="DistortionCompensationEnabled" value="0"/>
+            <option name="DistortionCompensationThickness" value="0"/>
+            <option name="DistortionCompensationFocalLength" value="0"/>
+            <option name="XYAxisProfileCompensationEnabled" value="0"/>
+            <option name="XYAxisProfileCompensationValue" value="0"/>
+            <option name="ZPenetrationCompensationEnabled" value="0"/>
+            <option name="ZPenetrationCompensationLevel" value="0"/>
+            <option name="AntiAliasEnabled" value="0"/>
+        </options>
+    </printer>
+
+    <printer manufacturer="ELEGOO" name="ELEGOO" extension="goo" file="GOOFile">
+        <options name="Header">
+            <option name="Resolution" value="3840x2400"/>
+            <option name="PixelSizeUm" value="35.0f"/>
+        </options>
+    </printer>
+</printers>

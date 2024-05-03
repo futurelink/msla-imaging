@@ -1,77 +1,90 @@
 package futurelink.msla.formats;
 
-import futurelink.msla.formats.iface.MSLALayerEncodeReader;
+import futurelink.msla.formats.iface.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public final class MSLALayerEncoders {
-    private final Integer maxEncoders;
-    private volatile Integer encoders = 0;
+public final class MSLALayerEncoders<D> extends ThreadPoolExecutor implements MSLALayerEncoder<D> {
+    private final Class<? extends MSLALayerCodec<D>> codec;
+    private static final Map<UUID, MSLALayerEncoders<?>> instances = new ConcurrentHashMap<>();
+    private final AtomicInteger counter = new AtomicInteger();
 
-    public interface Callback {
-        void onFinish(int size, byte[] data);
-        default void onError(String error) {
-            throw new RuntimeException(error);
+    public static synchronized <T> MSLALayerEncoders<?> getInstance(MSLAFile<T> file) throws MSLAException {
+        var uuid = file.getUUID();
+        if (uuid == null) throw new MSLAException("No UUID was found");
+        if (instances.containsKey(uuid)) {
+            return instances.get(uuid);
+        } else {
+            var pool = new MSLALayerEncoders<>(file.getCodec());
+            instances.put(uuid, pool);
+            return pool;
         }
     }
 
-    public MSLALayerEncoders() {
-        this.maxEncoders = 5;
+    private MSLALayerEncoders(Class<? extends MSLALayerCodec<D>> codec) throws MSLAException {
+        this(5, codec);
     }
 
-    public synchronized boolean isBusy() {
-        synchronized (this) {
-            return (encoders >= maxEncoders);
-        }
+    private MSLALayerEncoders(int maxEncoders, Class<? extends MSLALayerCodec<D>> codec) throws MSLAException {
+        super(maxEncoders, maxEncoders, 1000000L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        if (codec == null) throw new MSLAException("No codec defined for layer data");
+        this.codec = codec;
     }
 
-    public synchronized boolean isEncoding() {
-        synchronized (this) {
-            return encoders > 0;
-        }
+    @Override
+    public boolean isEncoding() {
+        return counter.get() > 0;
     }
 
-    public boolean encode(int layer, MSLALayerEncodeReader reader, Callback callback) throws MSLAException {
-        if (reader.getCodec() == null) throw new MSLAException("No codec defined for layer data");
-        if (isBusy()) return false; // No encoders available
+    @Override
+    public void encode(int layer, MSLALayerEncodeReader reader, Callback<D> callback) throws MSLAException {
+        if (reader == null) throw new MSLAException("Reader can't be null");
         try {
-            // Create codec object
-            synchronized(this) { encoders++; }
-            var codec = reader.getCodec().getDeclaredConstructor().newInstance();
+            counter.getAndIncrement();
+
+            // Create codec object, one per encoding process
+            var codecObj = codec.getDeclaredConstructor().newInstance();
 
             // Start encode thread
-            new Thread(() -> {
+            submit(() -> {
                 try {
-                    var input = reader.read(layer, MSLALayerEncodeReader.ReadDirection.READ_ROW);
-                    var iSize = input.available();
-                    var output = new ByteArrayOutputStream();
-                    var oSize = codec.Encode(input, output);
                     reader.onStart(layer);
+                    var output = codecObj.Encode(layer, reader);
                     if (output.size() > 0) {
-                        reader.onFinish(layer, iSize, oSize);
-                        if (callback != null) callback.onFinish(oSize, output.toByteArray());
+                        reader.onFinish(layer, reader.getSize(), output);
+                        if (callback != null) callback.onFinish(layer, output);
+                        counter.decrementAndGet();
                     } else {
-                        reader.onError(layer, "Empty image");
+                        reader.onError(layer, "Empty encode output");
                         if (callback != null) callback.onError("Empty image");
+                        counter.decrementAndGet();
                     }
-                } catch (IOException e) {
+                } catch (MSLAException e) {
                     try {
                         reader.onError(layer, "Encoder error " + e.getMessage());
                         if (callback != null) callback.onError("Encoder error " + e.getMessage());
-                    } catch (IOException e2) {
+                        counter.decrementAndGet();
+                    } catch (MSLAException e2) {
                         throw new RuntimeException(e2);
                     }
                 }
-                synchronized(this) { encoders--; }
-            }).start();
+            });
         } catch (InstantiationException | IllegalAccessException |
                  NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-
-        return true;
     }
 
+    @Override
+    protected void afterExecute(Runnable r, Throwable t) {
+        super.afterExecute(r, t);
+        if (t != null) throw new RuntimeException(t);
+    }
 }

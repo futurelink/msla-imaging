@@ -1,10 +1,14 @@
 package futurelink.msla.formats.anycubic.tables;
 
 import com.google.common.io.LittleEndianDataInputStream;
-import com.google.common.io.LittleEndianDataOutputStream;
 import futurelink.msla.formats.*;
-import futurelink.msla.formats.iface.MSLALayerEncodeReader;
+import futurelink.msla.formats.anycubic.PhotonWorkshopCodec;
+import futurelink.msla.formats.iface.*;
+import futurelink.msla.formats.utils.FileFieldsReader;
+import futurelink.msla.formats.utils.FileFieldsWriter;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Delegate;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -15,15 +19,18 @@ import java.util.Arrays;
  */
 public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     public static final String Name = "LAYERDEF";
-    public static class PhotonWorkshopFileLayerDef {
-        public Integer DataAddress;
-        public Integer DataLength;
-        public Float LiftHeight = 0.0f;
-        public Float LiftSpeed = 0.0f;
-        public Float ExposureTime = 0.0f;
-        public Float LayerHeight = 0.0f;
-        public Integer NonZeroPixelCount = 0;
-        public Integer Padding1 = 0;
+    @Delegate private final Fields fields;
+
+    @Getter
+    public static class PhotonWorkshopFileLayerDef implements MSLAFileBlockFields {
+        @MSLAFileField @Setter private Integer DataAddress = 0;
+        @MSLAFileField(order = 1) private Integer DataLength;
+        @MSLAFileField(order = 2) @Setter private Float LiftHeight = 0.0f;
+        @MSLAFileField(order = 3) @Setter private Float LiftSpeed = 0.0f;
+        @MSLAFileField(order = 4) @Setter private Float ExposureTime = 0.0f;
+        @MSLAFileField(order = 5) @Setter private Float LayerHeight = 0.0f;
+        @MSLAFileField(order = 6) private Integer NonZeroPixelCount = 0;
+        @MSLAFileField(order = 7) private Integer Padding1 = 0;
 
         @Override
         public String toString() {
@@ -31,13 +38,30 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         }
     }
 
-    @Getter private Integer LayerCount;
-    private final ArrayList<PhotonWorkshopFileLayerDef> layers = new ArrayList<>();
-    private final ArrayList<byte[]> layerData = new ArrayList<>();
+    @SuppressWarnings("unused")
+    static class Fields implements MSLAFileBlockFields {
+        private final PhotonWorkshopFileTable parent;
+
+        @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return PhotonWorkshopFileLayerDefTable.Name; }
+        // Validation setter checks for what's been read from file
+        // and throws an exception when that is something unexpected.
+        private void setName(String name) throws MSLAException {
+            if (!PhotonWorkshopFileLayerDefTable.Name.equals(name))
+                throw new MSLAException("Table name '" + name + "' is invalid");
+        }
+        @MSLAFileField(order = 1, dontCount = true) private Integer TableLength() { return parent.calculateTableLength(); }
+        private void setTableLength(Integer length) { parent.TableLength = length; }
+        @MSLAFileField(order = 2) @Getter private Integer LayerCount;
+        @MSLAFileField(order = 3, lengthAt = "LayerCount") private final ArrayList<PhotonWorkshopFileLayerDef> Layers = new ArrayList<>();
+        private final ArrayList<byte[]> layerData = new ArrayList<>();
+
+        public Fields(PhotonWorkshopFileTable parent) { this.parent = parent; }
+    }
 
     public PhotonWorkshopFileLayerDefTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        this.LayerCount = 0;
+        this.fields = new Fields(this);
+        this.fields.LayerCount = 0;
     }
 
     /**
@@ -45,25 +69,24 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
      *
      * @param def PhotonWorkshopFileLayerDef instance
      * @param reader MSLAEncodeReader instance
-     * @return true if encode process successfully started, otherwise - false
      * @throws MSLAException if no codec defined or something went wrong
      */
-    public final boolean encodeLayer(PhotonWorkshopFileLayerDef def,
-                                     MSLALayerEncodeReader reader,
-                                     MSLALayerEncoders encoders) throws MSLAException {
-        if (reader.getCodec() == null) throw new MSLAException("No codec defined for layer data");
-        if (encoders.isBusy()) return false;
-
+    public final void encodeLayer(PhotonWorkshopFileLayerDef def,
+                                  MSLALayerEncodeReader reader,
+                                  MSLALayerEncoder<byte[]> encoders,
+                                  MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException {
         // Add empty layer
-        var number = layers.size();
-        layers.add(def);
-        layerData.add(null);
-        LayerCount = layers.size();
+        var number = fields.Layers.size();
+        fields.Layers.add(def);
+        fields.layerData.add(null);
+        fields.LayerCount = fields.Layers.size();
 
         // Encode layer data
-        return encoders.encode(number, reader, (size, data) -> {
-            layers.get(number).DataLength = size;
-            layerData.set(number, data);
+        encoders.encode(number, reader, (layerNumber, data) -> {
+            fields.Layers.get(layerNumber).DataLength = data.sizeInBytes();
+            fields.Layers.get(layerNumber).NonZeroPixelCount = data.pixels();
+            fields.layerData.set(layerNumber, data.data());
+            if (callback != null) callback.onFinish(layerNumber, data);
         });
     }
 
@@ -76,9 +99,18 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
      * @param decoders decoders pool
      * @return true if encode process successfully started, otherwise - false
      */
-    public final boolean decodeLayer(DataInputStream stream, int layer, int decodedDataLength, MSLALayerDecoders decoders)
-            throws MSLAException {
-        return decoders.decode(layer, stream, getLayer(layer).DataLength, decodedDataLength);
+    public final boolean decodeLayer(
+            int layer,
+            DataInputStream stream,
+            int decodedDataLength,
+            MSLALayerDecoder<byte[]> decoders) throws MSLAException
+    {
+        try {
+            var input = new PhotonWorkshopCodec.Input(stream.readNBytes(getLayer(layer).DataLength));
+            return decoders.decode(layer, input, decodedDataLength);
+        } catch (IOException e) {
+            throw new MSLAException("Error decoding layer data", e);
+        }
     }
 
     /**
@@ -89,9 +121,9 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     public final void addLayer(PhotonWorkshopFileLayerDef def, byte[] data) throws MSLAException {
         if ((data != null) && (def != null)) {
             if (data.length != def.DataLength) throw new MSLAException("DataLength in layer definition does not match data size");
-            layers.add(def);
-            layerData.add(data);
-            LayerCount = layers.size();
+            fields.Layers.add(def);
+            fields.layerData.add(data);
+            fields.LayerCount = fields.Layers.size();
         }
     }
 
@@ -100,6 +132,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
      * @param def layer definition
      * @param stream stream
      */
+    @SuppressWarnings("unused")
     public final void addLayer(PhotonWorkshopFileLayerDef def, InputStream stream) throws MSLAException {
         if ((stream != null) && (def != null)) {
             try {
@@ -111,71 +144,39 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     }
 
     public final PhotonWorkshopFileLayerDef getLayer(int i) {
-        return layers.get(i);
+        return fields.Layers.get(i);
     }
 
     public final  byte[] getLayerData(int i) {
-        return layerData.get(i);
+        return fields.layerData.get(i);
     }
 
     @Override
-    final int calculateTableLength(byte versionMajor, byte versionMinor) {
-        return 4 + getLayerCount() * 32;
+    final int calculateTableLength() {
+        return 4 + fields.getLayerCount() * 32;
     }
 
     @Override
-    public void read(FileInputStream stream, int position) throws IOException {
-        var fc = stream.getChannel(); fc.position(position);
-        var dis = new LittleEndianDataInputStream(stream);
-
-        int dataRead = 0;
-        var headerMark = stream.readNBytes(Name.length());
-        if (!Arrays.equals(headerMark, Name.getBytes())) {
-            throw new IOException("Layer definition mark not found! Corrupted data.");
-        }
-        dis.readNBytes(MarkLength - Name.length()); // Skip section name zeroes
-        TableLength = dis.readInt();
-        LayerCount = dis.readInt();
-        dataRead += 4;
-
-        while (layers.size() < LayerCount) {
-            var layer = new PhotonWorkshopFileLayerDef();
-            layer.DataAddress = dis.readInt();
-            layer.DataLength = dis.readInt();
-            layer.LiftHeight = dis.readFloat();
-            layer.LiftSpeed = dis.readFloat();
-            layer.ExposureTime = dis.readFloat();
-            layer.LayerHeight = dis.readFloat();
-            layer.NonZeroPixelCount = dis.readInt();
-            layer.Padding1 = dis.readInt();
-            layers.add(layer);
-            dataRead += 32;
-        }
-
-        if (dataRead != TableLength)
-            throw new IOException("Layer definition was not completely read out (" + dataRead + " of " + TableLength +
-                    "), some extra data left unread.");
+    public void read(FileInputStream stream, int position) throws MSLAException {
+        try {
+            var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
+            var dataRead = reader.read(fields);
+            if (dataRead != TableLength) throw new MSLAException(
+                    "LayerDef was not completely read out (" + dataRead + " of " + TableLength +
+                            "), some extra data left unread"
+            );
+        } catch (IOException e) { throw new MSLAException("Error reading LayerDef table", e); }
     }
 
     @Override
-    public final void write(OutputStream stream) throws IOException {
-        var dos = new LittleEndianDataOutputStream(stream);
-        dos.write(Name.getBytes());
-        dos.write(new byte[PhotonWorkshopFileTable.MarkLength - Name.length()]);
-        TableLength = calculateTableLength(versionMajor, versionMinor);
-
-        dos.writeInt(TableLength);   // Pre-calculate table length
-        dos.writeInt(LayerCount);    // Pre-calculate layer count
-        for (var i = 0; i < LayerCount; i++) {
-            var layer = layers.get(i);
-            dos.writeInt(layer.DataAddress);
-            dos.writeInt(layer.DataLength);
-            dos.writeFloat(layer.LiftHeight);
-            dos.writeFloat(layer.LiftSpeed);
-            dos.writeFloat(layer.ExposureTime);
-            dos.writeFloat(layer.LayerHeight);
-            dos.writeInt(layer.NonZeroPixelCount);
-            dos.writeInt(layer.Padding1);
+    public final void write(OutputStream stream) throws MSLAException {
+        TableLength = calculateTableLength();
+        try {
+            var writer = new FileFieldsWriter(stream, FileFieldsWriter.Endianness.LittleEndian);
+            writer.write(fields);
+            stream.flush();
+        } catch (IOException e) {
+            throw new MSLAException("Error writing LayerDef table", e);
         }
     }
 
@@ -184,8 +185,8 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         var b = new StringBuilder();
         b.append("-- Layer definition data --\n");
         b.append("TableLength: ").append(TableLength).append("\n");
-        b.append("Layers count: ").append(layers.size()).append("\n");
-        for (var layer : layers) {
+        b.append("Layers count: ").append(fields.Layers.size()).append("\n");
+        for (var layer : fields.Layers) {
             b.append("-> ").append(layer).append("\n");
         }
 

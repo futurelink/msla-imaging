@@ -4,9 +4,7 @@ import futurelink.msla.formats.utils.Size;
 import lombok.Setter;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 /**
  *                   Pattern example (one character 0.1mm width):

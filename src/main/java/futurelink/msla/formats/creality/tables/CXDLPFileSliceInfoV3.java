@@ -1,93 +1,62 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAOption;
-import futurelink.msla.formats.iface.MSLAOptionContainer;
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Delegate;
 
-import java.io.*;
-
-@MSLAOptionContainer(className= CXDLPFileSliceInfoV3.Fields.class)
+@MSLAOptionContainer(className = CXDLPFileSliceInfoV3.Fields.class)
+@Getter
 public class CXDLPFileSliceInfoV3 extends CXDLPFileTable {
+    @Delegate private final Fields fields;
+    @Getter
     public static class Fields implements MSLAFileBlockFields {
-        @MSLAOption(type=String.class) @Getter private String SoftwareName = "v1.9.4";
-        @MSLAOption(type=String.class) @Getter private String MaterialName = "normal";
-        @MSLAOption @Getter @Setter private Byte DistortionCompensationEnabled = 0;
-        @MSLAOption @Getter @Setter private Integer DistortionCompensationThickness = 600;
-        @MSLAOption @Getter @Setter private Integer DistortionCompensationFocalLength = 300000;
-        @MSLAOption @Getter @Setter private Byte XYAxisProfileCompensationEnabled = 1;
-        @MSLAOption @Getter @Setter private Short XYAxisProfileCompensationValue = 0;
-        @MSLAOption @Getter @Setter private Byte ZPenetrationCompensationEnabled = 0;
-        @MSLAOption @Getter @Setter private Short ZPenetrationCompensationLevel = 1000;
-        @MSLAOption @Getter @Setter private Byte AntiAliasEnabled = 1;
-        @MSLAOption @Getter private Byte AntiAliasGreyMinValue = 1;
-        @MSLAOption @Getter private Byte AntiAliasGreyMaxValue = (byte) 0xff;
-        @MSLAOption @Getter @Setter private Byte ImageBlurEnabled = 0;
-        @MSLAOption @Getter @Setter private Byte ImageBlurLevel = 2;
+        @MSLAFileField() private Integer SoftwareNameLength = 0;
+        @MSLAFileField(order = 1, lengthAt = "SoftwareNameLength") @MSLAOption(type = String.class) private String SoftwareName;
+        @MSLAFileField(order = 2) private Integer MaterialNameLength = 0;
+        @MSLAFileField(order = 3, lengthAt = "MaterialNameLength") @MSLAOption(type = String.class) private String MaterialName;
+        @MSLAFileField(order = 4) @MSLAOption @Setter private Byte DistortionCompensationEnabled = 0;
+        @MSLAFileField(order = 5) @MSLAOption @Setter private Integer DistortionCompensationThickness = 600;
+        @MSLAFileField(order = 6) @MSLAOption @Setter private Integer DistortionCompensationFocalLength = 300000;
+        @MSLAFileField(order = 7) @MSLAOption @Setter private Byte XYAxisProfileCompensationEnabled = 1;
+        @MSLAFileField(order = 8) @MSLAOption @Setter private Short XYAxisProfileCompensationValue = 0;
+        @MSLAFileField(order = 9) @MSLAOption @Setter private Byte ZPenetrationCompensationEnabled = 0;
+        @MSLAFileField(order = 10) @MSLAOption @Setter private Short ZPenetrationCompensationLevel = 1000;
+        @MSLAFileField(order = 11) @MSLAOption @Setter private Byte AntiAliasEnabled = 1;
+        @MSLAFileField(order = 12) @MSLAOption private Byte AntiAliasGreyMinValue = 1;
+        @MSLAFileField(order = 13) @MSLAOption private Byte AntiAliasGreyMaxValue = (byte) 0xff;
+        @MSLAFileField(order = 14) @MSLAOption @Setter private Byte ImageBlurEnabled = 0;
+        @MSLAFileField(order = 15) @MSLAOption @Setter private Byte ImageBlurLevel = 2;
+        @MSLAFileField(order = 16, length = 2) private byte[] PageBreak = new byte[]{ 0x0d, 0x0a };
 
         public int getDataLength() { return (SoftwareName.length() + 1) + (MaterialName.length() + 1) + 28; }
-        public void setMaterialName(String name) {
-            MaterialName = name;
-        }
-        public void setSoftwareName(String name) {
+
+        @SuppressWarnings("unused")
+        private void setSoftwareName(String name) {
             SoftwareName = name;
+            SoftwareNameLength = name.length() + 1;
+        }
+
+        @SuppressWarnings("unused")
+        private void setMaterialName(String name) {
+            MaterialName = name;
+            MaterialNameLength = name.length() + 1;
         }
     }
 
-    private final Fields fields = new Fields();
+    public CXDLPFileSliceInfoV3() {
+        fields = new Fields();
+        fields.setSoftwareName("v1.9.4");
+        fields.setMaterialName("normal");
+    }
+    public CXDLPFileSliceInfoV3(MSLAFileDefaults defaults) throws MSLAException {
+        this();
+        defaults.setFields("SliceInfoV3", fields);
+    }
 
     @Override
     public int getDataLength() { return fields.getDataLength() + 2; }
-
-    @Override
-    public void read(FileInputStream stream, int position) throws IOException {
-        var l = 0;
-        var fc = stream.getChannel();
-        fc.position(position);
-
-        var dis = new DataInputStream(stream);
-        l = dis.readInt();
-        fields.SoftwareName = new String(dis.readNBytes(l)).trim();
-        l = dis.readInt();
-        fields.MaterialName = new String(dis.readNBytes(l)).trim();
-        fields.DistortionCompensationEnabled = dis.readByte();
-        fields.DistortionCompensationThickness = dis.readInt();
-        fields.DistortionCompensationFocalLength = dis.readInt();
-        fields.XYAxisProfileCompensationEnabled = dis.readByte();
-        fields.XYAxisProfileCompensationValue = dis.readShort();
-        fields.ZPenetrationCompensationEnabled = dis.readByte();
-        fields.ZPenetrationCompensationLevel = dis.readShort();
-        fields.AntiAliasEnabled = dis.readByte();
-        fields.AntiAliasGreyMinValue = dis.readByte();
-        fields.AntiAliasGreyMaxValue = dis.readByte();
-        fields.ImageBlurEnabled = dis.readByte();
-        fields.ImageBlurLevel = dis.readByte();
-        dis.readNBytes(2); // Page break (0x0d, 0x0a)
-    }
-
-    @Override
-    public void write(OutputStream stream) throws IOException {
-        var dos = new DataOutputStream(stream);
-        dos.writeInt(fields.SoftwareName.length()+1);
-        dos.write(fields.SoftwareName.getBytes()); dos.write(0);
-        dos.writeInt(fields.MaterialName.length()+1);
-        dos.write(fields.MaterialName.getBytes()); dos.write(0);
-        dos.writeByte(fields.DistortionCompensationEnabled);
-        dos.writeInt(fields.DistortionCompensationThickness);
-        dos.writeInt(fields.DistortionCompensationFocalLength);
-        dos.writeByte(fields.XYAxisProfileCompensationEnabled);
-        dos.writeShort(fields.XYAxisProfileCompensationValue);
-        dos.writeByte(fields.ZPenetrationCompensationEnabled);
-        dos.writeShort(fields.ZPenetrationCompensationLevel);
-        dos.writeByte(fields.AntiAliasEnabled);
-        dos.writeByte(fields.AntiAliasGreyMinValue);
-        dos.writeByte(fields.AntiAliasGreyMaxValue);
-        dos.writeByte(fields.ImageBlurEnabled);
-        dos.writeByte(fields.ImageBlurLevel);
-        dos.writeByte(0x0d);
-        dos.writeByte(0x0a);
-    }
 
     @Override
     public String toString() {
