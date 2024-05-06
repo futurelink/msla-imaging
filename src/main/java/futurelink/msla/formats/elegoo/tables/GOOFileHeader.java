@@ -1,24 +1,17 @@
 package futurelink.msla.formats.elegoo.tables;
 
-import com.google.common.io.LittleEndianDataOutputStream;
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileTable;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.utils.FileFieldsReader;
-import futurelink.msla.formats.utils.FileFieldsWriter;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@Getter
 @MSLAOptionContainer(className = GOOFileHeader.Fields.class)
-public class GOOFileHeader implements MSLAFileBlock {
+public class GOOFileHeader extends GOOFileTable {
     enum DelayModes {
         LightOff((byte) 0), WaitTime((byte) 1);
         public final byte value; DelayModes(byte value) { this.value = value; }
@@ -28,6 +21,7 @@ public class GOOFileHeader implements MSLAFileBlock {
     @Delegate private final Fields fields;
 
     @Getter
+    @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
         float PixelSizeUm;
         Size Resolution; // Goes to file as short values: ResolutionX and ResolutionY
@@ -107,25 +101,5 @@ public class GOOFileHeader implements MSLAFileBlock {
     }
 
     @Override
-    public int getDataLength() {
-        return 0;
-    }
-
-    @Override
-    public void read(FileInputStream stream, int position) throws MSLAException {
-        try {
-            var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.BigEndian);
-            var dataRead = reader.read(fields);
-        } catch (IOException e) { throw new MSLAException("Error reading " + this.getClass().getName() + " table", e); }
-    }
-
-    @Override
-    public void write(OutputStream stream) throws MSLAException {
-        try {
-            var writer = new FileFieldsWriter(stream, FileFieldsWriter.Endianness.BigEndian);
-            writer.write(fields);
-        } catch (IOException e) {
-            throw new MSLAException("Error writing " + this.getClass().getName() + " table", e);
-        }
-    }
+    public int getDataLength() { return 0; }
 }

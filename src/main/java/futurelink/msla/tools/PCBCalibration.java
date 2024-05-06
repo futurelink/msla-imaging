@@ -104,6 +104,9 @@ public class PCBCalibration {
                 wsFile.addLayer(reader, null,  0.05f, interval, 10.0f, 0.5f);
             while (wsFile.getEncodersPool().isEncoding()); // Wait until all layers are encoded
             logger.info("Encoding done, writing a file");
+
+            System.out.println(wsFile);
+
             wsFile.write(fos);
             fos.flush();
 

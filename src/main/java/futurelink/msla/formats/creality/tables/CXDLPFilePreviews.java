@@ -1,64 +1,40 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.iface.MSLAFileBlock;
+import futurelink.msla.formats.iface.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.iface.MSLAPreview;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+@Getter
+public class CXDLPFilePreviews extends CXDLPFileTable {
+    private final Fields fields = new Fields();
 
-public class CXDLPFilePreviews implements MSLAFileBlock {
-    @Getter List<CXDLPFilePreview> previews = new ArrayList<>();
-    public Size[] PreviewOriginalSizes = {
-            new Size(116, 116),
-            new Size(290, 290),
-            new Size(290, 290)
-    };
-    public MSLAPreview getPreview(int index) {
-        return previews.size() > index ? previews.get(index) : null;
+    @SuppressWarnings("unused")
+    static class Fields implements MSLAFileBlockFields {
+        @MSLAFileField() CXDLPFilePreview Preview1 = new CXDLPFilePreview(new Size(116, 116));
+        @MSLAFileField(order = 1) CXDLPFilePreview Preview2 = new CXDLPFilePreview(new Size(290, 290));
+        @MSLAFileField(order = 2) CXDLPFilePreview Preview3 = new CXDLPFilePreview(new Size(290, 290));
     }
+
+    public final MSLAPreview getPreview(int index) {
+        return switch (index) {
+            case 0 -> fields.Preview1;
+            case 1 -> fields.Preview2;
+            case 2 -> fields.Preview3;
+            default -> null;
+        };
+    }
+
     @Override
     public int getDataLength() {
-        return (PreviewOriginalSizes[0].length() + PreviewOriginalSizes[1].length() + PreviewOriginalSizes[2].length()) * 2 + 6;
-    }
-    @Override
-    public void read(FileInputStream stream, int position) throws MSLAException {
-        var fc = stream.getChannel();
-        try {
-            fc.position(position);
-
-            var dis = new DataInputStream(stream);
-            for (var size : PreviewOriginalSizes) {
-                var data = new int[size.length()];
-                for (int i = 0; i < size.length(); i++) data[i] = dis.readShort();
-                previews.add(CXDLPFilePreview.fromArray(size.getWidth(), size.getHeight(), data));
-                dis.readNBytes(2); // PageBreak 0x0d 0x0a
-            }
-        } catch (IOException e) {
-            throw new MSLAException("Can't read preview", e);
-        }
-    }
-    @Override
-    public void write(OutputStream stream) throws MSLAException {
-        // Write dummy null previews
-        var dos = new DataOutputStream(stream);
-        try {
-            for (Size previewOriginalSize : PreviewOriginalSizes) {
-                var length = previewOriginalSize.length();
-                for (int l = 0; l < length; l++) dos.writeShort(0);
-                dos.write(0x0d);
-                dos.write(0x0a); // Page break
-            }
-        } catch (IOException e) {
-            throw new MSLAException("Can't write preview", e);
-        }
+        return (fields.Preview1.getResolution().length() +
+                fields.Preview2.getResolution().length() +
+                fields.Preview3.getResolution().length()) * 2 + 6;
     }
 
     @Override
     public String toString() {
-        return "CXDLPFilePreviews {" + previews + '}';
+        return "CXDLPFilePreviews { " + fields.Preview1 + ", " + fields.Preview2 + ", " + fields.Preview3 + " }";
     }
 }

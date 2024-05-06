@@ -1,17 +1,14 @@
 package futurelink.msla.formats.elegoo.tables;
 
-import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileField;
-import futurelink.msla.formats.utils.FileFieldsWriter;
+import lombok.Getter;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
-public class GOOFileLayerDef implements MSLAFileBlock {
+@Getter
+public class GOOFileLayerDef extends GOOFileTable {
     private final Fields fields = new Fields();
+
+    @SuppressWarnings("unused")
     static class Fields implements MSLAFileBlockFields {
         @MSLAFileField short Pause;
         @MSLAFileField(order = 1) float PausePositionZ;
@@ -35,23 +32,5 @@ public class GOOFileLayerDef implements MSLAFileBlock {
     }
 
     @Override
-    public int getDataLength() {
-        return 0;
-    }
-
-    @Override
-    public void read(FileInputStream stream, int position) throws MSLAException {
-
-    }
-
-    @Override
-    public void write(OutputStream stream) throws MSLAException {
-        try {
-            var writer = new FileFieldsWriter(stream, FileFieldsWriter.Endianness.BigEndian);
-            writer.write(fields);
-            stream.flush();
-        } catch (IOException e) {
-            throw new MSLAException("Error writing GOO header", e);
-        }
-    }
+    public int getDataLength() { return 0; }
 }

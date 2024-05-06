@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.io.File;
 import java.util.logging.Logger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CommonTestRoutines {
@@ -29,10 +30,17 @@ public class CommonTestRoutines {
         return resource.getFile();
     }
 
-    protected void assertFileExists(String fileName, int minSize) {
+    protected void assertFileMinSize(String fileName, int minSize) {
         var outFile2 = new File(fileName);
         outFile2.deleteOnExit();
         assertTrue(outFile2.exists());
         assertTrue(outFile2.length() > minSize);
+    }
+
+    protected void assertFileExactSize(String fileName, int size) {
+        var outFile2 = new File(fileName);
+        outFile2.deleteOnExit();
+        assertTrue(outFile2.exists());
+        assertEquals(size, outFile2.length());
     }
 }

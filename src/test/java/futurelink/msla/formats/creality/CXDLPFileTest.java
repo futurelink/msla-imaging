@@ -36,6 +36,8 @@ public class CXDLPFileTest extends CommonTestRoutines {
         while (file.getEncodersPool().isEncoding()) {}
         logger.info("Done");
 
+        System.out.println(file);
+
         // Write output file
         try(var fos = new FileOutputStream(outFile)) {
             file.write(fos);
@@ -44,7 +46,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
             throw new MSLAException("Can't write test file", e);
         }
 
-        assertFileExists(outFile, 400000);
+        assertFileExactSize(outFile, 441597);
     }
 
     @Test
@@ -65,8 +67,8 @@ public class CXDLPFileTest extends CommonTestRoutines {
         while (decoders.isDecoding()) {} // Wait while decoding-writing is done
         logger.info("Done");
 
-        assertFileExists(temp_dir + "extracted_1.png", 12000);
-        assertFileExists(temp_dir + "extracted_10.png", 12000);
+        assertFileMinSize(temp_dir + "extracted_1.png", 12000);
+        assertFileMinSize(temp_dir + "extracted_10.png", 12000);
 
         // Create new file from those images
         var newFile = (CXDLPFile) FileFactory.instance.create("CREALITY HALOT-ONE PLUS");
@@ -95,8 +97,8 @@ public class CXDLPFileTest extends CommonTestRoutines {
         file.readLayer(decoders, 1);
         while(decoders.isDecoding()) {}
 
-        assertFileExists(temp_dir + "final_0.png", 12000);
-        assertFileExists(temp_dir + "final_1.png", 12000);
+        assertFileMinSize(temp_dir + "final_0.png", 12000);
+        assertFileMinSize(temp_dir + "final_1.png", 12000);
     }
 
     @Test
@@ -114,7 +116,9 @@ public class CXDLPFileTest extends CommonTestRoutines {
         file.readLayer(decoders, 10);
         while (decoders.isDecoding()) {} // Wait while decoding-writing is done
 
-        assertFileExists(temp_dir + "/1.png", 12000);
-        assertFileExists(temp_dir + "/10.png", 12000);
+        System.out.println(file);
+
+        assertFileMinSize(temp_dir + "/1.png", 12000);
+        assertFileMinSize(temp_dir + "/10.png", 12000);
     }
 }

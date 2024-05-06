@@ -1,39 +1,22 @@
-package futurelink.msla.formats.creality.tables;
+package futurelink.msla.formats.elegoo.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAOption;
-import futurelink.msla.formats.iface.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsReader;
 import futurelink.msla.formats.utils.FileFieldsWriter;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.HashMap;
 
-public abstract class CXDLPFileTable implements MSLAFileBlock {
-    public HashMap<String, Class<?>> getOptions() {
-        var a = getClass().getAnnotation(MSLAOptionContainer.class);
-        if (a != null) {
-            var optionsMap = new HashMap<String, Class<?>>();
-            Arrays.stream(a.className().getDeclaredFields())
-                    .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
-                    .forEach((f) -> optionsMap.put(f.getName(), f.getAnnotation(MSLAOption.class).type()));
-            return optionsMap;
-        }
-        return null;
-    }
+public abstract class GOOFileTable implements MSLAFileBlock {
 
-    public abstract MSLAFileBlockFields getFields();
+    abstract MSLAFileBlockFields getFields();
 
     @Override
     public void read(FileInputStream stream, int position) throws MSLAException {
         try {
-            var fc = stream.getChannel();
-            fc.position(position);
             var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.BigEndian);
             var dataRead = reader.read(getFields());
         } catch (IOException e) { throw new MSLAException("Error reading " + this.getClass().getName() + " table", e); }
@@ -48,5 +31,4 @@ public abstract class CXDLPFileTable implements MSLAFileBlock {
             throw new MSLAException("Error writing " + this.getClass().getName() + " table", e);
         }
     }
-
 }

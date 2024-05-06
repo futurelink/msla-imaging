@@ -4,8 +4,11 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileField;
 import lombok.Getter;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -43,13 +46,61 @@ public class FileFieldsIO {
         @Override public String toString() { return name + ":" + length; }
     }
 
-    static Object getFieldValue(MSLAFileBlockFields fields, String fieldName)
-            throws NoSuchFieldException, IllegalAccessException
-    {
-        var f = fields.getClass().getDeclaredField(fieldName);
-        f.setAccessible(true);
-        var value = f.get(fields);
-        f.setAccessible(false);
+    static String getReadMethodName(Type elementType) {
+        if ((elementType == int.class) || (elementType == Integer.class)) return "readInt";
+        else if (elementType == short.class || elementType == Short.class) return "readShort";
+        else if (elementType == long.class || elementType == Long.class) return "readLong";
+        else if (elementType == float.class || elementType == Float.class) return "readFloat";
+        else if (elementType == double.class || elementType == Double.class) return "readDouble";
+        else if (elementType == boolean.class || elementType == Boolean.class) return "readBoolean";
+        else if (elementType == char.class || elementType == Character.class) return "readChar";
+        else if (elementType == byte.class || elementType == Byte.class) return "readByte";
+        else return null;
+    }
+
+    static Class<?> getWriteMethodPrimitiveType(Type type) {
+        if (type == int.class || type == Integer.class) return int.class;
+        else if (type == short.class || type == Short.class) return int.class; // writeShort requires int argument
+        else if (type == long.class || type == Long.class) return long.class;
+        else if (type == float.class || type == Float.class) return float.class;
+        else if (type == double.class || type == Double.class) return double.class;
+        else if (type == boolean.class || type == Boolean.class) return boolean.class;
+        else if (type == char.class || type == Character.class) return char.class;
+        else if (type == byte.class || type == Byte.class) return int.class;  // writeByte requires int argument
+        else return null;
+    }
+
+    static int getTypeSize(Type type, int length) {
+        if (type == int.class || type == Integer.class) return 4;
+        else if (type == long.class || type == Long.class) return 8;
+        else if (type == float.class || type == Float.class) return 4;
+        else if (type == double.class || type == Double.class) return 8;
+        else if (type == boolean.class || type == Boolean.class) return 1;
+        else if (type == char.class || type == Character.class) return 1;
+        else if (type == byte.class || type == Byte.class) return 1;
+        else if (type == short.class || type == Short.class) return 2;
+        else if (type == String.class || type == byte[].class) return length;
+        return 0;
+    }
+
+    static Object getFieldOrMethodValue(MSLAFileBlockFields fields, String fieldOrMethodName) throws IOException {
+        Object value;
+        try {
+            var f = fields.getClass().getDeclaredField(fieldOrMethodName);
+            f.setAccessible(true);
+            value = f.get(fields);
+            f.setAccessible(false);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            try {
+                var m = fields.getClass().getDeclaredMethod(fieldOrMethodName);
+                m.setAccessible(true);
+                value = m.invoke(fields);
+                m.setAccessible(false);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e2) {
+                throw new IOException("No such field or method " + fieldOrMethodName);
+            }
+        }
+
         return value;
     }
 

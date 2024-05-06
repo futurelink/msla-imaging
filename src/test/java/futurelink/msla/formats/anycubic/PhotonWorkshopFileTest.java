@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PhotonWorkshopFileTest extends CommonTestRoutines {
@@ -45,8 +44,8 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
             while (decoders.isDecoding()) {} // Wait while decoding-writing is done
             logger.info("Done");
 
-            assertFileExists(temp_dir + "/1.png", 11000);
-            assertFileExists(temp_dir + "/10.png", 11000);
+            assertFileMinSize(temp_dir + "/1.png", 11000);
+            assertFileMinSize(temp_dir + "/10.png", 11000);
         } catch (MSLAException e) {
             throw new RuntimeException(e);
         }
@@ -81,6 +80,6 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
         }
 
         // Check if file exists
-        assertFileExists(outFile, 1000000);
+        assertFileMinSize(outFile, 1000000);
     }
 }
