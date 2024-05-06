@@ -1,9 +1,9 @@
 package futurelink.msla.formats.anycubic.tables;
 
-import com.google.common.io.LittleEndianDataInputStream;
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.PhotonWorkshopCodec;
 import futurelink.msla.formats.iface.*;
+import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.utils.FileFieldsReader;
 import futurelink.msla.formats.utils.FileFieldsWriter;
 import lombok.Getter;
@@ -12,25 +12,26 @@ import lombok.experimental.Delegate;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * "LAYERDEF" section representation.
  */
+@Getter
 public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     public static final String Name = "LAYERDEF";
     @Delegate private final Fields fields;
 
     @Getter
     public static class PhotonWorkshopFileLayerDef implements MSLAFileBlockFields {
-        @MSLAFileField @Setter private Integer DataAddress = 0;
+        @MSLAFileField
+        @Setter private Integer DataAddress = 0;
         @MSLAFileField(order = 1) private Integer DataLength;
         @MSLAFileField(order = 2) @Setter private Float LiftHeight = 0.0f;
         @MSLAFileField(order = 3) @Setter private Float LiftSpeed = 0.0f;
         @MSLAFileField(order = 4) @Setter private Float ExposureTime = 0.0f;
         @MSLAFileField(order = 5) @Setter private Float LayerHeight = 0.0f;
         @MSLAFileField(order = 6) private Integer NonZeroPixelCount = 0;
-        @MSLAFileField(order = 7) private Integer Padding1 = 0;
+        @MSLAFileField(order = 7) private final Integer Padding1 = 0;
 
         @Override
         public String toString() {
@@ -103,11 +104,12 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
             int layer,
             DataInputStream stream,
             int decodedDataLength,
-            MSLALayerDecoder<byte[]> decoders) throws MSLAException
+            MSLALayerDecoder<byte[]> decoders,
+            MSLALayerDecodeWriter writer) throws MSLAException
     {
         try {
             var input = new PhotonWorkshopCodec.Input(stream.readNBytes(getLayer(layer).DataLength));
-            return decoders.decode(layer, input, decodedDataLength);
+            return decoders.decode(layer, writer,  input, decodedDataLength);
         } catch (IOException e) {
             throw new MSLAException("Error decoding layer data", e);
         }
@@ -157,7 +159,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public void read(FileInputStream stream, int position) throws MSLAException {
+    public long read(FileInputStream stream, long position) throws MSLAException {
         try {
             var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
             var dataRead = reader.read(fields);
@@ -165,6 +167,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
                     "LayerDef was not completely read out (" + dataRead + " of " + TableLength +
                             "), some extra data left unread"
             );
+            return dataRead;
         } catch (IOException e) { throw new MSLAException("Error reading LayerDef table", e); }
     }
 

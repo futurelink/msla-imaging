@@ -2,13 +2,12 @@ package futurelink.msla.formats.creality.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
+import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
-
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 @MSLAOptionContainer(className = CXDLPFileSliceInfo.Fields.class)
 @Getter

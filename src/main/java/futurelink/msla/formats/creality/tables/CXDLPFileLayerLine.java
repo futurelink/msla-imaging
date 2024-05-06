@@ -9,7 +9,7 @@ import java.util.Objects;
 public class CXDLPFileLayerLine {
     static public final byte CoordinateCount = 5;
     private final byte[] Coordinates = new byte[CoordinateCount];
-    private byte Gray;
+    private int Gray;
 
     public short getStartY() {
         var c1 = Byte.toUnsignedInt(Coordinates[0]) << 8;
@@ -36,18 +36,20 @@ public class CXDLPFileLayerLine {
 
     public CXDLPFileLayerLine() {}
 
-    public CXDLPFileLayerLine(short startY, short endY, short startX, byte gray) {
+    public CXDLPFileLayerLine(short startY, short endY, short startX, int gray) {
         Coordinates[0] = (byte) ((startY >> 5) & 0xFF);
         Coordinates[1] = (byte) (((startY << 3) + (endY >> 10)) & 0xFF);
         Coordinates[2] = (byte) ((endY >> 2) & 0xFF);
         Coordinates[3] = (byte) (((endY << 6) + (startX >> 8)) & 0xFF);
         Coordinates[4] = (byte) startX;
-        Gray = gray;
+        Gray = gray & 0xff;
     }
+
+    public int getGray() { return Gray & 0xff; }
 
     public final byte[] bytes() {
         var bytes = Arrays.copyOf(Coordinates, 6);
-        bytes[5] = Gray;
+        bytes[5] = (byte) (Gray & 0xff);
         return bytes;
     }
 
@@ -58,7 +60,7 @@ public class CXDLPFileLayerLine {
         l.Coordinates[2] = bytes[2];
         l.Coordinates[3] = bytes[3];
         l.Coordinates[4] = bytes[4];
-        l.Gray = bytes[5];
+        l.Gray = bytes[5] & 0xff;
         return l;
     }
 

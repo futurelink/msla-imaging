@@ -51,7 +51,7 @@ public class FileFieldsReader {
                 }
                 else if (MSLAFileBlockFields.class.isAssignableFrom((Class<?>) type)) {
                     logger.fine("Reading block of type " + type);
-                    readBlock(dis, (MSLAFileBlockFields) f.get(fields));
+                    dataRead = readBlock(dis, (MSLAFileBlockFields) f.get(fields));
                 }
                 else {
                     f.set(fields, readFieldValue(dis, type, (int) length, field.getCharset()));

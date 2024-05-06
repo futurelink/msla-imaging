@@ -300,7 +300,7 @@
 
     <printer manufacturer="ELEGOO" name="ELEGOO" extension="goo" file="GOOFile">
         <options name="Header">
-            <option name="Resolution" value="3840x2400"/>
+            <option name="Resolution" value="5760x3600"/>
             <option name="PixelSizeUm" value="35.0f"/>
         </options>
     </printer>

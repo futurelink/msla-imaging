@@ -9,27 +9,56 @@ import futurelink.msla.formats.elegoo.tables.GOOFileLayerDef;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.utils.Size;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 public class GOOFile extends MSLAFileGeneric<byte[]> {
-    private final GOOFileHeader Header;
-    private final List<GOOFileLayerDef> LayersDef = new LinkedList<>();
-    private final GOOFileFooter Footer = new GOOFileFooter();
+    private final GOOFileHeader header;
+    private final List<GOOFileLayerDef> layersDef;
+    private final GOOFileFooter footer = new GOOFileFooter();
+    private final GOOFileOptionMapper optionMapper;
 
     public GOOFile(MSLAFileDefaults defaults) throws MSLAException {
         super();
-        Header = new GOOFileHeader(defaults);
+        header = new GOOFileHeader(defaults);
+        layersDef =  new LinkedList<>();
+        optionMapper = new GOOFileOptionMapper(this);
+    }
+
+    public GOOFile(FileInputStream stream) throws IOException, MSLAException {
+        super();
+        header = new GOOFileHeader();
+        layersDef =  new LinkedList<>();
+        readTables(stream);
+        optionMapper = new GOOFileOptionMapper(this);
+    }
+
+    private void readTables(FileInputStream input) throws MSLAException {
+        var pos = header.read(input, 0);
+        if (pos != header.getLayerDefAddress()) throw new MSLAException("Invalid layer definition at position " + pos);
+
+        var layerOffset = 0L;
+        for (var i = 0; i < header.getLayerCount(); i++) {
+            var layer = new GOOFileLayerDef();
+            pos += layer.read(input, pos);
+            layerOffset += layer.getDataLength();
+            // Check if stream position is still ok while reading layers
+            if (header.getLayerDefAddress() + layerOffset != pos)
+                throw new MSLAException("Invalid layer " + layer + " definition at position " + pos);
+            layersDef.add(layer);
+        }
     }
 
     @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return GOOFileCodec.class; }
-    @Override public MSLAPreview getPreview() { return null; }
+    @Override public MSLAPreview getPreview() { return header.getSmallPreview(); }
     @Override public void updatePreviewImage() throws MSLAException {}
     @Override public float getDPI() { return 0; }
-    @Override public Size getResolution() { return Header.getResolution(); }
-    @Override public float getPixelSizeUm() { return Header.getPixelSizeUm(); }
-    @Override public int getLayerCount() { return LayersDef.size(); }
+    @Override public Size getResolution() { return header.getResolution(); }
+    @Override public float getPixelSizeUm() { return header.getPixelSizeUm(); }
+    @Override public int getLayerCount() { return layersDef.size(); }
 
     @Override
     public void addLayer(
@@ -45,28 +74,40 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
             MSLALayerEncoder.Callback<byte[]> callback,
             float layerHeight, float exposureTime, float liftSpeed, float liftHeight) throws MSLAException
     {
-        LayersDef.add(new GOOFileLayerDef());
+        var layer = new GOOFileLayerDef();
+        var layerNumber = layersDef.size();
+        layersDef.add(layer);
+        getEncodersPool().encode(layerNumber, reader, callback);
     }
 
     @Override
-    public boolean readLayer(MSLALayerDecoder<byte[]> decoders, int layer) throws MSLAException {
-        return false;
+    public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
+        return getDecodersPool().decode(layer, writer,
+                new GOOFileCodec.Input(layersDef.get(layer).getFields().getData()), 0
+        );
     }
 
     @Override
     public void write(OutputStream stream) throws MSLAException {
-        Header.write(stream);
-        for (var layer : LayersDef) { layer.write(stream); }
-        Footer.write(stream);
+        header.write(stream);
+        for (var layer : layersDef) { layer.write(stream); }
+        footer.write(stream);
     }
 
     @Override
     public boolean isValid() {
-        return false;
+        return (header != null && layersDef != null);
     }
 
     @Override
     public MSLAOptionMapper options() {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return header.toString();
+                //layersDef.toString() + "\n" +
+                //footer.toString();
     }
 }

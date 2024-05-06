@@ -23,7 +23,7 @@ public interface MSLALayerDecodeWriter {
      * @param length number of pixels of the same color
      * @param direction specifies if stripes should be aligned vertically
      */
-    void stripe(int layerNumber, int color, int position, int length, WriteDirection direction);
+    void stripe(int layerNumber, int color, int position, int length, WriteDirection direction) throws MSLAException;
 
     /**
      * Method is being called when decoding process starts.

@@ -102,7 +102,10 @@ public class PCBCalibration {
             var reader = new EncodeReader(wsFile, pattern, repetitions);
             for (int i = 0; i < repetitions; i++)
                 wsFile.addLayer(reader, null,  0.05f, interval, 10.0f, 0.5f);
-            while (wsFile.getEncodersPool().isEncoding()); // Wait until all layers are encoded
+            try {
+                // Wait until all layers are encoded
+                while (wsFile.getEncodersPool().isEncoding()) Thread.sleep(100);
+            } catch (InterruptedException ignored) {}
             logger.info("Encoding done, writing a file");
 
             System.out.println(wsFile);

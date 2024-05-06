@@ -1,16 +1,27 @@
 package futurelink.msla.formats.anycubic.tables;
 
-import futurelink.msla.formats.MSLAException;
-
-import java.io.FileInputStream;
-import java.io.OutputStream;
+import futurelink.msla.formats.iface.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.utils.About;
+import lombok.Getter;
 
 /**
  * "SOFTWARE" section representation.
- * TODO Not implemented yet.
  */
+@Getter
 public class PhotonWorkshopFileSoftwareTable extends PhotonWorkshopFileTable {
     public static final String Name = "SOFTWARE";
+    private final Fields fields = new Fields();
+
+    @SuppressWarnings("unused")
+    @Getter
+    static class Fields implements MSLAFileBlockFields {
+        @MSLAFileField(length = 32) private final String SoftwareName = About.Name;
+        @MSLAFileField(order = 1) private final Integer TableLength = 64;
+        @MSLAFileField(order = 2, length = 32) private final String Version = About.Version;
+        @MSLAFileField(order = 3, length = 64) private final String OperatingSystem  = System.getProperty("os.name");
+        @MSLAFileField(order = 4, length = 32) private final String OpenGLVersion = "3.3-CoreProfile";
+    }
 
     public PhotonWorkshopFileSoftwareTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
@@ -18,15 +29,18 @@ public class PhotonWorkshopFileSoftwareTable extends PhotonWorkshopFileTable {
 
     @Override
     int calculateTableLength() {
-        return 0;
+        return 164;
     }
 
     @Override
-    public int getDataLength() { return 0; }
+    public int getDataLength() { return 164; }
 
     @Override
-    public void read(FileInputStream stream, int position) throws MSLAException {}
-
-    @Override
-    public void write(OutputStream stream) throws MSLAException {}
+    public String toString() {
+        return "SoftwareName = " + fields.SoftwareName + "\n" +
+                "TableLength = " + fields.TableLength + "\n" +
+                "Version = " + fields.Version + "\n" +
+                "OperatingSystem = " + fields.OperatingSystem + "\n" +
+                "OpenGLVersion = " + fields.OpenGLVersion + "\n";
+    }
 }

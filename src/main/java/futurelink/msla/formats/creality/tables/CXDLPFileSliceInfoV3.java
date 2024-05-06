@@ -2,6 +2,9 @@ package futurelink.msla.formats.creality.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
+import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
@@ -24,11 +27,11 @@ public class CXDLPFileSliceInfoV3 extends CXDLPFileTable {
         @MSLAFileField(order = 9) @MSLAOption @Setter private Byte ZPenetrationCompensationEnabled = 0;
         @MSLAFileField(order = 10) @MSLAOption @Setter private Short ZPenetrationCompensationLevel = 1000;
         @MSLAFileField(order = 11) @MSLAOption @Setter private Byte AntiAliasEnabled = 1;
-        @MSLAFileField(order = 12) @MSLAOption private Byte AntiAliasGreyMinValue = 1;
-        @MSLAFileField(order = 13) @MSLAOption private Byte AntiAliasGreyMaxValue = (byte) 0xff;
+        @MSLAFileField(order = 12) @MSLAOption private final Byte AntiAliasGreyMinValue = 1;
+        @MSLAFileField(order = 13) @MSLAOption private final Byte AntiAliasGreyMaxValue = (byte) 0xff;
         @MSLAFileField(order = 14) @MSLAOption @Setter private Byte ImageBlurEnabled = 0;
         @MSLAFileField(order = 15) @MSLAOption @Setter private Byte ImageBlurLevel = 2;
-        @MSLAFileField(order = 16, length = 2) private byte[] PageBreak = new byte[]{ 0x0d, 0x0a };
+        @MSLAFileField(order = 16, length = 2) private final byte[] PageBreak = new byte[]{ 0x0d, 0x0a };
 
         public int getDataLength() { return (SoftwareName.length() + 1) + (MaterialName.length() + 1) + 28; }
 

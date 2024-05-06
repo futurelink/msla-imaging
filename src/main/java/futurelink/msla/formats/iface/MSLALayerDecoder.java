@@ -20,5 +20,5 @@ public interface MSLALayerDecoder<D> {
      * @param decodedDataLength expected decoded data length
      * @return true if job was added successfully, otherwise - false.
      */
-    boolean decode(int layer, MSLALayerDecodeInput<D> data, int decodedDataLength) throws MSLAException;
+    boolean decode(int layer, MSLALayerDecodeWriter writer, MSLALayerDecodeInput<D> data, int decodedDataLength) throws MSLAException;
 }

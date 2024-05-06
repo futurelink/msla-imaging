@@ -32,9 +32,12 @@ public class ImageWriter implements MSLALayerDecodeWriter {
     private static final Logger logger = Logger.getLogger(ImageWriter.class.getName());
 
     public interface Callback {
-        void onStart(int layerNumber);
-        void onFinish(int layerNumber, String fileName);
-        void onError(int layerNumber, String error);
+        @SuppressWarnings("unused")
+        default void onStart(int layerNumber) {}
+        void onFinish(int layerNumber, String fileName, int pixels);
+        default void onError(int layerNumber, String error) throws MSLAException {
+            throw new MSLAException("Error writing layer " + layerNumber + " : " + error);
+        }
     }
 
     public ImageWriter(MSLAFile<?> file, String destinationDir, String prefix, String format) {
@@ -50,14 +53,21 @@ public class ImageWriter implements MSLALayerDecodeWriter {
         this(file, destinationDir, "", format);
     }
 
+    public ImageWriter(MSLAFile<?> file, String destinationDir, String format, Callback callback) {
+        this(file, destinationDir, "", format);
+        this.callback = callback;
+    }
+
     @Override public Size getLayerResolution() { return file.getResolution(); }
-    @Override public void stripe(int layerNumber, int color, int position, int length, WriteDirection direction) {
-        img.get(layerNumber).getGraphics().setColor(new Color(color));
+    @Override public void stripe(int layerNumber, int color, int position, int length, WriteDirection direction)
+            throws MSLAException
+    {
+        if (color < 0) throw new MSLAException("Color can't be equal to " + color);
+        img.get(layerNumber).getGraphics().setColor(new Color(color, color, color));
         if (direction == WriteDirection.WRITE_COLUMN) {
             var y = position / file.getResolution().getWidth();
             var x = position % file.getResolution().getWidth();
-            img.get(layerNumber).getGraphics().drawLine(
-                    x, file.getResolution().getHeight() - y, x,
+            img.get(layerNumber).getGraphics().drawLine(x, file.getResolution().getHeight() - y, x,
                     file.getResolution().getHeight() - y - length);
         } else {
             var y = position / file.getResolution().getWidth();
@@ -68,7 +78,7 @@ public class ImageWriter implements MSLALayerDecodeWriter {
 
     @Override public void onStart(int layerNumber) {
         logger.info("Layer " + layerNumber + " write started");
-        img.put(layerNumber,new BufferedImage(
+        img.put(layerNumber, new BufferedImage(
                 file.getResolution().getWidth(),
                 file.getResolution().getHeight(),
                 BufferedImage.TYPE_BYTE_GRAY
@@ -88,14 +98,14 @@ public class ImageWriter implements MSLALayerDecodeWriter {
                 f.flush();
             }
             img.remove(layerNumber);
-            if (callback != null) callback.onFinish(layerNumber, fileName);
+            if (callback != null) callback.onFinish(layerNumber, fileName, pixels);
         } catch (IOException e) {
             throw new MSLAException("Error finalizing image file!", e);
         }
     }
 
     @Override
-    public void onError(int layerNumber, String error) {
+    public void onError(int layerNumber, String error) throws MSLAException {
         logger.info("Layer " + layerNumber + " write error: " + error);
         img.remove(layerNumber);
         if (callback != null) callback.onError(layerNumber, error);

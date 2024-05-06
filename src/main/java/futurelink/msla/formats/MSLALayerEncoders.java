@@ -62,7 +62,7 @@ public final class MSLALayerEncoders<D> extends ThreadPoolExecutor implements MS
                         if (callback != null) callback.onFinish(layer, output);
                         counter.decrementAndGet();
                     } else {
-                        reader.onError(layer, "Empty encode output");
+                        reader.onError(layer, "Encoder output is empty");
                         if (callback != null) callback.onError("Empty image");
                         counter.decrementAndGet();
                     }

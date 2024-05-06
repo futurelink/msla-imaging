@@ -1,7 +1,7 @@
 package futurelink.msla.formats.utils;
 
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAFileField;
+import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -67,6 +67,18 @@ public class FileFieldsIO {
         else if (type == boolean.class || type == Boolean.class) return boolean.class;
         else if (type == char.class || type == Character.class) return char.class;
         else if (type == byte.class || type == Byte.class) return int.class;  // writeByte requires int argument
+        else return null;
+    }
+
+    static String getWriteMethodName(Type elementType) {
+        if (elementType == int.class || elementType == Integer.class) return "writeInt";
+        else if (elementType == short.class || elementType == Short.class) return "writeShort";
+        else if (elementType == long.class || elementType == Long.class) return "writeLong";
+        else if (elementType == float.class || elementType == Float.class) return "writeFloat";
+        else if (elementType == double.class || elementType == Double.class) return "writeDouble";
+        else if (elementType == boolean.class || elementType == Boolean.class) return "writeBoolean";
+        else if (elementType == char.class || elementType == Character.class) return "writeChar";
+        else if (elementType == byte.class || elementType == Byte.class) return "writeByte";
         else return null;
     }
 

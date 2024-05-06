@@ -82,11 +82,8 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     public final CXDLPFileLayer getLayer(int index) { return layers.get(index); }
 
     @Override
-    public boolean readLayer(
-            MSLALayerDecoder< List<CXDLPFileLayerLine>> decoders,
-            int layer) throws MSLAException
-    {
-        return layers.decodeLayer(iStream, layer, decoders);
+    public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
+        return layers.decodeLayer(iStream, layer, getDecodersPool(), writer);
     }
 
     @Override

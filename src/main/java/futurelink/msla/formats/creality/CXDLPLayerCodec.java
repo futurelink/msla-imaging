@@ -73,7 +73,7 @@ public class CXDLPLayerCodec implements MSLALayerCodec<List<CXDLPFileLayerLine>>
                 var pixel = data.read();
                 if (color != pixel) {
                     if (color != 0) {   // color change, break the line and start new
-                        var line = new CXDLPFileLayerLine((short) startY, (short) endY, (short) startX, (byte) color);
+                        var line = new CXDLPFileLayerLine((short) startY, (short) endY, (short) startX, color & 0xff);
                         output.writeLine(line);
                     } else {            // break the line, no start
                         startX = pos / width;

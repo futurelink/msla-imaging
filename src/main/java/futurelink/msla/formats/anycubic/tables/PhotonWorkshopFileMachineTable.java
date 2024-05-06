@@ -3,8 +3,8 @@ package futurelink.msla.formats.anycubic.tables;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
-import futurelink.msla.formats.iface.MSLAFileField;
-import futurelink.msla.formats.iface.MSLAOptionContainer;
+import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsReader;
 import futurelink.msla.formats.utils.FileFieldsWriter;
 import lombok.Getter;
@@ -18,6 +18,7 @@ import java.io.OutputStream;
 /**
  * "MACHINE" section representation.
  */
+@Getter
 @MSLAOptionContainer(className = PhotonWorkshopFileMachineTable.Fields.class)
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     public static final String Name = "MACHINE";
@@ -120,7 +121,7 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public void read(FileInputStream stream, int position) throws MSLAException {
+    public long read(FileInputStream stream, long position) throws MSLAException {
         try {
             var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
             var dataRead = reader.read(fields);
@@ -128,6 +129,7 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
                     "Machine table was not completely read out (" + dataRead + " of " + TableLength +
                             "), some extra data left unread"
             );
+            return dataRead;
         } catch (IOException e) {
             throw new MSLAException("Error reading Machine table", e);
         }

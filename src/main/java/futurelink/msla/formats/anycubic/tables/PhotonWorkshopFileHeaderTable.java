@@ -1,8 +1,10 @@
 package futurelink.msla.formats.anycubic.tables;
 
-import com.google.common.io.LittleEndianDataInputStream;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
+import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsReader;
 import futurelink.msla.formats.utils.FileFieldsWriter;
 import futurelink.msla.formats.utils.Size;
@@ -13,11 +15,11 @@ import lombok.experimental.Delegate;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 /**
  * "HEADER" section representation.
  */
+@Getter
 @MSLAOptionContainer(className = PhotonWorkshopFileHeaderTable.Fields.class)
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     public static final String Name = "HEADER";
@@ -39,7 +41,8 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         @MSLAFileField(order = 1, dontCount = true) private Integer TableLength() { return parent.calculateTableLength(); }
         private void setTableLength(Integer length) { parent.TableLength = length; }
         @MSLAFileField(order = 2) private Float PixelSizeUm;
-        @MSLAFileField(order = 3) @MSLAOption private Float LayerHeight;
+        @MSLAFileField(order = 3) @MSLAOption
+        private Float LayerHeight;
         @MSLAFileField(order = 4) @MSLAOption private Float ExposureTime;
         @MSLAFileField(order = 5) @MSLAOption private Float WaitTimeBeforeCure1;
         @MSLAFileField(order = 6) @MSLAOption private Float BottomExposureTime;
@@ -101,13 +104,14 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public void read(FileInputStream stream, int position) throws MSLAException {
+    public long read(FileInputStream stream, long position) throws MSLAException {
         try {
             var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
             var dataRead = reader.read(fields);
             if (dataRead != TableLength) throw new MSLAException(
                 "Header was not completely read out (" + dataRead + " of " + TableLength + "), some extra data left unread"
             );
+            return dataRead;
         } catch (IOException e) { throw new MSLAException("Error reading Header table", e); }
     }
 

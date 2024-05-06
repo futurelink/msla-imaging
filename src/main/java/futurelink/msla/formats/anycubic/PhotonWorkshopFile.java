@@ -117,8 +117,8 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     }
 
     @Override
-    public final boolean readLayer(MSLALayerDecoder<byte[]> decoders, int layer) throws MSLAException {
-        if (decoders == null) throw new MSLAException("Decoder is not specified");
+    public final boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
+        if (writer == null) throw new MSLAException("Writer is not specified");
         if (layerDef == null) throw new MSLAException("LayerDef does not exist in a file");
         if (header == null) throw new MSLAException("Header was not defined");
 
@@ -136,7 +136,8 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         }
 
         // Decode layer using codec
-        return layerDef.decodeLayer(layer, new DataInputStream(iStream), header.getResolution().length(), decoders);
+        return layerDef.decodeLayer(layer, new DataInputStream(iStream),
+                header.getResolution().length(), getDecodersPool(), writer);
     }
 
     @Override
@@ -204,6 +205,11 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         var offset = descriptor.calculateDataLength();
         descriptor.getFields().setHeaderAddress(offset);
         offset += header.getDataLength();
+
+        if (software != null) {
+            descriptor.getFields().setSoftwareAddress(offset);
+            offset += software.getDataLength();
+        }
 
         if (getPreview() != null) {
             descriptor.getFields().setPreviewAddress(offset);

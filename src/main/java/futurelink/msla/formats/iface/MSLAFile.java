@@ -24,9 +24,8 @@ public interface MSLAFile<T> {
 
     /**
      * Get decoders pool object.
-     * @param writer object to be used as output channel
      */
-    MSLALayerDecoder<T> getDecodersPool(MSLALayerDecodeWriter writer) throws MSLAException;
+    MSLALayerDecoder<T> getDecodersPool() throws MSLAException;
 
     /**
      * Returns {@code MSLAPreview} object.
@@ -88,10 +87,10 @@ public interface MSLAFile<T> {
 
     /**
      * Reads layer from a file.
-     * @param decoders  {@code MSLALayerDecoder} decoders pool object
+     * @param writer  {@link MSLALayerDecodeWriter} object to be used as output channel
      * @param layer layer number
      */
-    boolean readLayer(MSLALayerDecoder<T> decoders, int layer) throws MSLAException;
+    boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException;
 
     /**
      * Writes file data to a stream.

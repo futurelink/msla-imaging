@@ -7,13 +7,12 @@ import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class CXDLPFileTest extends CommonTestRoutines {
 
     @Test
-    void TestFileCreate() throws MSLAException {
+    void TestFileCreate() throws MSLAException, InterruptedException {
         var outFile = temp_dir + "test_one_layer_file.cxdlp";
         logger.info("Temporary file: " + outFile);
         delete_file(outFile); // Clean up files just in case
@@ -33,24 +32,19 @@ public class CXDLPFileTest extends CommonTestRoutines {
                 throw new MSLAException("Can't read layer image", e);
             }
         }
-        while (file.getEncodersPool().isEncoding()) {}
+        while (file.getEncodersPool().isEncoding()) Thread.sleep(100);
         logger.info("Done");
 
         System.out.println(file);
 
         // Write output file
-        try(var fos = new FileOutputStream(outFile)) {
-            file.write(fos);
-            fos.flush();
-        } catch (IOException e) {
-            throw new MSLAException("Can't write test file", e);
-        }
+        writeMSLAFile(outFile, file);
 
         assertFileExactSize(outFile, 441597);
     }
 
     @Test
-    void TestFileCreateAndExtract() throws MSLAException {
+    void TestFileCreateAndExtract() throws MSLAException, InterruptedException {
         var outFile = temp_dir + "test_create_and_extract.cxdlp";
         logger.info("Temporary file: " + outFile);
         delete_file(temp_dir + "extracted_1.png"); // Clean up files just in case
@@ -61,10 +55,10 @@ public class CXDLPFileTest extends CommonTestRoutines {
         );
 
         // Asynchronously extract image files
-        var decoders = file.getDecodersPool(new ImageWriter(file, temp_dir, "extracted_", "png"));
-        file.readLayer(decoders, 1);
-        file.readLayer(decoders, 10);
-        while (decoders.isDecoding()) {} // Wait while decoding-writing is done
+        var writer = new ImageWriter(file, temp_dir, "extracted_", "png");
+        file.readLayer(writer, 1);
+        file.readLayer(writer, 10);
+        while (file.getDecodersPool().isDecoding()) Thread.sleep(100); // Wait while decoding-writing is done
         logger.info("Done");
 
         assertFileMinSize(temp_dir + "extracted_1.png", 12000);
@@ -78,31 +72,27 @@ public class CXDLPFileTest extends CommonTestRoutines {
         } catch (IOException e) {
             throw new MSLAException("Can't read test file", e);
         }
-        while (newFile.getEncodersPool().isEncoding()) {}
+        while (newFile.getEncodersPool().isEncoding()) { Thread.sleep(100);  }
 
-        try(var fos = new FileOutputStream(outFile)) {
-            newFile.write(fos);
-            fos.flush();
-        } catch (IOException e) {
-            throw new MSLAException("Can't write test file", e);
-        }
+        // Write new file
+        writeMSLAFile(outFile, newFile);
 
         delete_file(temp_dir + "final_0.png"); // Clean up files just in case
         delete_file(temp_dir + "final_1.png");
 
         // Extract images from newly created file
         file = (CXDLPFile) FileFactory.instance.load(outFile);
-        decoders = file.getDecodersPool(new ImageWriter(file, temp_dir, "final_", "png"));
-        file.readLayer(decoders, 0);
-        file.readLayer(decoders, 1);
-        while(decoders.isDecoding()) {}
+        writer = new ImageWriter(file, temp_dir, "final_", "png");
+        file.readLayer(writer, 0);
+        file.readLayer(writer, 1);
+        while (file.getDecodersPool().isDecoding()) { Thread.sleep(100); } // Wait while decoding-writing is done
 
         assertFileMinSize(temp_dir + "final_0.png", 12000);
         assertFileMinSize(temp_dir + "final_1.png", 12000);
     }
 
     @Test
-    void TestFileExtract() throws MSLAException {
+    void TestFileExtract() throws MSLAException, InterruptedException {
         delete_file(temp_dir + "1.png"); // Clean up files just in case
         delete_file(temp_dir + "10.png");
 
@@ -111,14 +101,14 @@ public class CXDLPFileTest extends CommonTestRoutines {
         );
 
         // Asynchronously extract image files
-        var decoders = file.getDecodersPool(new ImageWriter(file, temp_dir, "png"));
-        file.readLayer(decoders, 1);
-        file.readLayer(decoders, 10);
-        while (decoders.isDecoding()) {} // Wait while decoding-writing is done
+        var writer = new ImageWriter(file, temp_dir, "png");
+        file.readLayer(writer, 1);
+        file.readLayer(writer, 10);
+        while (file.getDecodersPool().isDecoding()) { Thread.sleep(100); } // Wait while decoding-writing is done
 
         System.out.println(file);
 
-        assertFileMinSize(temp_dir + "/1.png", 12000);
-        assertFileMinSize(temp_dir + "/10.png", 12000);
+        assertFileMinSize(temp_dir + "1.png", 12000);
+        assertFileMinSize(temp_dir + "10.png", 12000);
     }
 }

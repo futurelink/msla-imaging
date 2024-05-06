@@ -12,13 +12,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class MSLALayerDecoders<D> extends ThreadPoolExecutor implements MSLALayerDecoder<D> {
     private final Integer maxDecoders;
-    private final MSLALayerDecodeWriter writer;
     private final Class<? extends MSLALayerCodec<D>> codec;
     private static final HashMap<UUID, MSLALayerDecoders<?>> instances = new HashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
 
     public static <T> MSLALayerDecoders<?> getInstance(
-            MSLALayerDecodeWriter writer,
+
             MSLAFile<T> file) throws MSLAException
     {
         var uuid = file.getUUID();
@@ -26,26 +25,19 @@ public final class MSLALayerDecoders<D> extends ThreadPoolExecutor implements MS
         if (instances.containsKey(uuid)) {
             return instances.get(uuid);
         } else {
-            var pool = new MSLALayerDecoders<>(writer, file.getCodec());
+            var pool = new MSLALayerDecoders<>(file.getCodec());
             instances.put(uuid, pool);
             return pool;
         }
     }
 
-    private MSLALayerDecoders(
-            MSLALayerDecodeWriter writer,
-            Class<? extends MSLALayerCodec<D>> codec) throws MSLAException
-    {
-        this(5, writer, codec);
+    private MSLALayerDecoders(Class<? extends MSLALayerCodec<D>> codec) throws MSLAException {
+        this(codec, 5);
     }
 
-    private MSLALayerDecoders(
-            int maxDecoders,
-            MSLALayerDecodeWriter writer, Class<? extends MSLALayerCodec<D>> codec) throws MSLAException
-    {
-        super(maxDecoders, maxDecoders, 1000000L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+    private MSLALayerDecoders(Class<? extends MSLALayerCodec<D>> codec, int maxDecoders) throws MSLAException {
+        super(maxDecoders, maxDecoders, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         if (codec == null) throw new MSLAException("No codec defined for layer data");
-        this.writer = writer;
         this.maxDecoders = maxDecoders;
         this.codec = codec;
     }
@@ -61,7 +53,7 @@ public final class MSLALayerDecoders<D> extends ThreadPoolExecutor implements MS
     }
 
     @Override
-    public boolean decode(int layer, MSLALayerDecodeInput<D> data, int decodedDataLength) throws MSLAException {
+    public boolean decode(int layer, MSLALayerDecodeWriter writer, MSLALayerDecodeInput<D> data, int decodedDataLength) throws MSLAException {
         if (data == null) throw new MSLAException("No data to decode");
         if (isBusy()) return false; // No decoder slots available
         counter.getAndIncrement();

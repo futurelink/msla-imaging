@@ -14,14 +14,16 @@ import java.io.*;
 @SuppressWarnings("unused")
 public class ImageTools {
 
-    @SuppressWarnings("unchecked")
-    public static void exportLayers(String fileName, String destinationDir, String format) throws MSLAException {
+    public static void exportLayers(String fileName, String destinationDir, String format)
+            throws MSLAException, InterruptedException
+    {
         var wsFile = FileFactory.instance.load(fileName);
         if (wsFile != null) {
             if (wsFile.isValid()) {
-                var decoders = wsFile.getDecodersPool(new ImageWriter(wsFile, destinationDir, "png"));
                 for (int i = 0; i < wsFile.getLayerCount(); i++)
-                    while (!wsFile.readLayer(decoders, i)) {} // Wait while layer can be read (returns false when busy)
+                    // Wait while layer can be read (returns false when busy)
+                    while (!wsFile.readLayer(new ImageWriter(wsFile, destinationDir, "png"), i))
+                        Thread.sleep(100);
             }
         }
     }

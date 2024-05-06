@@ -23,19 +23,6 @@ public class FileFieldsWriter {
         this.endianness = endianness;
     }
 
-
-    private String getWriteMethodName(Type elementType) {
-        if (elementType == int.class || elementType == Integer.class) return "writeInt";
-        else if (elementType == short.class || elementType == Short.class) return "writeShort";
-        else if (elementType == long.class || elementType == Long.class) return "writeLong";
-        else if (elementType == float.class || elementType == Float.class) return "writeFloat";
-        else if (elementType == double.class || elementType == Double.class) return "writeDouble";
-        else if (elementType == boolean.class || elementType == Boolean.class) return "writeBoolean";
-        else if (elementType == char.class || elementType == Character.class) return "writeChar";
-        else if (elementType == byte.class || elementType == Byte.class) return "writeByte";
-        else return null;
-    }
-
     private void writeArray(DataOutput stream, Type arrayType, Object value, int length) throws IOException {
         var elementType = ((Class<?>) arrayType).getComponentType();
         if ((elementType == byte.class) || (elementType == Byte.class))
@@ -52,7 +39,7 @@ public class FileFieldsWriter {
     }
 
     private void writeField(DataOutput stream, Type type, Object value, int length, Charset charset) throws IOException {
-        var writeMethodName = getWriteMethodName(type);
+        var writeMethodName = FileFieldsIO.getWriteMethodName(type);
         if (writeMethodName != null) {
             try {
                 stream.getClass().getDeclaredMethod(writeMethodName, FileFieldsIO.getWriteMethodPrimitiveType(type))

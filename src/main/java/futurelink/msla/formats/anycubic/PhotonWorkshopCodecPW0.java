@@ -8,8 +8,10 @@ import futurelink.msla.formats.iface.MSLALayerEncodeReader;
 import futurelink.msla.tools.BufferedImageInputStream;
 
 import java.io.*;
+import java.util.logging.Logger;
 
 public class PhotonWorkshopCodecPW0 extends PhotonWorkshopCodec {
+    private final Logger logger = Logger.getLogger(PhotonWorkshopCodecPW0.class.getName());
     public final byte RLE1EncodingLimit = 0x7d;
     public final short RLE4EncodingLimit = 0xfff;
     public static int[] CRC16Table = {
@@ -77,6 +79,7 @@ public class PhotonWorkshopCodecPW0 extends PhotonWorkshopCodec {
             MSLALayerDecodeWriter writer) throws MSLAException {
         if (input == null) throw new MSLAException("Input data can't be null");
         if (writer == null) throw new MSLAException("Writer can't be null");
+        logger.info("Decoding " + input.size() + " bytes, expected output " + decodedDataLength + " bytes");
         int pixelPos = 0;
         int pixels = 0;
         var data = input.data();
@@ -105,13 +108,16 @@ public class PhotonWorkshopCodecPW0 extends PhotonWorkshopCodec {
              * Set pixels or something like this...
              */
             if (color != 0) {
-                writer.stripe(layerNumber, color, pixelPos, repeat, MSLALayerDecodeWriter.WriteDirection.WRITE_ROW);
+                logger.fine("Write stripe at " + pixelPos + ", length = " + repeat);
+                writer.stripe(layerNumber, color & 0xff, pixelPos, repeat, MSLALayerDecodeWriter.WriteDirection.WRITE_ROW);
                 pixels += repeat;
             }
             pixelPos += repeat;
 
             if (pixelPos >= decodedDataLength) break;
         }
+
+        logger.info("Decoded layer " + layerNumber);
 
         if ((pixelPos > 0) && (pixelPos != decodedDataLength))
             throw new MSLAException("Image ended too early: " + pixelPos + ", expecting: " + decodedDataLength);

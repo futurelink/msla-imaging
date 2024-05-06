@@ -7,9 +7,9 @@ import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PhotonWorkshopFileTest extends CommonTestRoutines {
@@ -17,10 +17,9 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
     @Test
     void TestFileRead() {
         try {
-            var classLoader = getClass().getClassLoader();
-            var resource = classLoader.getResource("test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma");
-            if (resource == null) throw new RuntimeException("Resource data file not found");
-            var file = FileFactory.instance.load(resource.getFile());
+            var file = FileFactory.instance.load(
+                    resourceFile("test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma")
+            );
             assertTrue(file.isValid());
         } catch (MSLAException e) {
             throw new RuntimeException(e);
@@ -28,7 +27,7 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
     }
 
     @Test
-    void TestFileExtract() {
+    void TestFileExtract() throws InterruptedException {
         try {
             delete_file(temp_dir + "1.png");  // Clean up files just in case
             delete_file(temp_dir + "10.png");
@@ -38,21 +37,29 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
             );
 
             // Asynchronously extract image files
-            var decoders = file.getDecodersPool(new ImageWriter(file, temp_dir, "png"));
-            file.readLayer(decoders, 1);
-            file.readLayer(decoders, 10);
-            while (decoders.isDecoding()) {} // Wait while decoding-writing is done
+            var layerPixels = new int[2];
+            var layerFiles = new String[2];
+            var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
+                layerPixels[layerNumber] = pixels;
+                layerFiles[layerNumber] = fileName;
+            });
+            file.readLayer(writer, 0);
+            file.readLayer(writer, 1);
+            while (file.getDecodersPool().isDecoding()) { Thread.sleep(100); } // Wait while decoding-writing is done
             logger.info("Done");
 
-            assertFileMinSize(temp_dir + "/1.png", 11000);
-            assertFileMinSize(temp_dir + "/10.png", 11000);
+            assertEquals(166587, layerPixels[0]);
+            assertEquals(169644, layerPixels[1]);
+
+            assertFileMinSize(layerFiles[0], 11000);
+            assertFileMinSize(layerFiles[1], 11000);
         } catch (MSLAException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Test
-    void TestFileCreate() throws MSLAException {
+    void TestFileCreate() throws MSLAException, InterruptedException {
         var outFile = temp_dir + "test_one_layer_file.pwma";
         logger.info("Temporary file: " + outFile);
         delete_file(outFile); // Clean up files just in case
@@ -68,16 +75,11 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
             try { file.addLayer(new ImageReader(file, pngFile),  null); }
             catch (IOException e) { throw new MSLAException("Can't read layer image", e); }
         }
-        while (file.getEncodersPool().isEncoding()) {} // Wait while encoding
+        while (file.getEncodersPool().isEncoding()) { Thread.sleep(100); } // Wait while encoding
         logger.info("Done");
 
         // Write output file
-        try(var fos = new FileOutputStream(outFile)) {
-            file.write(fos);
-            fos.flush();
-        } catch (IOException e) {
-            throw new MSLAException("Can't write test file", e);
-        }
+        writeMSLAFile(outFile, file);
 
         // Check if file exists
         assertFileMinSize(outFile, 1000000);

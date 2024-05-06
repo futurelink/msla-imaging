@@ -1,8 +1,11 @@
 package futurelink.msla.formats;
 
+import futurelink.msla.formats.iface.MSLAFile;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,6 +18,15 @@ public class CommonTestRoutines {
     @BeforeAll
     static void setUpBeforeClass() {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tF %1$tT | %4$s | %2$s -> %5$s%6$s%n");
+    }
+
+    protected void writeMSLAFile(String fileName, MSLAFile<?> file) throws MSLAException {
+        try(var fos = new FileOutputStream(fileName)) {
+            file.write(fos);
+            fos.flush();
+        } catch (IOException e) {
+            throw new MSLAException("Can't write test file", e);
+        }
     }
 
     protected void delete_file(String file_path) {

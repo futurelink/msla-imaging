@@ -1,11 +1,8 @@
 package futurelink.msla.formats.creality.tables;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLALayerDecoder;
-import futurelink.msla.formats.iface.MSLALayerEncodeReader;
+import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.creality.CXDLPLayerCodec;
-import futurelink.msla.formats.iface.MSLALayerEncoder;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -22,7 +19,7 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
     }
 
     @Override
-    public final void read(FileInputStream iStream, int layerDataPosition) throws MSLAException {
+    public final long read(FileInputStream iStream, long layerDataPosition) throws MSLAException {
         var dis = new DataInputStream(iStream);
         var currentPosition = layerDataPosition;
         try {
@@ -36,6 +33,7 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
                 layer.DataOffset = currentPosition;
                 currentPosition += layer.DataLength;
             }
+            return currentPosition;
         } catch (IOException e) {
             throw new MSLAException("Can't read layer definition", e);
         }
@@ -104,7 +102,8 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
     public final boolean decodeLayer(
             FileInputStream iStream,
             int layer,
-            MSLALayerDecoder<List<CXDLPFileLayerLine>> decoders) throws MSLAException
+            MSLALayerDecoder<List<CXDLPFileLayerLine>> decoders,
+            MSLALayerDecodeWriter writer) throws MSLAException
     {
         logger.finest("Decoding layer " + layer + "...");
         var position = layers.get(layer).getDataOffset();
@@ -121,6 +120,6 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
         logger.finest("CXDLP file position " + position +
                 ", data length is " + encodedDataLength +
                 ", expected data length " + decodedDataLength);
-        return decoders.decode(layer, new CXDLPLayerCodec.Input(dis, encodedDataLength), decodedDataLength);
+        return decoders.decode(layer, writer, new CXDLPLayerCodec.Input(dis, encodedDataLength), decodedDataLength);
     }
 }

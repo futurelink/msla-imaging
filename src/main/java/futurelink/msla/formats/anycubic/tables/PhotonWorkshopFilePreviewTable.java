@@ -1,9 +1,8 @@
 package futurelink.msla.formats.anycubic.tables;
 
-import com.google.common.io.LittleEndianDataInputStream;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAFileField;
+import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.MSLAPreview;
 import futurelink.msla.formats.utils.FileFieldsReader;
 import futurelink.msla.formats.utils.FileFieldsWriter;
@@ -14,11 +13,11 @@ import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 /**
  * "PREVIEW" section representation.
  */
+@Getter
 public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable  {
     public static final String Name = "PREVIEW";
     private final Fields fields;
@@ -40,20 +39,20 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable  {
         private void setTableLength(Integer length) { parent.TableLength = length; }
         @MSLAFileField(order = 2) private Integer ResolutionX() { return Resolution.getWidth(); }
         private void setResolutionX(Integer width) { Resolution = new Size(width, Resolution.getHeight()); }
-        @MSLAFileField(order = 3) private int Mark = 'x'; /// Gets the operation mark 'x'
+        @MSLAFileField(order = 3) private final int Mark = 'x'; /// Gets the operation mark 'x'
         @MSLAFileField(order = 4) private Integer ResolutionY() { return Resolution.getHeight(); }
         private void setResolutionY(Integer height) { Resolution = new Size(Resolution.getWidth(), height); }
         @Getter private int ImageDataSize = Resolution.length() * 2;
         @MSLAFileField(order = 5, lengthAt="ImageDataSize") public byte[] ImageData = null;
 
         /* Color table fields are part of preview section */
-        @MSLAFileField(order = 6) public int UseFullGreyscale;
-        @MSLAFileField(order = 7) public int GreyMaxCount = 16;
+        @MSLAFileField(order = 6) private int UseFullGreyscale;
+        @MSLAFileField(order = 7) private final int GreyMaxCount = 16;
         @MSLAFileField(order = 8, length = 16, dontCount = true) public byte[] ShadesOfGrey = {
                 15, 31, 47, 63, 79, 95, 111, 127, (byte) 143, (byte) 159, (byte) 175,
                 (byte) 191, (byte) 207, (byte) 223, (byte) 239, (byte) 255
         };
-        @MSLAFileField(order = 9) public int Unknown;
+        @MSLAFileField(order = 9) private int Unknown;
 
         BufferedImage image;
 
@@ -91,7 +90,7 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable  {
     @Override int calculateTableLength() { return 12 + 12 + fields.ImageDataSize; }
 
     @Override
-    public void read(FileInputStream stream, int position) throws MSLAException {
+    public long read(FileInputStream stream, long position) throws MSLAException {
         try {
             var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
             var dataRead = reader.read(fields);
@@ -99,6 +98,7 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable  {
                     "Preview table was not completely read out (" + dataRead + " of " + TableLength +
                             "), some extra data left unread"
             );
+            return dataRead;
         } catch (IOException e) {
             throw new MSLAException("Error reading Preview table", e);
         }

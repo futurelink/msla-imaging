@@ -1,12 +1,10 @@
 package futurelink.msla.formats.anycubic.tables;
 
-import com.google.common.io.LittleEndianDataInputStream;
-import com.google.common.io.LittleEndianDataOutputStream;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAFileField;
-import futurelink.msla.formats.iface.MSLAOption;
-import futurelink.msla.formats.iface.MSLAOptionContainer;
+import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsReader;
 import futurelink.msla.formats.utils.FileFieldsWriter;
 import lombok.Getter;
@@ -15,7 +13,6 @@ import lombok.Setter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 /**
  * "EXTRA" section representation.
@@ -75,10 +72,10 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public void read(FileInputStream stream, int position) throws MSLAException {
+    public long read(FileInputStream stream, long position) throws MSLAException {
         try {
             var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
-            reader.read(fields);
+            return reader.read(fields);
         } catch (IOException e) { throw new MSLAException("Error reading Extra table", e); }
     }
 

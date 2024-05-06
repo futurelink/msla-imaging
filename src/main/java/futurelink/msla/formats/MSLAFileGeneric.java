@@ -19,7 +19,7 @@ public abstract class MSLAFileGeneric<T> implements MSLAFile<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public MSLALayerDecoder<T> getDecodersPool(MSLALayerDecodeWriter writer) throws MSLAException {
-        return (MSLALayerDecoder<T>) MSLALayerDecoders.getInstance(writer, this);
+    public MSLALayerDecoder<T> getDecodersPool() throws MSLAException {
+        return (MSLALayerDecoder<T>) MSLALayerDecoders.getInstance(this);
     }
 }

@@ -1,9 +1,7 @@
-package futurelink.msla.formats.iface;
+package futurelink.msla.formats.iface.annotations;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MSLAFileField {

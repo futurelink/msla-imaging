@@ -11,7 +11,7 @@ import java.util.List;
 public class CXDLPFileLayer {
 
     // Used to position in a file when read
-    Integer DataOffset = 0;
+    Long DataOffset = 0L;
     Integer DataLength = 0;
 
     // Layer data

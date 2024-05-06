@@ -1,8 +1,8 @@
 package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.iface.MSLAFileBlock;
-import futurelink.msla.formats.iface.MSLAOption;
-import futurelink.msla.formats.iface.MSLAOptionContainer;
+import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import lombok.Getter;
 
 import java.util.Arrays;

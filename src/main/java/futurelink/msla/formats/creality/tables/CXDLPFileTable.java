@@ -1,16 +1,9 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlock;
-import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAOption;
-import futurelink.msla.formats.iface.MSLAOptionContainer;
-import futurelink.msla.formats.utils.FileFieldsReader;
-import futurelink.msla.formats.utils.FileFieldsWriter;
+import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -26,27 +19,4 @@ public abstract class CXDLPFileTable implements MSLAFileBlock {
         }
         return null;
     }
-
-    public abstract MSLAFileBlockFields getFields();
-
-    @Override
-    public void read(FileInputStream stream, int position) throws MSLAException {
-        try {
-            var fc = stream.getChannel();
-            fc.position(position);
-            var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.BigEndian);
-            var dataRead = reader.read(getFields());
-        } catch (IOException e) { throw new MSLAException("Error reading " + this.getClass().getName() + " table", e); }
-    }
-
-    @Override
-    public void write(OutputStream stream) throws MSLAException {
-        try {
-            var writer = new FileFieldsWriter(stream, FileFieldsWriter.Endianness.BigEndian);
-            writer.write(getFields());
-        } catch (IOException e) {
-            throw new MSLAException("Error writing " + this.getClass().getName() + " table", e);
-        }
-    }
-
 }

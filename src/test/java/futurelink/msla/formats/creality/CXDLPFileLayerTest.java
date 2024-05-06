@@ -25,7 +25,7 @@ class CXDLPFileLayerTest extends CommonTestRoutines {
         var line3 = new CXDLPFileLayerLine((short) 20, (short) 50, (short) 10, (byte) 100);
         logger.info(line3.toString());
         var bytes = Arrays.copyOf(line3.getCoordinates(), 6);
-        bytes[5] = line3.getGray();
+        bytes[5] = (byte) line3.getGray();
         var line4 = CXDLPFileLayerLine.fromByteArray(bytes);
         logger.info(line4.toString());
 
@@ -33,7 +33,7 @@ class CXDLPFileLayerTest extends CommonTestRoutines {
     }
 
     @Test
-    void LayerFromBufferedImageTest() throws MSLAException {
+    void LayerFromBufferedImageTest() throws MSLAException, InterruptedException {
         // Prepare graphics
         var img = new BufferedImage(200, 100, BufferedImage.TYPE_BYTE_GRAY);
         img.getGraphics().drawLine(0, 10, 0, 50);
@@ -43,7 +43,7 @@ class CXDLPFileLayerTest extends CommonTestRoutines {
         // Prepare file
         var file = (CXDLPFile) FileFactory.instance.create("CREALITY HALOT-ONE");
         file.addLayer(new ImageReader(file, img), null);
-        while(file.getEncodersPool().isEncoding()) {} // Wait while working
+        while(file.getEncodersPool().isEncoding())  Thread.sleep(100); // Wait while working
 
         // Check layer lines
         var layer = file.getLayer(0);

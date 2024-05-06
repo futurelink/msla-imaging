@@ -9,13 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PCBCalibrationTest extends CommonTestRoutines {
     @Test
     void TestPCBCalibrationOnPhoton() throws MSLAException {
-
         var filePath = PCBCalibration.generateTestPattern(
                 "Anycubic Photon Mono X 6K",
                 temp_dir + "test_pcb_calibration",
                 10, 1, 10);
 
-        assertFileExactSize(filePath, 3048296);
+        assertFileExactSize(filePath, 3048460);
 
         var file = FileFactory.instance.load(filePath);
         logger.info(file.toString());

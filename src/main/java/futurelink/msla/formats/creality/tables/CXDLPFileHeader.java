@@ -3,14 +3,10 @@ package futurelink.msla.formats.creality.tables;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
-import futurelink.msla.formats.iface.MSLAFileField;
+import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.experimental.Delegate;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 @Getter
 public class CXDLPFileHeader extends CXDLPFileTable {
