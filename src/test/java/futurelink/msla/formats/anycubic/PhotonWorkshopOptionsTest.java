@@ -14,7 +14,7 @@ public class PhotonWorkshopOptionsTest extends CommonTestRoutines {
         var file = FileFactory.instance.create("Anycubic Photon Mono X 6K");
         var options = file.options().getAvailable();
         logger.info(options.toString());
-        assertEquals("PriceCurrencySymbol", options.toArray()[4]);
+        assertEquals("BottomLiftSpeed1", options.toArray()[4]);
     }
 
     @Test

@@ -1,12 +1,8 @@
 package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.iface.MSLAFileBlock;
-import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
-
-import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * Common class for section representation.
@@ -31,6 +27,6 @@ abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {
 
     abstract int calculateTableLength();
 
-    @Override
-    public int getDataLength() { return calculateTableLength() + MarkLength + 4; }
+    @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
+    @Override public int getDataLength() { return calculateTableLength() + MarkLength + 4; }
 }

@@ -9,13 +9,25 @@ import java.util.Set;
  * This mapper aims to manage all possible print options in one place.
  */
 public abstract class MSLAOptionMapper {
-    abstract protected boolean hasOption(String option, Class<? extends Serializable> aClass);
+    /**
+     * Gets option type.
+     * @param option option name
+     */
     public abstract Class<?> getType(String option);
-    abstract protected boolean hasLayerOption(String option, Class<? extends Serializable> aClass);
+
+    /* File options */
+    abstract protected boolean hasOption(String option, Class<? extends Serializable> aClass);
     abstract protected void populateOption(String option, Serializable value) throws MSLAException;
     abstract protected Serializable fetchOption(String option) throws MSLAException;
+
+    /* Layer options */
+    abstract protected boolean hasLayerOption(String option, Class<? extends Serializable> aClass);
     abstract protected void populateLayerOption(String option, int layer, Serializable value);
     abstract protected Serializable fetchLayerOption(String option, int layer);
+
+    /**
+     * Lists all available options
+     */
     abstract public Set<String> getAvailable();
 
     public final void set(String option, Serializable value) throws MSLAException {

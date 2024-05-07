@@ -53,10 +53,7 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
         return CXDLPLayerCodec.class;
     }
 
-    @Override public MSLAPreview getPreview() {
-        return previews.getPreview(0);
-    }
-    @Override public void updatePreviewImage() {}
+    @Override public MSLAPreview getPreview() { return previews.getPreview(0); }
     @Override public float getDPI() { return 0; }
     @Override public float getPixelSizeUm() { return header.getPixelSizeUm(); }
 
@@ -105,6 +102,9 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
         return optionMapper;
     }
     @Override public String toString() {
-        return header.toString() + sliceInfo + sliceInfoV3 + previews;
+        return "---- Header ----\n" + header.toString() + "\n" +
+                "---- SliceInfo ----\n" + sliceInfo + "\n" +
+                "---- SliceInfoV3 ----\n" + sliceInfoV3 + "\n" +
+                "---- Previews ----\n" + previews;
     }
 }

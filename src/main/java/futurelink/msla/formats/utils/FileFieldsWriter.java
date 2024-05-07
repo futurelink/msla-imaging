@@ -1,6 +1,8 @@
 package futurelink.msla.formats.utils;
 
 import com.google.common.io.LittleEndianDataOutputStream;
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 
 import java.io.*;
@@ -13,12 +15,11 @@ import java.util.logging.Logger;
 
 public class FileFieldsWriter {
     private final Logger logger = Logger.getLogger(FileFieldsWriter.class.getName());
-    public enum Endianness { BigEndian, LittleEndian }
 
     private final OutputStream stream;
-    private final Endianness endianness;
+    private final FileFieldsIO.Endianness endianness;
 
-    public FileFieldsWriter(OutputStream out, Endianness endianness) {
+    public FileFieldsWriter(OutputStream out, FileFieldsIO.Endianness endianness) {
         this.stream = out;
         this.endianness = endianness;
     }
@@ -30,15 +31,21 @@ public class FileFieldsWriter {
         else {
             for (int i = 0; i < length; i++) {
                 if (elementType == int.class) stream.writeInt(((int[]) value)[i]);
-                else if (elementType == short.class) stream.writeShort(((short[]) value)[i]);
                 else if (elementType == Integer.class) stream.writeInt(((Integer[]) value)[i]);
+                else if (elementType == short.class) stream.writeShort(((short[]) value)[i]);
                 else if (elementType == Short.class) stream.writeShort(((Short[]) value)[i]);
+                else if (elementType == double.class) stream.writeDouble(((double[]) value)[i]);
+                else if (elementType == Double.class) stream.writeDouble(((Double[]) value)[i]);
+                else if (elementType == long.class) stream.writeLong(((long[]) value)[i]);
+                else if (elementType == Long.class) stream.writeLong(((Long[]) value)[i]);
                 else throw new IOException("Unknown array component type " + elementType);
             }
         }
     }
 
-    private void writeField(DataOutput stream, Type type, Object value, int length, Charset charset) throws IOException {
+    private void writeField(DataOutput stream, Type type, Object value, int length, Charset charset)
+            throws MSLAException, IOException
+    {
         var writeMethodName = FileFieldsIO.getWriteMethodName(type);
         if (writeMethodName != null) {
             try {
@@ -66,12 +73,16 @@ public class FileFieldsWriter {
             writeArray(stream, type, value, length);
         }
         else if (MSLAFileBlockFields.class.isAssignableFrom((Class<?>) type)) {
-            logger.fine("Writing fields block of " + type);
-            writeBlock(stream, (MSLAFileBlockFields) value);
+            logger.fine("Writing fields of " + type);
+            writeFields(stream, (MSLAFileBlockFields) value);
+        }
+        else if (MSLAFileBlock.class.isAssignableFrom((Class<?>) type)) {
+            logger.fine("Writing block of " + type);
+            writeBlock(stream, (MSLAFileBlock) value);
         } else throw new IOException("Unknown type " + type);
     }
 
-    private void writeBlock(DataOutput dos, MSLAFileBlockFields fields) throws IOException {
+    private void writeFields(DataOutput dos, MSLAFileBlockFields fields) throws MSLAException, IOException {
         var fieldsList = FileFieldsIO.getFields(fields.getClass());
         logger.fine(fieldsList.toString());
         try {
@@ -102,11 +113,16 @@ public class FileFieldsWriter {
         }
     }
 
-    public final void write(MSLAFileBlockFields fields) throws IOException {
-        var dos = (endianness == Endianness.BigEndian) ?
+    private void writeBlock(DataOutput dos, MSLAFileBlock block) throws MSLAException, IOException {
+        block.beforeWrite();
+        writeFields(dos, block.getFields());
+    }
+
+    public final void write(MSLAFileBlock block) throws MSLAException, IOException {
+        var dos = (endianness == FileFieldsIO.Endianness.BigEndian) ?
                 new DataOutputStream(stream) :
                 new LittleEndianDataOutputStream(stream);
-        writeBlock(dos, fields);
+        writeBlock(dos, block);
         logger.fine("Finished writing a table");
     }
 }

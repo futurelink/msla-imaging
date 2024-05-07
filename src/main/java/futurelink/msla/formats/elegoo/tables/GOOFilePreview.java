@@ -23,4 +23,7 @@ public class GOOFilePreview implements MSLAFileBlockFields, MSLAPreview {
 
     @Override public BufferedImage getImage() { return image; }
     @Override public Size getResolution() { return Resolution; }
+
+    @Override
+    public String toString() { return "GOOFilePreview { " + Resolution + " }"; }
 }

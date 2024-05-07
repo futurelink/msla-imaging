@@ -2,6 +2,7 @@ package futurelink.msla.formats.utils;
 
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.PhotonWorkshopFileFactory;
+import futurelink.msla.formats.chitubox.CTBFileFactory;
 import futurelink.msla.formats.creality.CXDLPFileFactory;
 import futurelink.msla.formats.elegoo.GOOFileFactory;
 import futurelink.msla.formats.iface.MSLAFile;
@@ -26,6 +27,7 @@ public final class FileFactory {
         addFileTypeFactory(new PhotonWorkshopFileFactory());
         addFileTypeFactory(new CXDLPFileFactory());
         addFileTypeFactory(new GOOFileFactory());
+        addFileTypeFactory(new CTBFileFactory());
     }
 
     public void addFileTypeFactory(MSLAFileFactory factory) {
@@ -73,17 +75,18 @@ public final class FileFactory {
      */
     public MSLAFile load(String fileName) throws MSLAException {
         try (var stream = new FileInputStream(fileName)) {
-            return supportedFiles.stream().filter((t) -> {
+            var factory = supportedFiles.stream().filter((t) -> {
                 try {
                     if (t.checkType(stream)) {
                         logger.info("Found file of type " + t.getClass());
                         return true;
                     }
                     return false;
-                } catch (Exception e) { throw new RuntimeException(e); }
-            }).findFirst().map(f -> {
-                try { return f.load(fileName); } catch (Exception e) { throw new RuntimeException(e); }
-            }).orElse(null);
+                } catch (MSLAException e) { return false; }
+            }).findFirst().orElse(null);
+            if (factory != null) {
+                return factory.load(fileName);
+            } else throw new MSLAException("File is not supported");
         } catch (IOException e) {
             throw new MSLAException("File error", e);
         }

@@ -5,8 +5,8 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.utils.FileFieldsIO;
 import futurelink.msla.formats.utils.FileFieldsReader;
-import futurelink.msla.formats.utils.FileFieldsWriter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
@@ -123,8 +123,8 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     @Override
     public long read(FileInputStream stream, long position) throws MSLAException {
         try {
-            var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
-            var dataRead = reader.read(fields);
+            var reader = new FileFieldsReader(stream, FileFieldsIO.Endianness.LittleEndian);
+            var dataRead = reader.read(this);
             if (dataRead != TableLength) throw new MSLAException(
                     "Machine table was not completely read out (" + dataRead + " of " + TableLength +
                             "), some extra data left unread"
@@ -138,47 +138,9 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     @Override
     public void write(OutputStream stream) throws MSLAException {
         TableLength = calculateTableLength();
-        try {
-            var writer = new FileFieldsWriter(stream, FileFieldsWriter.Endianness.LittleEndian);
-            writer.write(fields);
-            stream.flush();
-        } catch (IOException e) {
-            throw new MSLAException("Error writing Machine table", e);
-        }
+        super.write(stream);
     }
 
     @Override
-    public String toString() {
-        String out = "-- Machine data --\n" +
-                "Machine name: " + fields.MachineName + "\n" +
-                "LayerImageFormat: " + fields.LayerImageFormat + "\n" +
-                "MaxAntialiasingLevel: " + fields.MaxAntialiasingLevel + "\n" +
-                "PropertyFields: " + fields.PropertyFields + "\n" +
-                "DisplayWidth: " + fields.DisplayWidth + "\n" +
-                "DisplayHeight: " + fields.DisplayHeight + "\n" +
-                "MachineZ: " + fields.MachineZ + "\n" +
-                "MaxFileVersion: " + fields.MaxFileVersion + "\n" +
-                "MachineBackground: " + fields.MachineBackground + "\n";
-
-        if (TableLength >= 160) { out += "PixelWidthUm: " + fields.PixelWidthUm + "\n"; }
-        if (TableLength >= 164) { out += "PixelHeightUm: " + fields.PixelHeightUm + "\n"; }
-        if (TableLength >= 168) { out += "Padding1: " + fields.Padding1 + "\n"; }
-        if (TableLength >= 172) { out += "Padding2: " + fields.Padding2 + "\n"; }
-        if (TableLength >= 176) { out += "Padding3: " + fields.Padding3 + "\n"; }
-        if (TableLength >= 180) { out += "Padding4: " + fields.Padding4 + "\n"; }
-        if (TableLength >= 184) { out += "Padding5: " + fields.Padding5 + "\n"; }
-        if (TableLength >= 188) { out += "Padding6: " + fields.Padding6 + "\n"; }
-        if (TableLength >= 192) { out += "Padding7: " + fields.Padding7 + "\n"; }
-        if (TableLength >= 196) { out += "Padding8: " + fields.Padding8 + "\n"; }
-        if (TableLength >= 200) { out += "DisplayCount: " + fields.DisplayCount + "\n"; }
-        if (TableLength >= 204) { out += "Padding9: " + fields.Padding9 + "\n"; }
-        if (TableLength >= 206) { out += "ResolutionX: " + fields.ResolutionX + "\n"; }
-        if (TableLength >= 208) { out += "ResolutionY: " + fields.ResolutionY + "\n"; }
-        if (TableLength >= 212) { out += "Padding10: " + fields.Padding10 + "\n"; }
-        if (TableLength >= 216) { out += "Padding11: " + fields.Padding11 + "\n"; }
-        if (TableLength >= 220) { out += "Padding12: " + fields.Padding12 + "\n"; }
-        if (TableLength >= 224) { out += "Padding13: " + fields.Padding13 + "\n"; }
-
-        return out;
-    }
+    public String toString() { return "-- Machine data --\n" + fields.fieldsAsString(" = ", "\n"); }
 }

@@ -33,30 +33,6 @@ public class GOOFileLayerDef extends GOOFileTable {
         @MSLAFileField(order = 20, length = 2) public byte[] Delimiter2 = new byte[]{ 0x0d, 0x0a };
     }
 
-    @Override
-    public int getDataLength() { return 72 + fields.DataLength; }
-
-    @Override
-    public String toString() {
-        return "Layer { " +
-                "DataLength = " + fields.DataLength + ", " +
-                "Pause = " + fields.Pause + ", " +
-                "PausePositionZ = " + fields.PausePositionZ + ", " +
-                "PositionZ = " + fields.PositionZ + ", " +
-                "ExposureTime = " + fields.ExposureTime + ", " +
-                "LightOffDelay = " + fields.LightOffDelay + ", " +
-                "WaitTimeAfterCure = " + fields.WaitTimeAfterCure + ", " +
-                "WaitTimeAfterLift = " + fields.WaitTimeAfterLift + ", " +
-                "WaitTimeBeforeCure = " + fields.WaitTimeBeforeCure + ", " +
-                "LiftHeight = " + fields.LiftHeight + ", " +
-                "LiftSpeed = " + fields.LiftSpeed + ", " +
-                "LiftHeight2 = " + fields.LiftHeight2 + ", " +
-                "LiftSpeed2 = " + fields.LiftSpeed2 + ", " +
-                "RetractHeight = " + fields.RetractHeight + ", " +
-                "RetractSpeed = " + fields.RetractSpeed + ", " +
-                "RetractHeight2 = " + fields.RetractHeight2 + ", " +
-                "RetractSpeed2 = " + fields.RetractSpeed2 + ", " +
-                "LightPWM = " + fields.LightPWM + ", " +
-                " } \n";
-    }
+    @Override public int getDataLength() { return 72 + fields.DataLength; }
+    @Override public String toString() { return fields.fieldsAsString(" = ", "\n"); }
 }

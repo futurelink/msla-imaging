@@ -33,11 +33,6 @@ public interface MSLAFile<T> {
     MSLAPreview getPreview();
 
     /**
-     * Updates preview image.
-     */
-    void updatePreviewImage() throws MSLAException;
-
-    /**
      * Gets file UUID
      */
     UUID getUUID();

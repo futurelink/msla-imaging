@@ -14,6 +14,7 @@ import java.util.*;
 
 public class FileFieldsIO {
     private static final HashMap<Class<?>, LinkedList<MSLAField>> fields = new HashMap<>();
+    public enum Endianness { BigEndian, LittleEndian }
 
     @Getter
     static class MSLAField {

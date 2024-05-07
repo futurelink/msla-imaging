@@ -7,6 +7,8 @@ import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
 import org.junit.jupiter.api.Test;
 
+import javax.imageio.ImageIO;
+import java.io.File;
 import java.io.IOException;
 
 public class CXDLPFileTest extends CommonTestRoutines {
@@ -44,7 +46,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
     }
 
     @Test
-    void TestFileCreateAndExtract() throws MSLAException, InterruptedException {
+    void TestFileCreateAndExtract() throws MSLAException, InterruptedException, IOException {
         var outFile = temp_dir + "test_create_and_extract.cxdlp";
         logger.info("Temporary file: " + outFile);
         delete_file(temp_dir + "extracted_1.png"); // Clean up files just in case
@@ -53,6 +55,9 @@ public class CXDLPFileTest extends CommonTestRoutines {
         var file = (CXDLPFile) FileFactory.instance.load(
                 resourceFile("test_data/CXDLPFileTest/Example_HALOT_ONE_PLUS.cxdlp")
         );
+
+        ImageIO.write(file.getPreview().getImage(), "png", new File(temp_dir + "cxdlp_preview.png"));
+        assertFileExactSize(temp_dir + "cxdlp_preview.png", 1871);
 
         // Asynchronously extract image files
         var writer = new ImageWriter(file, temp_dir, "extracted_", "png");

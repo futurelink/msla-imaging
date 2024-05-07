@@ -38,10 +38,9 @@ public class GOOFileHeader extends GOOFileTable {
         @MSLAFileField(length = 32, order = 5) String MachineName = "DEFAULT";
         @MSLAFileField(length = 32, order = 6) String MachineType = "DLP";
         @MSLAFileField(length = 32, order = 7) String ProfileName = "DEFAULT";
-        @MSLAFileField(order = 8) @MSLAOption
-        Short AntiAliasingLevel = 8;
-        @MSLAFileField(order = 9) @MSLAOption Short GreyLevel = 1;
-        @MSLAFileField(order = 10) @MSLAOption Short BlurLevel = 0;
+        @MSLAFileField(order = 8) @MSLAOption(MSLAOption.AntialiasLevel) Short AntiAliasingLevel = 8;
+        @MSLAFileField(order = 9) @MSLAOption(MSLAOption.GreyLevel) Short GreyLevel = 1;
+        @MSLAFileField(order = 10) @MSLAOption(MSLAOption.BlurLevel) Short BlurLevel = 0;
         @MSLAFileField(order = 11) GOOFilePreview SmallPreview = new GOOFilePreview(new Size(116, 116));
         @MSLAFileField(order = 11) GOOFilePreview BigPreview = new GOOFilePreview(new Size(290, 290));
         @MSLAFileField(order = 12) int LayerCount;
@@ -49,31 +48,32 @@ public class GOOFileHeader extends GOOFileTable {
         private void setResolutionX(short width) { Resolution = new Size(width, Resolution.getHeight()); }
         @MSLAFileField(order = 14) short ResolutionY() { return (short) Resolution.getHeight(); }
         private void setResolutionY(short height) { Resolution = new Size(Resolution.getWidth(), height); }
-        @MSLAFileField(order = 15) @MSLAOption boolean MirrorX;
-        @MSLAFileField(order = 16) @MSLAOption boolean MirrorY;
+        @MSLAFileField(order = 15) @MSLAOption("Mirror X") boolean MirrorX;
+        @MSLAFileField(order = 16) @MSLAOption("Mirror Y") boolean MirrorY;
         @MSLAFileField(order = 17) float DisplayWidth;
         @MSLAFileField(order = 18) float DisplayHeight;
         @MSLAFileField(order = 19) float MachineZ;
-        @MSLAFileField(order = 20) @MSLAOption float LayerHeight;
-        @MSLAFileField(order = 21) @MSLAOption float ExposureTime;
+        @MSLAFileField(order = 20) @MSLAOption(MSLAOption.LayerHeight) float LayerHeight;
+        @MSLAFileField(order = 21) @MSLAOption(MSLAOption.ExposureTime) float ExposureTime;
         @MSLAFileField(order = 22) @MSLAOption byte DelayMode = DelayModes.WaitTime.value;
-        @MSLAFileField(order = 23) @MSLAOption float LightOffDelay;
-        @MSLAFileField(order = 24) @MSLAOption float BottomWaitTimeAfterCure;
-        @MSLAFileField(order = 25) @MSLAOption float BottomWaitTimeAfterLift;
-        @MSLAFileField(order = 26) @MSLAOption float BottomWaitTimeBeforeCure;
-        @MSLAFileField(order = 27) @MSLAOption float WaitTimeAfterCure;
-        @MSLAFileField(order = 28) @MSLAOption float WaitTimeAfterLift;
-        @MSLAFileField(order = 29) @MSLAOption float WaitTimeBeforeCure;
-        @MSLAFileField(order = 30) @MSLAOption float BottomExposureTime;
-        @MSLAFileField(order = 31) int BottomLayerCount;
-        @MSLAFileField(order = 32) @MSLAOption float BottomLiftHeight;
-        @MSLAFileField(order = 33) @MSLAOption float BottomLiftSpeed;
-        @MSLAFileField(order = 34) @MSLAOption float LiftHeight;
-        @MSLAFileField(order = 35) @MSLAOption float LiftSpeed;
-        @MSLAFileField(order = 36) @MSLAOption float BottomRetractHeight;
-        @MSLAFileField(order = 37) @MSLAOption float BottomRetractSpeed;
-        @MSLAFileField(order = 38) @MSLAOption float RetractHeight;
-        @MSLAFileField(order = 39) @MSLAOption float RetractSpeed;
+        @MSLAFileField(order = 23) @MSLAOption("Light off delay") float LightOffDelay;
+        @MSLAFileField(order = 24) @MSLAOption("Bottom layers wait after cure") float BottomWaitTimeAfterCure;
+        @MSLAFileField(order = 25) @MSLAOption("Bottom layers wait after lift") float BottomWaitTimeAfterLift;
+        @MSLAFileField(order = 26) @MSLAOption("Bottom layers wait before cure") float BottomWaitTimeBeforeCure;
+        @MSLAFileField(order = 27) @MSLAOption("Normal layers wait after cure") float WaitTimeAfterCure;
+        @MSLAFileField(order = 28) @MSLAOption("Normal layers wait after lift") float WaitTimeAfterLift;
+        @MSLAFileField(order = 29) @MSLAOption(MSLAOption.WaitBeforeCure) float WaitTimeBeforeCure;
+        @MSLAFileField(order = 30) @MSLAOption(MSLAOption.BottomExposureTime) float BottomExposureTime;
+        @MSLAFileField(order = 31) @MSLAOption(MSLAOption.BottomLayersCount) int BottomLayerCount;
+        @MSLAFileField(order = 32) @MSLAOption(MSLAOption.BottomLiftHeight) float BottomLiftHeight;
+        @MSLAFileField(order = 33) @MSLAOption(MSLAOption.BottomLiftSpeed) float BottomLiftSpeed;
+        @MSLAFileField(order = 34) @MSLAOption(MSLAOption.LiftHeight) float LiftHeight;
+        @MSLAFileField(order = 35) @MSLAOption(MSLAOption.LiftSpeed) float LiftSpeed;
+        @MSLAFileField(order = 36) @MSLAOption("Bottom layers retract height") float BottomRetractHeight;
+        @MSLAFileField(order = 37) @MSLAOption("Bottom layers retract speed") float BottomRetractSpeed;
+        @MSLAFileField(order = 38) @MSLAOption(MSLAOption.RetractHeight) float RetractHeight;
+        @MSLAFileField(order = 39) @MSLAOption(MSLAOption.RetractSpeed) float RetractSpeed;
+
         @MSLAFileField(order = 40) @MSLAOption float BottomLiftHeight2;
         @MSLAFileField(order = 41) @MSLAOption float BottomLiftSpeed2;
         @MSLAFileField(order = 42) @MSLAOption float LiftHeight2;
@@ -82,8 +82,9 @@ public class GOOFileHeader extends GOOFileTable {
         @MSLAFileField(order = 45) @MSLAOption float BottomRetractSpeed2;
         @MSLAFileField(order = 46) @MSLAOption float RetractHeight2;
         @MSLAFileField(order = 47) @MSLAOption float RetractSpeed2;
-        @MSLAFileField(order = 48) @MSLAOption short BottomLightPWM = DefaultBottomLightPWM;
-        @MSLAFileField(order = 49) @MSLAOption short LightPWM = DefaultLightPWM;
+
+        @MSLAFileField(order = 48) @MSLAOption("Bottom layers PWM") short BottomLightPWM = DefaultBottomLightPWM;
+        @MSLAFileField(order = 49) @MSLAOption("Normal layers PWM") short LightPWM = DefaultLightPWM;
         @MSLAFileField(order = 50) @MSLAOption boolean PerLayerSettings; // 0: Normal mode, 1: Advance mode, printing use the value of "Layer Definition Content"
         @MSLAFileField(order = 51) int PrintTime;
         @MSLAFileField(order = 52) float Volume; // The volume of all parts. unit: mm3
@@ -92,7 +93,7 @@ public class GOOFileHeader extends GOOFileTable {
         @MSLAFileField(length = 8, order = 55) @MSLAOption String PriceCurrencySymbol = "$"; // 8 bytes
         @MSLAFileField(order = 56) int LayerDefAddress; // Always after the header at 195477
         @MSLAFileField(order = 57) byte GrayScaleLevel = 1; // 0：The range of pixel's gray value is from 0x0 ~ 0xf, 1：The range of pixel's gray value is from 0x0 ~ 0xff
-        @MSLAFileField(order = 58) @MSLAOption short TransitionLayerCount;
+        @MSLAFileField(order = 58) @MSLAOption("Transition layers count") short TransitionLayerCount;
 
         private String formatDate(Date date) {
             var dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -107,62 +108,7 @@ public class GOOFileHeader extends GOOFileTable {
         fields.MachineName = defaults.getName();
     }
 
-    @Override
-    public int getDataLength() { return HEADER_LENGTH; }
+    @Override public int getDataLength() { return HEADER_LENGTH; }
+    @Override public String toString() { return "-- Header --\n" + fields.fieldsAsString(" = ", "\n"); }
 
-    @Override
-    public String toString() {
-        return "Version = " + fields.Version + "\n" +
-                "SoftwareName = " + fields.SoftwareName + "\n" +
-                "SoftwareVersion = " + fields.SoftwareVersion + "\n" +
-                "FileCreateTime = " + fields.FileCreateTime + "\n" +
-                "MachineName = " + fields.MachineName + "\n" +
-                "MachineType = " + fields.MachineType + "\n" +
-                "ProfileName = " + fields.ProfileName + "\n" +
-                "AntiAliasingLevel = " + fields.AntiAliasingLevel + "\n" +
-                "GreyLevel = " + fields.GreyLevel + "\n" +
-                "BlurLevel = " + fields.BlurLevel + "\n" +
-                "LayerCount = " + fields.LayerCount + "\n" +
-                "Resolution = " + fields.Resolution + "\n" +
-                "MirrorX = " + fields.MirrorX + "\n" +
-                "MirrorY = " + fields.MirrorY + "\n" +
-                "DisplayWidth = " + fields.DisplayWidth + "\n" +
-                "DisplayHeight = " + fields.DisplayHeight + "\n" +
-                "MachineZ = " + fields.MachineZ + "\n" +
-                "LayerHeight = " + fields.LayerHeight + "\n" +
-                "ExposureTime = " + fields.ExposureTime + "\n" +
-                "DelayMode = " + fields.DelayMode + "\n" +
-                "LightOffDelay = " + fields.LightOffDelay + "\n" +
-                "BottomWaitTimeAfterCure = " + fields.BottomWaitTimeAfterCure + "\n" +
-                "BottomWaitTimeAfterLift = " + fields.BottomWaitTimeAfterLift + "\n" +
-                "BottomWaitTimeBeforeCure = " + fields.BottomWaitTimeBeforeCure + "\n" +
-                "WaitTimeAfterCure = " + fields.WaitTimeAfterCure + "\n" +
-                "WaitTimeAfterLift = " + fields.WaitTimeAfterLift + "\n" +
-                "WaitTimeBeforeCure = " + fields.WaitTimeBeforeCure + "\n" +
-                "BottomExposureTime = " + fields.BottomExposureTime + "\n" +
-                "BottomLayerCount = " + fields.BottomLayerCount + "\n" +
-
-                "BottomLiftHeight = " + fields.BottomLiftHeight + "\n" +
-                "BottomLiftSpeed = " + fields.BottomLiftSpeed + "\n" +
-                "LiftHeight = " + fields.LiftHeight + "\n" +
-                "LiftSpeed = " + fields.LiftSpeed + "\n" +
-                "LiftSpeed = " + fields.LiftSpeed + "\n" +
-                "BottomRetractHeight = " + fields.BottomRetractHeight + "\n" +
-                "BottomRetractSpeed = " + fields.BottomRetractSpeed + "\n" +
-                "RetractHeight = " + fields.RetractHeight + "\n" +
-                "RetractSpeed = " + fields.RetractSpeed + "\n" +
-
-                "BottomLiftHeight2 = " + fields.BottomLiftHeight2 + "\n" +
-                "BottomLiftSpeed2 = " + fields.BottomLiftSpeed2 + "\n" +
-                "LiftHeight2 = " + fields.LiftHeight2 + "\n" +
-                "LiftSpeed2 = " + fields.LiftSpeed2 + "\n" +
-                "BottomRetractHeight2 = " + fields.BottomRetractHeight2 + "\n" +
-                "BottomRetractSpeed2 = " + fields.BottomRetractSpeed2 + "\n" +
-                "RetractHeight2 = " + fields.RetractHeight2 + "\n" +
-                "RetractSpeed2 = " + fields.RetractSpeed2 + "\n" +
-
-                "BottomLightPWM = " + fields.BottomLightPWM + "\n" +
-                "LightPWM = " + fields.LightPWM + "\n" +
-                "PerLayerSettings = " + fields.PerLayerSettings + "\n";
-    }
 }

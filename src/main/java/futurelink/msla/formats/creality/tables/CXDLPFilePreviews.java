@@ -34,7 +34,5 @@ public class CXDLPFilePreviews extends CXDLPFileTable {
     }
 
     @Override
-    public String toString() {
-        return "CXDLPFilePreviews { " + fields.Preview1 + ", " + fields.Preview2 + ", " + fields.Preview3 + " }";
-    }
+    public String toString() { return fields.fieldsAsString(" = ", "\n"); }
 }

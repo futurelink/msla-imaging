@@ -36,11 +36,5 @@ public class PhotonWorkshopFileSoftwareTable extends PhotonWorkshopFileTable {
     public int getDataLength() { return 164; }
 
     @Override
-    public String toString() {
-        return "SoftwareName = " + fields.SoftwareName + "\n" +
-                "TableLength = " + fields.TableLength + "\n" +
-                "Version = " + fields.Version + "\n" +
-                "OperatingSystem = " + fields.OperatingSystem + "\n" +
-                "OpenGLVersion = " + fields.OpenGLVersion + "\n";
-    }
+    public String toString() { return fields.fieldsAsString(" = ", "\n"); }
 }

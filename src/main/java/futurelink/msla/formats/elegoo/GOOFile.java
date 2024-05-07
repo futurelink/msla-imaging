@@ -54,7 +54,6 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
 
     @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return GOOFileCodec.class; }
     @Override public MSLAPreview getPreview() { return header.getSmallPreview(); }
-    @Override public void updatePreviewImage() throws MSLAException {}
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return header.getResolution(); }
     @Override public float getPixelSizeUm() { return header.getPixelSizeUm(); }

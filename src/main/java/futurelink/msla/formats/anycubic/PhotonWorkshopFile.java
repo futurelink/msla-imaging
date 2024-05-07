@@ -40,7 +40,6 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
             extra = new PhotonWorkshopFileExtraTable(VersionMajor, VersionMinor);
         }
         optionMapper = new PhotonWorkshopFileOptionMapper(this);
-        updatePreviewImage();
         initCodec();
     }
 
@@ -103,7 +102,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         if (descriptor.getFields().getLayerDefinitionAddress() > 0) {
             layerDef = new PhotonWorkshopFileLayerDefTable(descriptor.getVersionMajor(), descriptor.getVersionMinor());
             layerDef.read(stream, descriptor.getFields().getLayerDefinitionAddress());
-        } else throw new MSLAException("No LAYERDEF section found!");
+        } else throw new MSLAException("No layer definition section found!");
 
         if (descriptor.getFields().getExtraAddress() > 0) {
             extra = new PhotonWorkshopFileExtraTable(descriptor.getVersionMajor(), descriptor.getVersionMinor());
@@ -140,15 +139,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
                 header.getResolution().length(), getDecodersPool(), writer);
     }
 
-    @Override
-    public MSLAPreview getPreview() {
-        return preview.getPreview();
-    }
-
-    @Override
-    public final void updatePreviewImage() throws MSLAException {
-        if (getPreview() != null) preview.updateImageData();
-    }
+    @Override  public MSLAPreview getPreview() { return preview; }
 
     @Override
     public final void addLayer(

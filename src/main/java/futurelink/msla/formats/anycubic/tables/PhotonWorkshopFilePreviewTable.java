@@ -4,27 +4,25 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.MSLAPreview;
-import futurelink.msla.formats.utils.FileFieldsReader;
-import futurelink.msla.formats.utils.FileFieldsWriter;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
  * "PREVIEW" section representation.
  */
 @Getter
-public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable  {
+public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable implements MSLAPreview  {
     public static final String Name = "PREVIEW";
     private final Fields fields;
+    private BufferedImage image;
 
     @Getter
     @SuppressWarnings("unused")
-    static class Fields implements MSLAFileBlockFields, MSLAPreview {
+    static class Fields implements MSLAFileBlockFields {
         private final PhotonWorkshopFileTable parent;
         private Size Resolution = new Size(224, 168);
 
@@ -54,74 +52,54 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable  {
         };
         @MSLAFileField(order = 9) private int Unknown;
 
-        BufferedImage image;
-
         public Fields(PhotonWorkshopFileTable parent) {
             this.parent = parent;
-            this.image = new BufferedImage(
-                    getResolution().getWidth(),
-                    getResolution().getHeight(),
-                    BufferedImage.TYPE_USHORT_GRAY
-            );
-        }
-
-        public void updateImageData() throws MSLAException {
-            var buffer = getImage().getData().getDataBuffer();
-            var size = buffer.getSize() * 2;
-            if (getImageDataSize() != size)
-                throw new MSLAException("Preview size " + size + " does not match resolution size " + getImageDataSize());
-
-            ImageData = new byte[size];
-            for (int i = 0; i < size; i+=2) {
-                int elem = buffer.getElem(i / 2);
-                ImageData[i] = (byte) ((elem >> 8) & 0xff);
-                ImageData[i+1] = (byte) (elem & 0xff);
-            }
         }
     }
 
     public PhotonWorkshopFilePreviewTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
         fields = new Fields(this);
+        image = new BufferedImage(224, 168, BufferedImage.TYPE_USHORT_GRAY);
     }
 
-    public void updateImageData() throws MSLAException { fields.updateImageData(); }
-    public MSLAPreview getPreview() { return fields; }
+    @Override public Size getResolution() { return fields.Resolution; }
     @Override int calculateTableLength() { return 12 + 12 + fields.ImageDataSize; }
 
     @Override
-    public long read(FileInputStream stream, long position) throws MSLAException {
-        try {
-            var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
-            var dataRead = reader.read(fields);
-            if (dataRead != TableLength) throw new MSLAException(
-                    "Preview table was not completely read out (" + dataRead + " of " + TableLength +
-                            "), some extra data left unread"
-            );
-            return dataRead;
-        } catch (IOException e) {
-            throw new MSLAException("Error reading Preview table", e);
+    public void afterRead() {
+        this.image = new BufferedImage(getResolution().getWidth(), getResolution().getHeight(), BufferedImage.TYPE_USHORT_GRAY);
+    }
+
+    @Override public void beforeWrite() throws MSLAException {
+        var buffer = getImage().getData().getDataBuffer();
+        var size = buffer.getSize() * 2;
+        if (fields.getImageDataSize() != size)
+            throw new MSLAException("Preview size " + size + " does not match resolution size " + fields.getImageDataSize());
+
+        fields.ImageData = new byte[size];
+        for (int i = 0; i < size; i+=2) {
+            int elem = buffer.getElem(i / 2);
+            fields.ImageData[i] = (byte) ((elem >> 8) & 0xff);
+            fields.ImageData[i+1] = (byte) (elem & 0xff);
         }
+    }
+
+    @Override
+    public long read(FileInputStream stream, long position) throws MSLAException {
+        var dataRead = super.read(stream, position);
+        if (dataRead != TableLength) throw new MSLAException(
+                "Preview table was not completely read out (" + dataRead + " of " + TableLength +
+                        "), some extra data left unread"
+        );
+        return dataRead;
     }
 
     @Override
     public void write(OutputStream stream) throws MSLAException {
         TableLength = calculateTableLength();
-        try {
-            var writer = new FileFieldsWriter(stream, FileFieldsWriter.Endianness.LittleEndian);
-            writer.write(fields);
-            stream.flush();
-        } catch (IOException e) {
-            throw new MSLAException("Error writing Preview table", e);
-        }
+        super.write(stream);
     }
 
-    public String toString() {
-        return "-- Preview data --\n" +
-                "TableLength: " + TableLength + "\n" +
-                "Resolution: " + fields.Resolution + "\n" +
-                "DataSize: " + fields.ImageDataSize + "\n" +
-                "UseFullGreyscale: " + fields.UseFullGreyscale + "\n" +
-                "GreyMaxCount: " + fields.GreyMaxCount + "\n";
-    }
+    public String toString() { return "-- Preview --\n" + fields.fieldsAsString(" = ", "\n"); }
 }

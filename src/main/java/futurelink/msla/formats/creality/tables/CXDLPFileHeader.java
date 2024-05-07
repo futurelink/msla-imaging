@@ -48,14 +48,5 @@ public class CXDLPFileHeader extends CXDLPFileTable {
     }
 
     @Override
-    public String toString() {
-        return "-- Header --\n" +
-                "HeaderSize: " + fields.HeaderSize + "\n" +
-                "HeaderValue: " + fields.HeaderValue + "\n" +
-                "Version: " + fields.Version + "\n" +
-                "PrinterModelSize: " + fields.PrinterModelSize + "\n" +
-                "PrinterModelArray: " + fields.PrinterModel + "\n" +
-                "LayerCount: " + fields.LayerCount + "\n" +
-                "Resolution: " + fields.Resolution + "\n";
-    }
+    public String toString() { return fieldsAsString(" = ", "\n"); }
 }

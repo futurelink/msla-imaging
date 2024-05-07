@@ -26,7 +26,13 @@ public class CXDLPFilePreview implements MSLAFileBlockFields, MSLAPreview {
 
     void setImageData(Short[] imageData) {
         var length = getImageDataLength();
-        for (int i = 0; i < length; i++) image.getRaster().getDataBuffer().setElem(i, imageData[i]);
+        for (int i = 0; i < length; i++) {
+            // Assume we've got RBG555 format
+            var r = (imageData[i] >> 10) & 0x1f;
+            var b = (imageData[i] >> 5) & 0x1f;
+            var g = imageData[i] & 0x1f;
+            image.getRaster().getDataBuffer().setElem(i, (r << 10) | (g << 5) | b);
+        }
     }
 
     public int getImageDataLength() { return this.resolution.getWidth() * this.resolution.getHeight(); }
@@ -36,11 +42,8 @@ public class CXDLPFilePreview implements MSLAFileBlockFields, MSLAPreview {
         this.image = new BufferedImage(
                 resolution.getWidth(),
                 resolution.getHeight(),
-                BufferedImage.TYPE_USHORT_565_RGB);
+                BufferedImage.TYPE_USHORT_555_RGB);
     }
 
-    @Override
-    public String toString() {
-        return "CXDLPFilePreview { " + getResolution() + " }";
-    }
+    @Override public String toString() { return "CXDLPFilePreview { " + getResolution() + " }"; }
 }

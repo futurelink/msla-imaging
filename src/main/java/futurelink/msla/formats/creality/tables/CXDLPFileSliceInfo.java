@@ -6,13 +6,14 @@ import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Delegate;
 
 @MSLAOptionContainer(CXDLPFileSliceInfo.Fields.class)
 @Getter
 public class CXDLPFileSliceInfo extends CXDLPFileTable {
     @Delegate private final Fields fields;
+
+    @SuppressWarnings("unused")
     @Getter
     public static class Fields implements MSLAFileBlockFields {
         @MSLAFileField()
@@ -24,18 +25,18 @@ public class CXDLPFileSliceInfo extends CXDLPFileTable {
         private String DisplayHeight;
         @MSLAFileField(order = 4) private Integer LayerHeightLength = 8;
         @MSLAFileField(order = 5, lengthAt = "LayerHeightLength", charset = "UTF-16BE")
-        @MSLAOption(type=String.class) private String LayerHeight = "0.05";
-        @MSLAFileField(order = 6) @MSLAOption @Setter private Short ExposureTime;
-        @MSLAFileField(order = 7) @MSLAOption @Setter private Short WaitTimeBeforeCure = 1;   // 1 as minimum or it won't print!
-        @MSLAFileField(order = 8) @MSLAOption @Setter private Short BottomExposureTime;
-        @MSLAFileField(order = 9) @MSLAOption @Setter private Short BottomLayersCount;
-        @MSLAFileField(order = 10) @MSLAOption @Setter private Short BottomLiftHeight;
-        @MSLAFileField(order = 11) @MSLAOption @Setter private Short BottomLiftSpeed;
-        @MSLAFileField(order = 12) @MSLAOption @Setter private Short LiftHeight;
-        @MSLAFileField(order = 13) @MSLAOption @Setter private Short LiftSpeed;
-        @MSLAFileField(order = 14) @MSLAOption @Setter private Short RetractSpeed;
-        @MSLAFileField(order = 15) @MSLAOption @Setter private Short BottomLightPWM = 255;
-        @MSLAFileField(order = 16) @MSLAOption @Setter private Short LightPWM = 255;
+        @MSLAOption(value = MSLAOption.LayerHeight, type=String.class) private String LayerHeight = "0.05";
+        @MSLAFileField(order = 6) @MSLAOption(MSLAOption.ExposureTime) private Short ExposureTime;
+        @MSLAFileField(order = 7) @MSLAOption(MSLAOption.WaitBeforeCure) private final Short WaitTimeBeforeCure = 1;   // 1 as minimum or it won't print!
+        @MSLAFileField(order = 8) @MSLAOption(MSLAOption.BottomExposureTime) private Short BottomExposureTime;
+        @MSLAFileField(order = 9) @MSLAOption(MSLAOption.BottomLayersCount) private Short BottomLayersCount;
+        @MSLAFileField(order = 10) @MSLAOption(MSLAOption.BottomLiftHeight) private Short BottomLiftHeight;
+        @MSLAFileField(order = 11) @MSLAOption(MSLAOption.BottomLiftSpeed) private Short BottomLiftSpeed;
+        @MSLAFileField(order = 12) @MSLAOption(MSLAOption.LiftHeight) private Short LiftHeight;
+        @MSLAFileField(order = 13) @MSLAOption(MSLAOption.LiftSpeed) private Short LiftSpeed;
+        @MSLAFileField(order = 14) @MSLAOption(MSLAOption.RetractSpeed) private Short RetractSpeed;
+        @MSLAFileField(order = 15) @MSLAOption("Bottom layers PWM") private final Short BottomLightPWM = 255;
+        @MSLAFileField(order = 16) @MSLAOption("Normal layers PWM") private final Short LightPWM = 255;
 
         public Fields() {}
 
@@ -72,24 +73,5 @@ public class CXDLPFileSliceInfo extends CXDLPFileTable {
     public int getDataLength() { return fields.getDataLength(); }
 
     @Override
-    public String toString() {
-        return "-- Slicer Info --\n" +
-                "DisplayWidthLength: " + fields.DisplayWidthLength + "\n" +
-                "DisplayWidth: " + fields.DisplayWidth + "\n" +
-                "DisplayHeightLength: " + fields.DisplayHeightLength + "\n" +
-                "DisplayHeight: " + fields.DisplayHeight + "\n" +
-                "LayerHeightLength: " + fields.LayerHeightLength + "\n" +
-                "LayerHeight: " + fields.LayerHeight + "\n" +
-                "ExposureTime: " + fields.ExposureTime + "\n" +
-                "WaitTimeBeforeCure: " + fields.WaitTimeBeforeCure + "\n" +
-                "BottomExposureTime: " + fields.BottomExposureTime + "\n" +
-                "BottomLayersCount: " + fields.BottomLayersCount + "\n" +
-                "BottomLiftHeight: " + fields.BottomLiftHeight + "\n" +
-                "BottomLiftSpeed: " + fields.BottomLiftSpeed + "\n" +
-                "LiftHeight: " + fields.LiftHeight + "\n" +
-                "LiftSpeed: " + fields.LiftSpeed + "\n" +
-                "RetractSpeed: " + fields.RetractSpeed + "\n" +
-                "BottomLightPWM: " + fields.BottomLightPWM + "\n" +
-                "LightPWM: " + fields.LightPWM + "\n";
-    }
+    public String toString() { return fieldsAsString(" = ", "\n"); }
 }

@@ -5,13 +5,9 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.formats.utils.FileFieldsReader;
-import futurelink.msla.formats.utils.FileFieldsWriter;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -37,20 +33,21 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
         }
         @MSLAFileField(order = 1, dontCount = true) private Integer TableLength() { return parent.calculateTableLength(); }
         private void setTableLength(Integer length) { parent.TableLength = length; }
-        @MSLAFileField(order = 2) @MSLAOption Integer BottomLiftCount = 2;
-        @MSLAFileField(order = 3) @MSLAOption Float BottomLiftHeight1 = 2.0f;
-        @MSLAFileField(order = 4) @MSLAOption Float BottomLiftSpeed1 = 1.0f;
-        @MSLAFileField(order = 5) @MSLAOption Float BottomRetractSpeed2 = 4.0f;
-        @MSLAFileField(order = 6) @MSLAOption Float BottomLiftHeight2 = 6.0f;
-        @MSLAFileField(order = 7) @MSLAOption Float BottomLiftSpeed2 = 4.0f;
-        @MSLAFileField(order = 8) @MSLAOption Float BottomRetractSpeed1 = 2.0f;
-        @MSLAFileField(order = 9) @MSLAOption Integer NormalLiftCount = 2;
-        @MSLAFileField(order = 10) @MSLAOption Float LiftHeight1 = 2.0f;
-        @MSLAFileField(order = 11) @MSLAOption Float LiftSpeed1 = 2.0f;
-        @MSLAFileField(order = 12) @MSLAOption Float RetractSpeed2 = 4.0f;
-        @MSLAFileField(order = 13) @MSLAOption Float LiftHeight2 = 6.0f;
-        @MSLAFileField(order = 14) @MSLAOption Float LiftSpeed2 = 4.0f;
-        @MSLAFileField(order = 15) @MSLAOption Float RetractSpeed1 = 2.0f;
+        @MSLAFileField(order = 2) @MSLAOption("Bottom layers gradient") Integer BottomGradientSteps = 2;
+        @MSLAFileField(order = 3) @MSLAOption("Bottom layers lift height 1") Float BottomLiftHeight1 = 2.0f;
+        @MSLAFileField(order = 4) @MSLAOption("Bottom layers lift speed 1") Float BottomLiftSpeed1 = 1.0f;
+        @MSLAFileField(order = 5) @MSLAOption("Bottom layers retract speed 1") Float BottomRetractSpeed1 = 2.0f;
+        @MSLAFileField(order = 6) @MSLAOption("Bottom layers lift height 2") Float BottomLiftHeight2 = 6.0f;
+        @MSLAFileField(order = 7) @MSLAOption("Bottom layers lift speed 2") Float BottomLiftSpeed2 = 4.0f;
+        @MSLAFileField(order = 8) @MSLAOption("Bottom layers retract speed 2") Float BottomRetractSpeed2 = 4.0f;
+
+        @MSLAFileField(order = 9) @MSLAOption("Normal layers gradient") Integer NormalGradientSteps = 2;
+        @MSLAFileField(order = 10) @MSLAOption("Normal layers lift height 1") Float NormalLiftHeight1 = 2.0f;
+        @MSLAFileField(order = 11) @MSLAOption("Normal layers lift speed 1") Float NormalLiftSpeed1 = 2.0f;
+        @MSLAFileField(order = 12) @MSLAOption("Normal layers retract speed 1") Float NormalRetractSpeed1 = 2.0f;
+        @MSLAFileField(order = 13) @MSLAOption("Normal layers lift height 2") Float NormalLiftHeight2 = 6.0f;
+        @MSLAFileField(order = 14) @MSLAOption("Normal layers lift speed 2") Float NormalLiftSpeed2 = 4.0f;
+        @MSLAFileField(order = 15) @MSLAOption("Normal layers retract speed 2") Float NormalRetractSpeed2 = 4.0f;
 
         public Fields(PhotonWorkshopFileTable parent) { this.parent = parent; }
     }
@@ -73,41 +70,11 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public long read(FileInputStream stream, long position) throws MSLAException {
-        try {
-            var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
-            return reader.read(fields);
-        } catch (IOException e) { throw new MSLAException("Error reading Extra table", e); }
-    }
-
-    @Override
     public final void write(OutputStream stream) throws MSLAException {
         TableLength = calculateTableLength();
-        try {
-            var writer = new FileFieldsWriter(stream, FileFieldsWriter.Endianness.LittleEndian);
-            writer.write(fields);
-            stream.flush();
-        } catch (IOException e) {
-            throw new MSLAException("Error writing Extra table", e);
-        }
+        super.write(stream);
     }
 
     @Override
-    public String toString() {
-        return "-- Extra table --" + "\n" +
-                "BottomLiftCount: " + fields.BottomLiftCount + "\n" +
-                "BottomLiftHeight1: " + fields.BottomLiftHeight1 + "\n" +
-                "BottomLiftSpeed1: " + fields.BottomLiftSpeed1 + "\n" +
-                "BottomRetractSpeed2: " + fields.BottomRetractSpeed2 + "\n" +
-                "BottomLiftHeight2: " + fields.BottomLiftHeight2 + "\n" +
-                "BottomLiftSpeed2: " + fields.BottomLiftSpeed2 + "\n" +
-                "BottomRetractSpeed1: " + fields.BottomRetractSpeed1 + "\n" +
-                "NormalLiftCount: " + fields.NormalLiftCount + "\n" +
-                "LiftHeight1: " + fields.LiftHeight1 + "\n" +
-                "LiftSpeed1: " + fields.LiftSpeed1 + "\n" +
-                "RetractSpeed2: " + fields.RetractSpeed2 + "\n" +
-                "LiftHeight2: " + fields.LiftHeight2 + "\n" +
-                "LiftSpeed2: " + fields.LiftSpeed2 + "\n" +
-                "RetractSpeed1: " + fields.RetractSpeed1 + "\n";
-    }
+    public String toString() { return "-- Extra table --" + "\n" + fields.fieldsAsString(" = ", "\n"); }
 }

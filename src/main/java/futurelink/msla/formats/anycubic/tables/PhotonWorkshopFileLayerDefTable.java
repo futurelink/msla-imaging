@@ -4,8 +4,6 @@ import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.PhotonWorkshopCodec;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.utils.FileFieldsReader;
-import futurelink.msla.formats.utils.FileFieldsWriter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
@@ -160,27 +158,18 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
 
     @Override
     public long read(FileInputStream stream, long position) throws MSLAException {
-        try {
-            var reader = new FileFieldsReader(stream, FileFieldsReader.Endianness.LittleEndian);
-            var dataRead = reader.read(fields);
-            if (dataRead != TableLength) throw new MSLAException(
-                    "LayerDef was not completely read out (" + dataRead + " of " + TableLength +
-                            "), some extra data left unread"
-            );
-            return dataRead;
-        } catch (IOException e) { throw new MSLAException("Error reading LayerDef table", e); }
+        var dataRead = super.read(stream, position);
+        if (dataRead != TableLength) throw new MSLAException(
+                "LayerDef was not completely read out (" + dataRead + " of " + TableLength +
+                        "), some extra data left unread"
+        );
+        return dataRead;
     }
 
     @Override
     public final void write(OutputStream stream) throws MSLAException {
         TableLength = calculateTableLength();
-        try {
-            var writer = new FileFieldsWriter(stream, FileFieldsWriter.Endianness.LittleEndian);
-            writer.write(fields);
-            stream.flush();
-        } catch (IOException e) {
-            throw new MSLAException("Error writing LayerDef table", e);
-        }
+        super.write(stream);
     }
 
     @Override

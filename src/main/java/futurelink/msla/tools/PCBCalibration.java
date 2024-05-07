@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.logging.Logger;
 
 public class PCBCalibration {
@@ -145,8 +144,6 @@ public class PCBCalibration {
             graphics.setFont(graphics.getFont().deriveFont(16.0f));
             graphics.setColor(Color.RED);
             graphics.drawString("DO NOT PRINT!", 16, 16 + 20 + 30);
-
-            file.updatePreviewImage();
         }
     }
 }
