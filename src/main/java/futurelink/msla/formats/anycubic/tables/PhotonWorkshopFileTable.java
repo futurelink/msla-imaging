@@ -33,16 +33,4 @@ abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {
 
     @Override
     public int getDataLength() { return calculateTableLength() + MarkLength + 4; }
-
-    public HashMap<String, Class<?>> getOptions() {
-        var a = getClass().getAnnotation(MSLAOptionContainer.class);
-        if (a != null) {
-            var optionsMap = new HashMap<String, Class<?>>();
-            Arrays.stream(a.className().getDeclaredFields())
-                    .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
-                    .forEach((f) -> optionsMap.put(f.getName(), f.getType()));
-            return optionsMap;
-        }
-        return null;
-    }
 }

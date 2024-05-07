@@ -19,7 +19,7 @@ import java.io.OutputStream;
  * "MACHINE" section representation.
  */
 @Getter
-@MSLAOptionContainer(className = PhotonWorkshopFileMachineTable.Fields.class)
+@MSLAOptionContainer(PhotonWorkshopFileMachineTable.Fields.class)
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     public static final String Name = "MACHINE";
     @Delegate private final Fields fields;

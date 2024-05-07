@@ -16,7 +16,7 @@ public class GOOFileTest extends CommonTestRoutines {
     @Test
     void CreateFileTest() throws MSLAException, InterruptedException {
         var outFile = temp_dir + "elegoo_test.goo";
-        var file = (GOOFile) FileFactory.instance.create("ELEGOO ELEGOO");
+        var file = (GOOFile) FileFactory.instance.create("ELEGOO Mars 4 Max");
         assertEquals(GOOFile.class, file.getClass());
         assertEquals("5760 x 3600", file.getResolution().toString());
         assertEquals(35.0F, file.getPixelSizeUm());

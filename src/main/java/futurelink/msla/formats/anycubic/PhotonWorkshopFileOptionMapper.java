@@ -19,11 +19,12 @@ class PhotonWorkshopFileOptionMapper extends MSLAOptionMapper {
         this.file = file;
         this.optionsMap = new HashMap<>();
 
-        if (file.extra != null) file.extra.getOptions().forEach((name, type) -> { // EXTRA options (version 2.4 and greater)
-            this.optionsMap.put(name, new Option(type, "EXTRA"));
-        });
+        if (file.getExtra() != null)
+            file.getExtra().getOptions().forEach((name, type) -> { // EXTRA options (version 2.4 and greater)
+                this.optionsMap.put(name, new Option(type, "EXTRA"));
+            });
 
-        file.header.getOptions().forEach((name, type) -> { // HEADER options
+        file.getHeader().getOptions().forEach((name, type) -> { // HEADER options
             this.optionsMap.put(name, new Option(type, "HEADER"));
         });
     }
@@ -42,21 +43,16 @@ class PhotonWorkshopFileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    protected boolean hasLayerOption(String option, Class<? extends Serializable> aClass) {
-        return false;
-    }
-
-    @Override
     protected void populateOption(String option, Serializable value) throws MSLAException {
         try {
             var loc = this.optionsMap.get(option).location;
             var cls = this.optionsMap.get(option).aClass;
             if (loc.equals("EXTRA")) {
-                var m = file.extra.getClass().getMethod("set" + option, cls);
-                m.invoke(file.extra, value);
+                var m = file.getExtra().getClass().getMethod("set" + option, cls);
+                m.invoke(file.getExtra(), cls.cast(value));
             } else if (loc.equals("HEADER")) {
-                var m = file.header.getClass().getMethod("set" + option, cls);
-                m.invoke(file.header, value);
+                var m = file.getHeader().getClass().getMethod("set" + option, cls);
+                m.invoke(file.getHeader(), cls.cast(value));
             }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new MSLAException(e.getMessage());
@@ -64,20 +60,18 @@ class PhotonWorkshopFileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    protected Class<?> optionClass(String option) {
-        return this.optionsMap.get(option).aClass;
-    }
+    public Class<?> getType(String option) { return this.optionsMap.get(option).aClass; }
 
     @Override
     protected Serializable fetchOption(String option) throws MSLAException {
         try {
             var loc = this.optionsMap.get(option).location;
             if (loc.equals("EXTRA")) {
-                var m = file.extra.getClass().getMethod("get" + option);
-                return (Serializable) m.invoke(file.extra);
+                var m = file.getExtra().getClass().getMethod("get" + option);
+                return (Serializable) m.invoke(file.getExtra());
             } else if (loc.equals("HEADER")) {
-                var m = file.header.getClass().getMethod("get" + option);
-                return (Serializable) m.invoke(file.header);
+                var m = file.getHeader().getClass().getMethod("get" + option);
+                return (Serializable) m.invoke(file.getHeader());
             }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new MSLAException("Error while getting option", e);
@@ -86,13 +80,7 @@ class PhotonWorkshopFileOptionMapper extends MSLAOptionMapper {
         return null;
     }
 
-    @Override
-    protected void populateLayerOption(String option, int layer, Serializable value) {
-
-    }
-
-    @Override
-    protected Serializable fetchLayerOption(String option, int layer) {
-        return null;
-    }
+    @Override protected boolean hasLayerOption(String option, Class<? extends Serializable> aClass) { return false; }
+    @Override protected void populateLayerOption(String option, int layer, Serializable value) {}
+    @Override protected Serializable fetchLayerOption(String option, int layer) { return null; }
 }

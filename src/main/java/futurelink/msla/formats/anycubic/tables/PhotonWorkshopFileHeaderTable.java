@@ -20,7 +20,7 @@ import java.io.OutputStream;
  * "HEADER" section representation.
  */
 @Getter
-@MSLAOptionContainer(className = PhotonWorkshopFileHeaderTable.Fields.class)
+@MSLAOptionContainer(PhotonWorkshopFileHeaderTable.Fields.class)
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     public static final String Name = "HEADER";
     @Delegate private final Fields fields;

@@ -5,6 +5,7 @@ import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.utils.About;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.experimental.Delegate;
@@ -13,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Getter
-@MSLAOptionContainer(className = GOOFileHeader.Fields.class)
+@MSLAOptionContainer(GOOFileHeader.Fields.class)
 public class GOOFileHeader extends GOOFileTable {
     enum DelayModes {
         LightOff((byte) 0), WaitTime((byte) 1);
@@ -28,15 +29,15 @@ public class GOOFileHeader extends GOOFileTable {
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
         private float PixelSizeUm;
-        private Size Resolution = new Size(0, 0); // Goes to file as short values: ResolutionX and ResolutionY
-        @MSLAFileField(length = 4) private final String Version = "V3.0"; // 4 bytes
-        @MSLAFileField(length = 8, order = 1) byte[] Magic = { 0x07, 0x00, 0x00, 0x00, 0x44, 0x4C, 0x50, 0x00 }; // 8 bytes
-        @MSLAFileField(length = 32, order = 2) String SoftwareName = "mSLA-imaging library"; // 32 bytes
-        @MSLAFileField(length = 24, order = 3) String SoftwareVersion = "1.0"; // 24 bytes
+        private Size Resolution = new Size(0, 0);
+        @MSLAFileField(length = 4) private final String Version = "V3.0";
+        @MSLAFileField(length = 8, order = 1) byte[] Magic = { 0x07, 0x00, 0x00, 0x00, 0x44, 0x4C, 0x50, 0x00 };
+        @MSLAFileField(length = 32, order = 2) String SoftwareName = About.Name;
+        @MSLAFileField(length = 24, order = 3) String SoftwareVersion = About.Version;
         @MSLAFileField(length = 24, order = 4) String FileCreateTime = formatDate(new Date());
-        @MSLAFileField(length = 32, order = 5) String MachineName = ""; // 32 bytes
-        @MSLAFileField(length = 32, order = 6) String MachineType = "DLP"; // 32 bytes
-        @MSLAFileField(length = 32, order = 7) String ProfileName = ""; // 32 bytes
+        @MSLAFileField(length = 32, order = 5) String MachineName = "DEFAULT";
+        @MSLAFileField(length = 32, order = 6) String MachineType = "DLP";
+        @MSLAFileField(length = 32, order = 7) String ProfileName = "DEFAULT";
         @MSLAFileField(order = 8) @MSLAOption
         Short AntiAliasingLevel = 8;
         @MSLAFileField(order = 9) @MSLAOption Short GreyLevel = 1;
@@ -55,7 +56,7 @@ public class GOOFileHeader extends GOOFileTable {
         @MSLAFileField(order = 19) float MachineZ;
         @MSLAFileField(order = 20) @MSLAOption float LayerHeight;
         @MSLAFileField(order = 21) @MSLAOption float ExposureTime;
-        @MSLAFileField(order = 22) @MSLAOption byte DelayMode = DelayModes.WaitTime.value; // 1 byte, 0: Light off delay mode | 1：Wait time mode
+        @MSLAFileField(order = 22) @MSLAOption byte DelayMode = DelayModes.WaitTime.value;
         @MSLAFileField(order = 23) @MSLAOption float LightOffDelay;
         @MSLAFileField(order = 24) @MSLAOption float BottomWaitTimeAfterCure;
         @MSLAFileField(order = 25) @MSLAOption float BottomWaitTimeAfterLift;
@@ -103,6 +104,7 @@ public class GOOFileHeader extends GOOFileTable {
     public GOOFileHeader(MSLAFileDefaults defaults) throws MSLAException {
         this();
         defaults.setFields("Header", fields);
+        fields.MachineName = defaults.getName();
     }
 
     @Override

@@ -18,11 +18,11 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     @Getter private Class<? extends PhotonWorkshopCodec> codec;
     private FileInputStream iStream;
     private PhotonWorkshopFileDescriptor descriptor;
-    PhotonWorkshopFileHeaderTable header;
+    @Getter private PhotonWorkshopFileHeaderTable header;
     private PhotonWorkshopFilePreviewTable preview;
     private PhotonWorkshopFileLayerDefTable layerDef;
-    PhotonWorkshopFileSoftwareTable software;
-    PhotonWorkshopFileExtraTable extra;
+    private PhotonWorkshopFileSoftwareTable software;
+    @Getter private PhotonWorkshopFileExtraTable extra;
     private PhotonWorkshopFileMachineTable machine;
     private final MSLAOptionMapper optionMapper;
 

@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public abstract class MSLAOptionMapper {
     abstract protected boolean hasOption(String option, Class<? extends Serializable> aClass);
-    abstract protected Class<?> optionClass(String option);
+    public abstract Class<?> getType(String option);
     abstract protected boolean hasLayerOption(String option, Class<? extends Serializable> aClass);
     abstract protected void populateOption(String option, Serializable value) throws MSLAException;
     abstract protected Serializable fetchOption(String option) throws MSLAException;
@@ -27,11 +27,9 @@ public abstract class MSLAOptionMapper {
                 if (!hasOption(option, null)) {
                     throw new MSLAException("Option '" + option + " is not available at all");
                 } else {
-                    throw new MSLAException("Option '" + option + "' of type " + value.getClass() +
-                            " is not available, it has " + optionClass(option));
+                    populateOption(option, value);
                 }
             }
-            populateOption(option, value);
         }
     }
 

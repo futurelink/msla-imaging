@@ -27,9 +27,7 @@ class CXDLPFileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    public Set<String> getAvailable() {
-        throw new RuntimeException("Options list is not implemented yet");
-    }
+    public Set<String> getAvailable() { return optionsMap.keySet(); }
 
     @Override
     protected boolean hasOption(String option, Class<? extends Serializable> aClass) {
@@ -39,16 +37,25 @@ class CXDLPFileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    protected Class<?> optionClass(String option) {
-        return this.optionsMap.get(option).aClass;
-    }
+    public Class<?> getType(String option) { return this.optionsMap.get(option).aClass; }
 
     @Override
-    protected boolean hasLayerOption(String option, Class<? extends Serializable> value) {
-        return false;
+    protected void populateOption(String option, Serializable value) throws MSLAException {
+        try {
+            var loc = this.optionsMap.get(option).location;
+            var cls = this.optionsMap.get(option).aClass;
+            if (loc.equals("SliceInfo")) {
+                var m = file.sliceInfo.getClass().getMethod("set" + option, cls);
+                m.invoke(file.sliceInfoV3, cls.cast(value));
+            } else if (loc.equals("SliceInfoV3")) {
+                var m = file.sliceInfoV3.getClass().getMethod("set" + option, cls);
+                m.invoke(file.sliceInfoV3, cls.cast(value));
+            }
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new MSLAException(e.getMessage());
+        }
     }
-    @Override
-    protected void populateOption(String option, Serializable value) {}
+
     @Override
     protected Serializable fetchOption(String option) throws MSLAException {
         try {
@@ -63,10 +70,10 @@ class CXDLPFileOptionMapper extends MSLAOptionMapper {
         }
         return null;
     }
-    @Override
-    protected void populateLayerOption(String option, int layer, Serializable value) {}
-    @Override
-    protected Serializable fetchLayerOption(String option, int layer) {
-        return null;
+
+    @Override protected boolean hasLayerOption(String option, Class<? extends Serializable> value) {
+        return false;
     }
+    @Override protected void populateLayerOption(String option, int layer, Serializable value) {}
+    @Override protected Serializable fetchLayerOption(String option, int layer) { return null; }
 }

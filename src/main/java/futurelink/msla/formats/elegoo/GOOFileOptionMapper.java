@@ -17,9 +17,7 @@ public class GOOFileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    protected Class<?> optionClass(String option) {
-        return null;
-    }
+    public Class<?> getType(String option) { return null; }
 
     @Override
     protected boolean hasLayerOption(String option, Class<? extends Serializable> aClass) {

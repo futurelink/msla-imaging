@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
 
-@MSLAOptionContainer(className = CXDLPFileSliceInfo.Fields.class)
+@MSLAOptionContainer(CXDLPFileSliceInfo.Fields.class)
 @Getter
 public class CXDLPFileSliceInfo extends CXDLPFileTable {
     @Delegate private final Fields fields;

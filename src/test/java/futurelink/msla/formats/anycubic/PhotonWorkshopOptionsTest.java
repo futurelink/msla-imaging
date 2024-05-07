@@ -23,7 +23,7 @@ public class PhotonWorkshopOptionsTest extends CommonTestRoutines {
         file.options().set("AdvancedMode", 1);
         var option = file.options().get("AdvancedMode");
         assertEquals(1, option);
-        assertThrows(MSLAException.class, () -> file.options().set("AdvancedMode", "string"));
+        assertThrows(ClassCastException.class, () -> file.options().set("AdvancedMode", "string"));
         assertThrows(MSLAException.class, () -> file.options().set("UnavailableOption", true));
     }
 

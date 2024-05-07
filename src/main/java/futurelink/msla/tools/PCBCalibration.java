@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.logging.Logger;
 
 public class PCBCalibration {
@@ -50,6 +51,16 @@ public class PCBCalibration {
         }
     }
 
+    public static void setOptionFromString(MSLAFile<?> file, String optionName, String value) throws MSLAException {
+        var optionType = file.options().getType(optionName);
+        if (optionType == Integer.class) file.options().set(optionName, Integer.parseInt(value));
+        if (optionType == Float.class) file.options().set(optionName, Float.parseFloat(value));
+        if (optionType == Double.class) file.options().set(optionName, Double.parseDouble(value));
+        if (optionType == Short.class) file.options().set(optionName, Short.parseShort(value));
+        if (optionType == Byte.class) file.options().set(optionName, Byte.parseByte(value));
+        if (optionType == Character.class) file.options().set(optionName, value.toCharArray()[0]);
+    }
+
     /**
      * Creates a PCB photo resistive film calibration pattern.
      *
@@ -63,8 +74,8 @@ public class PCBCalibration {
     public static String generateTestPattern(
             String machineName,
             String filePath,
-            float startTime,
-            float interval,
+            int startTime,
+            int interval,
             int repetitions) throws MSLAException
     {
         var defaults = FileFactory.instance.defaults(machineName);
@@ -78,10 +89,10 @@ public class PCBCalibration {
                 filePath + "." + defaults.getFileExtension();
         try (var fos = new FileOutputStream(filePath)) {
             // Set options
-            wsFile.options().set("BottomLayersCount", 1);
-            wsFile.options().set("BottomExposureTime", startTime);
-            wsFile.options().set("ExposureTime", interval);
-            wsFile.options().set("LiftHeight", 0.5f);
+            setOptionFromString(wsFile, "BottomLayersCount", "1");
+            setOptionFromString(wsFile, "BottomExposureTime", String.valueOf(startTime));
+            setOptionFromString(wsFile, "ExposureTime", String.valueOf(interval));
+            setOptionFromString(wsFile, "LiftHeight", "1");
 
             //wsFile.setOption("PerLayerOverride", 0);
             //wsFile.setOption("TransitionLayerCount", 0);

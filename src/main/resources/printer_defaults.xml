@@ -298,7 +298,7 @@
         </options>
     </printer>
 
-    <printer manufacturer="ELEGOO" name="ELEGOO" extension="goo" file="GOOFile">
+    <printer manufacturer="ELEGOO" name="Mars 4 Max" extension="goo" file="GOOFile">
         <options name="Header">
             <option name="Resolution" value="5760x3600"/>
             <option name="PixelSizeUm" value="35.0f"/>

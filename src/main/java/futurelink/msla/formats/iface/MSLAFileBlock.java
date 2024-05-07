@@ -1,10 +1,14 @@
 package futurelink.msla.formats.iface;
 
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsReader;
 import futurelink.msla.formats.utils.FileFieldsWriter;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public interface MSLAFileBlock {
 
@@ -32,5 +36,18 @@ public interface MSLAFileBlock {
         } catch (IOException e) {
             throw new MSLAException("Error writing " + this.getClass().getName() + " table", e);
         }
+    }
+
+    default HashMap<String, Class<?>> getOptions() {
+        var a = getClass().getAnnotation(MSLAOptionContainer.class);
+        if (a != null) {
+            var optionContainerClass = a.value() != null ? a.value() : getClass();
+            var optionsMap = new HashMap<String, Class<?>>();
+            Arrays.stream(optionContainerClass.getDeclaredFields())
+                    .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
+                    .forEach((f) -> optionsMap.put(f.getName(), f.getType()));
+            return optionsMap;
+        }
+        return null;
     }
 }

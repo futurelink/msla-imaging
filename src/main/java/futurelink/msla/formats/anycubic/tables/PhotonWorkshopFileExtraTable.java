@@ -17,13 +17,14 @@ import java.io.OutputStream;
 /**
  * "EXTRA" section representation.
  */
-@MSLAOptionContainer(className = PhotonWorkshopFileExtraTable.Fields.class)
+@MSLAOptionContainer(PhotonWorkshopFileExtraTable.Fields.class)
 @Getter @Setter
 public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     public static final String Name = "EXTRA";
     private final Fields fields;
 
     @SuppressWarnings("unused")
+    @Getter
     static class Fields implements MSLAFileBlockFields {
         private final PhotonWorkshopFileTable parent;
 
