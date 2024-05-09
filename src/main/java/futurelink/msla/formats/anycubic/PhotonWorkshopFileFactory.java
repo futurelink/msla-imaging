@@ -43,7 +43,7 @@ public class PhotonWorkshopFileFactory implements MSLAFileFactory {
     }
 
     @Override public boolean checkDefaults(String machineName) {
-        return PrinterDefaults.instance.getSupportedPrinters(PhotonWorkshopFile.class).contains(machineName);
+        return getSupportedMachines().contains(machineName);
     }
 
     @Override

@@ -14,10 +14,12 @@ public interface MSLALayerCodec<D> {
      * Decodees layer data from byte array.
      * @param data {@link MSLALayerDecodeInput} object
      * @param layerNumber layer number
-     * @param decodedDataLength expected decoded data length
      * @param writer writer object to be used as output channel
      * @return number of decoded pixels
      */
-    int Decode(int layerNumber, MSLALayerDecodeInput<D> data, int decodedDataLength, MSLALayerDecodeWriter writer)
+    int Decode(int layerNumber, MSLALayerDecodeInput<D> data, MSLALayerDecodeWriter writer)
             throws MSLAException;
+
+    default void setParam(String paramName, Object paramValue) {}
+    default Object getParam(String paramName) { return null; }
 }

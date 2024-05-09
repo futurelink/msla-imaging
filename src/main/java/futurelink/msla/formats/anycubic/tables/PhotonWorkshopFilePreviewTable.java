@@ -16,7 +16,6 @@ import java.io.OutputStream;
  */
 @Getter
 public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable implements MSLAPreview  {
-    public static final String Name = "PREVIEW";
     private final Fields fields;
     private BufferedImage image;
 
@@ -26,12 +25,11 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable impl
         private final PhotonWorkshopFileTable parent;
         private Size Resolution = new Size(224, 168);
 
-        @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return PhotonWorkshopFilePreviewTable.Name; }
+        @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return "PREVIEW"; }
         // Validation setter checks for what's been read from file
         // and throws an exception when that is something unexpected.
         private void setName(String name) throws MSLAException {
-            if (!PhotonWorkshopFilePreviewTable.Name.equals(name))
-                throw new MSLAException("Table name '" + name + "' is invalid");
+            if (!"PREVIEW".equals(name)) throw new MSLAException("Table name '" + name + "' is invalid");
         }
         @MSLAFileField(order = 1) private Integer TableLength() { return parent.calculateTableLength() + 4; }
         private void setTableLength(Integer length) { parent.TableLength = length; }

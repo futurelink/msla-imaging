@@ -18,7 +18,7 @@ public class CTBFileResinParams implements MSLAFileBlock {
         @MSLAFileField(order = 2) private Byte ResinColorG;
         @MSLAFileField(order = 3) private Byte ResinColorR;
         @MSLAFileField(order = 4) private Byte ResinColorA;
-        @MSLAFileField(order = 5) private Integer MachineNameAddress;
+        @MSLAFileField(order = 5) private Integer MachineNameOffset;
         @MSLAFileField(order = 6) private Integer ResinTypeLength;
         @MSLAFileField(order = 7) private Integer ResinTypeAddress;
         @MSLAFileField(order = 8) private Integer ResinNameLength;

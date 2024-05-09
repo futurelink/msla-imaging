@@ -29,7 +29,7 @@ public interface MSLALayerDecodeWriter {
      * Method is being called when decoding process starts.
      * @param layerNumber layer number that is to be decoded
      */
-    void onStart(int layerNumber);
+    void onStart(int layerNumber) throws MSLAException;
 
     /**
      * Method is being called when decoding process ends.

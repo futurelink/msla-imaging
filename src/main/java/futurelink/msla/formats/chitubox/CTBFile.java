@@ -11,14 +11,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-class CTBFile extends MSLAFileGeneric<byte[]> {
+public class CTBFile extends MSLAFileGeneric<byte[]> {
+    private FileInputStream stream = null;
+    private final MSLAOptionMapper optionMapper;
 
     /* File sections */
     private final CTBFileHeader header;
     private final CTBFilePrintParams params;
-    private CTBFileSlicerInfo slicerInfo;
-    private CTBFilePrintParamsV4 paramsV4;
+    private final CTBFileSlicerInfo slicerInfo;
+    private CTBFilePrintParamsV4 paramsV4 = null;
     private CTBFileResinParams resinParams = null;
     private final CTBFilePreview previewSmall = new CTBFilePreview();
     private final CTBFilePreview previewLarge = new CTBFilePreview();
@@ -27,7 +30,7 @@ class CTBFile extends MSLAFileGeneric<byte[]> {
 
     public CTBFile(MSLAFileDefaults defaults) throws MSLAException {
         super();
-        //optionMapper = new CTBFileOptionMapper(this);
+        optionMapper = new CTBOptionMapper(this);
 
         header = new CTBFileHeader(defaults);
         if (header.getFields().getVersion() <= 0)
@@ -49,7 +52,8 @@ class CTBFile extends MSLAFileGeneric<byte[]> {
 
     public CTBFile(FileInputStream stream) throws IOException, MSLAException {
         super();
-        //optionMapper = new CTBFileOptionMapper(this);
+        this.stream = stream;
+        optionMapper = new CTBOptionMapper(this);
 
         header = new CTBFileHeader();
         params = new CTBFilePrintParams();
@@ -69,7 +73,7 @@ class CTBFile extends MSLAFileGeneric<byte[]> {
 
         // Read version 4 or later data
         if (header.getFields().getVersion() >= 4) {
-            if (slicerInfo == null || slicerInfo.getFields().getPrintParametersV4Offset() == 0)
+            if (slicerInfo.getFields().getPrintParametersV4Offset() == 0)
                 throw new MSLAException("Malformed file, PrintParametersV4 section offset is missing");
             paramsV4 = new CTBFilePrintParamsV4();
             paramsV4.read(stream, slicerInfo.getFields().getPrintParametersV4Offset());
@@ -135,10 +139,10 @@ class CTBFile extends MSLAFileGeneric<byte[]> {
         }
     }
 
-    @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return null; }
+    @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return CTBFileCodec.class; }
     @Override public MSLAPreview getPreview() { return previewLarge; }
     @Override public float getDPI() { return 0; }
-    @Override public Size getResolution() { return null; }
+    @Override public Size getResolution() { return header.getFields().getResolution(); }
     @Override public float getPixelSizeUm() { return 0; }
     @Override public int getLayerCount() { return header.getFields().getLayerCount(); }
 
@@ -158,7 +162,21 @@ class CTBFile extends MSLAFileGeneric<byte[]> {
 
     }
 
-    @Override public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException { return false; }
+    @Override public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
+        var layerDataPosition = layerDef.get(layer).getFields().getDataAddress();
+        var layerDataLength = layerDef.get(layer).getFields().getDataSize();
+        try {
+            var ch = stream.getChannel();
+            ch.position(layerDataPosition);
+            var layerData = new CTBFileCodec.Input(stream.readNBytes(layerDataLength));
+            var params = new HashMap<String, Object>();
+            params.put("EncryptionKey", header.getFields().getEncryptionKey());
+            return getDecodersPool().decode(layer, writer, layerData, params);
+        } catch (IOException e) {
+            throw new MSLAException("Error reading layer " + layer, e);
+        }
+    }
+
     @Override public void write(OutputStream stream) throws MSLAException {}
     @Override public boolean isValid() { return (header != null) && (slicerInfo != null) && (params != null); }
     @Override public MSLAOptionMapper options() { return null; }

@@ -127,7 +127,6 @@ public class GOOFileCodec implements MSLALayerCodec<byte[]> {
     public final int Decode(
             int layerNumber,
             MSLALayerDecodeInput<byte[]> data,
-            int decodedDataLength,
             MSLALayerDecodeWriter writer) throws MSLAException
     {
         logger.info("Starting decoding " + data.size() + " bytes");

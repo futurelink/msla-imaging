@@ -21,7 +21,7 @@ import java.io.OutputStream;
 @Getter
 @MSLAOptionContainer(PhotonWorkshopFileMachineTable.Fields.class)
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
-    public static final String Name = "MACHINE";
+    private static final String OPTIONS_SECTION_NAME = "Machine";
     @Delegate private final Fields fields;
 
     @Getter @Setter
@@ -29,12 +29,11 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     public static class Fields implements MSLAFileBlockFields {
         private final PhotonWorkshopFileTable parent;
 
-        @MSLAFileField(length = MarkLength) private String Name() { return PhotonWorkshopFileMachineTable.Name; }
+        @MSLAFileField(length = MarkLength) private String Name() { return "MACHINE"; }
         // Validation setter checks for what's been read from file
         // and throws an exception when that is something unexpected.
         private void setName(String name) throws MSLAException {
-            if (!PhotonWorkshopFileMachineTable.Name.equals(name))
-                throw new MSLAException("Table name '" + name + "' is invalid");
+            if (!"MACHINE".equals(name)) throw new MSLAException("Table name '" + name + "' is invalid");
         }
         @MSLAFileField(order = 1) private Integer TableLength() { return parent.calculateTableLength(); }
         private void setTableLength(Integer length) { parent.TableLength = length; }
@@ -105,7 +104,7 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
             byte versionMinor) throws MSLAException
     {
         this(versionMajor, versionMinor);
-        defaults.setFields("Machine", fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fields);
     }
 
     @Override

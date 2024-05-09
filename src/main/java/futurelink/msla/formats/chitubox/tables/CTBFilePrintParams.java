@@ -11,6 +11,7 @@ import lombok.Getter;
 
 @Getter
 public class CTBFilePrintParams implements MSLAFileBlock {
+    private final String OPTIONS_SECTION_NAME = "PrintParams";
     private final Fields fields;
 
     @Getter
@@ -39,7 +40,7 @@ public class CTBFilePrintParams implements MSLAFileBlock {
 
     public CTBFilePrintParams(MSLAFileDefaults defaults) throws MSLAException {
         this();
-        defaults.setFields("PrintParams", fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fields);
     }
 
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }

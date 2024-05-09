@@ -44,13 +44,18 @@ public final class MSLALayerEncoders<D> extends ThreadPoolExecutor implements MS
     }
 
     @Override
-    public void encode(int layer, MSLALayerEncodeReader reader, Callback<D> callback) throws MSLAException {
+    public void encode(int layer, MSLALayerEncodeReader reader, Map<String, Object> params, Callback<D> callback)
+            throws MSLAException
+    {
         if (reader == null) throw new MSLAException("Reader can't be null");
         try {
             counter.getAndIncrement();
 
             // Create codec object, one per encoding process
             var codecObj = codec.getDeclaredConstructor().newInstance();
+            if (params != null) {
+                for (var param : params.keySet()) codecObj.setParam(param, params.get(param));
+            }
 
             // Start encode thread
             submit(() -> {

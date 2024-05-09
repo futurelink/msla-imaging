@@ -2,7 +2,6 @@ package futurelink.msla.formats.chitubox;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.chitubox.tables.CTBFileHeader;
-import futurelink.msla.formats.elegoo.GOOFile;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
@@ -45,11 +44,11 @@ public class CTBFileFactory implements MSLAFileFactory {
     }
 
     @Override public boolean checkDefaults(String machineName) {
-        return (PrinterDefaults.instance.getPrinter(machineName) != null);
+        return getSupportedMachines().contains(machineName);
     }
 
     @Override public Set<String> getSupportedMachines() {
-        return PrinterDefaults.instance.getSupportedPrinters(GOOFile.class);
+        return PrinterDefaults.instance.getSupportedPrinters(CTBFile.class);
     }
 
     public final String getVersionByMagic(byte[] magic) {

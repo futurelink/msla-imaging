@@ -10,7 +10,6 @@ import lombok.Getter;
  */
 @Getter
 public class PhotonWorkshopFileSoftwareTable extends PhotonWorkshopFileTable {
-    public static final String Name = "SOFTWARE";
     private final Fields fields = new Fields();
 
     @SuppressWarnings("unused")

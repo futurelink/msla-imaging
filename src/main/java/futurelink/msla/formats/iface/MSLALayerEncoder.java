@@ -3,6 +3,8 @@ package futurelink.msla.formats.iface;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLALayerEncoders;
 
+import java.util.Map;
+
 public interface MSLALayerEncoder<D> {
 
     /**
@@ -25,7 +27,12 @@ public interface MSLALayerEncoder<D> {
      * Puts an encoding job into a queue.
      * @param layer layer number
      * @param reader {@link MSLALayerEncodeReader} object to be used as an input data channel
+     * @param params is a {@link Map} of codec parameters
      * @param callback {@link MSLALayerEncoders.Callback} to be executed when encoding is done
      */
-    void encode(int layer, MSLALayerEncodeReader reader, MSLALayerEncoders.Callback<D> callback) throws MSLAException;
+    void encode(int layer,
+                MSLALayerEncodeReader reader,
+                Map<String, Object> params,
+                MSLALayerEncoders.Callback<D> callback
+    ) throws MSLAException;
 }

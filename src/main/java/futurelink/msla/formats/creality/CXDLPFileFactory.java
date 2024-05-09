@@ -46,7 +46,7 @@ public class CXDLPFileFactory implements MSLAFileFactory {
     }
 
     @Override public boolean checkDefaults(String machineName) {
-        return PrinterDefaults.instance.getSupportedPrinters(CXDLPFile.class).contains(machineName);
+        return getSupportedMachines().contains(machineName);
     }
 
     @Override public Set<String> getSupportedMachines() {

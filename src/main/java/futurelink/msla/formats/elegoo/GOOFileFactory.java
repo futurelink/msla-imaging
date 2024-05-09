@@ -43,7 +43,7 @@ public class GOOFileFactory implements MSLAFileFactory {
     }
 
     @Override public boolean checkDefaults(String machineName) {
-        return (PrinterDefaults.instance.getPrinter(machineName) != null);
+        return getSupportedMachines().contains(machineName);
     }
 
     @Override public Set<String> getSupportedMachines() {

@@ -8,6 +8,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public abstract class PhotonWorkshopCodec implements MSLALayerCodec<byte[]> {
+    protected Integer decodedDataLength = 0;
+
     public static class Input implements MSLALayerDecodeInput<byte[]> {
         private final byte[] data;
         public Input(byte[] data) { this.data = data; }
@@ -31,5 +33,10 @@ public abstract class PhotonWorkshopCodec implements MSLALayerCodec<byte[]> {
             this.stream.write(data);
         }
         @Override public byte[] data() { return stream.toByteArray(); }
+    }
+
+    @Override
+    public void setParam(String paramName, Object paramValue) {
+        if ("DecodedDataLength".equals(paramName)) decodedDataLength = (Integer) paramValue;
     }
 }

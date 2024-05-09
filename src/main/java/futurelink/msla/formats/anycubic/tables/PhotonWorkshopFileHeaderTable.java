@@ -22,7 +22,8 @@ import java.io.OutputStream;
 @Getter
 @MSLAOptionContainer(PhotonWorkshopFileHeaderTable.Fields.class)
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
-    public static final String Name = "HEADER";
+    private static final String OPTIONS_SECTION_NAME = "Header";
+
     @Delegate private final Fields fields;
 
     @Getter @Setter
@@ -31,12 +32,11 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         private final PhotonWorkshopFileTable parent;
         private Size Resolution = new Size(0, 0);
 
-        @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return PhotonWorkshopFileHeaderTable.Name; }
+        @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return "HEADER"; }
         // Validation setter checks for what's been read from file
         // and throws an exception when that is something unexpected.
         private void setName(String name) throws MSLAException {
-            if (!PhotonWorkshopFileHeaderTable.Name.equals(name))
-                throw new MSLAException("Table name '" + name + "' is invalid");
+            if (!"HEADER".equals(name)) throw new MSLAException("Table name '" + name + "' is invalid");
         }
         @MSLAFileField(order = 1, dontCount = true) private Integer TableLength() { return parent.calculateTableLength(); }
         private void setTableLength(Integer length) { parent.TableLength = length; }
@@ -99,7 +99,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
             byte versionMinor) throws MSLAException
     {
         this(versionMajor, versionMinor);
-        defaults.setFields("Header", fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fields);
     }
 
     @Override

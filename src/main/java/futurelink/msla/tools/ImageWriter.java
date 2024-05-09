@@ -76,8 +76,9 @@ public class ImageWriter implements MSLALayerDecodeWriter {
         }
     }
 
-    @Override public void onStart(int layerNumber) {
-        logger.info("Layer " + layerNumber + " write started");
+    @Override public void onStart(int layerNumber) throws MSLAException {
+        if (file.getResolution() == null) throw new MSLAException("File resolution is undefined, can't write");
+        logger.info("Layer " + layerNumber + " write started, size is " + file.getResolution());
         img.put(layerNumber, new BufferedImage(
                 file.getResolution().getWidth(),
                 file.getResolution().getHeight(),

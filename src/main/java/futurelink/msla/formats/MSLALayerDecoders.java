@@ -4,6 +4,7 @@ import futurelink.msla.formats.iface.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -53,26 +54,32 @@ public final class MSLALayerDecoders<D> extends ThreadPoolExecutor implements MS
     }
 
     @Override
-    public boolean decode(int layer, MSLALayerDecodeWriter writer, MSLALayerDecodeInput<D> data, int decodedDataLength) throws MSLAException {
+    public boolean decode(int layer, MSLALayerDecodeWriter writer, MSLALayerDecodeInput<D> data, Map<String, Object> params)
+            throws MSLAException
+    {
         if (data == null) throw new MSLAException("No data to decode");
+        if (writer == null) throw new MSLAException("Writer is not defined");
         if (isBusy()) return false; // No decoder slots available
         counter.getAndIncrement();
         try {
             // Create codec object, one per encoding process
             var codecObj = codec.getDeclaredConstructor().newInstance();
+            if (params != null) {
+                for (var param : params.keySet()) codecObj.setParam(param, params.get(param));
+            }
 
             // Start decode thread
             submit(() -> {
                 try {
                     writer.onStart(layer);
-                    var pixels = codecObj.Decode(layer, data, decodedDataLength, writer);
+                    var pixels = codecObj.Decode(layer, data, writer);
                     writer.onFinish(layer, pixels);
                     counter.decrementAndGet();
-                } catch (MSLAException e) {
+                } catch (Exception e) {
                     try {
                         writer.onError(layer, e.getMessage());
                         counter.decrementAndGet();
-                    } catch (MSLAException e2) {
+                    } catch (Exception e2) {
                         counter.decrementAndGet();
                         throw new RuntimeException(e2);
                     }

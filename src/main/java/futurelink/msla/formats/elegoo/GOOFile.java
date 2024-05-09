@@ -76,14 +76,13 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
         var layer = new GOOFileLayerDef();
         var layerNumber = layersDef.size();
         layersDef.add(layer);
-        getEncodersPool().encode(layerNumber, reader, callback);
+        getEncodersPool().encode(layerNumber, reader, null, callback);
     }
 
     @Override
     public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        return getDecodersPool().decode(layer, writer,
-                new GOOFileCodec.Input(layersDef.get(layer).getFields().getData()), 0
-        );
+        var input = new GOOFileCodec.Input(layersDef.get(layer).getFields().getData());
+        return getDecodersPool().decode(layer, writer, input, null);
     }
 
     @Override

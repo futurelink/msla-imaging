@@ -2,6 +2,8 @@ package futurelink.msla.formats.iface;
 
 import futurelink.msla.formats.MSLAException;
 
+import java.util.Map;
+
 public interface MSLALayerDecoder<D> {
     /**
      * Returns true if there's no any free decoder thread.
@@ -17,8 +19,11 @@ public interface MSLALayerDecoder<D> {
      * Puts a job into decoding queue.
      * @param layer layer number
      * @param data {@link MSLALayerDecodeInput} to be used as data input channel
-     * @param decodedDataLength expected decoded data length
+     * @param params is a {@link Map} of codec parameters
      * @return true if job was added successfully, otherwise - false.
      */
-    boolean decode(int layer, MSLALayerDecodeWriter writer, MSLALayerDecodeInput<D> data, int decodedDataLength) throws MSLAException;
+    boolean decode(int layer,
+                   MSLALayerDecodeWriter writer,
+                   MSLALayerDecodeInput<D> data,
+                   Map<String, Object> params) throws MSLAException;
 }

@@ -69,7 +69,8 @@ public class PrinterDefaults {
 
         public final HashMap<String, String> getOptionsBlock(String blockName) {
             if (blockName == null) return fileOptions;
-            return options.get(blockName).getOptions();
+            var block = options.get(blockName);
+            return block != null ? block.getOptions() : new HashMap<>();
         }
 
         private Object transformToType(String val, String type) {

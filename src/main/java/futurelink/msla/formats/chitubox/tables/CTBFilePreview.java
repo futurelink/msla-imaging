@@ -12,11 +12,14 @@ import lombok.Getter;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 @Getter
 public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
     private BufferedImage image;
     private final Fields fields = new Fields();
+    private final short REPEAT_MASK_RGB565 = 0x20;
 
     @Getter
     @SuppressWarnings("unused")
@@ -28,10 +31,16 @@ public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
         void setResolutionY(Integer value) { Resolution = new Size(Resolution.getWidth(), value); }
         @MSLAFileField(order = 2) private Integer ImageOffset;
         @MSLAFileField(order = 3) private Integer ImageLength;
-        @MSLAFileField(order = 4) private Integer Unknown1;
-        @MSLAFileField(order = 5) private Integer Unknown2;
-        @MSLAFileField(order = 6) private Integer Unknown3;
-        @MSLAFileField(order = 7) private Integer Unknown4;
+        @MSLAFileField(order = 4) private final Integer Unknown1 = 0;
+        @MSLAFileField(order = 5) private final Integer Unknown2 = 0;
+        @MSLAFileField(order = 6) private final Integer Unknown3 = 0;
+        @MSLAFileField(order = 7) private final Integer Unknown4 = 0;
+    }
+
+    public CTBFilePreview() {
+        fields.Resolution = new Size(0,0);
+        fields.ImageLength = 0;
+        fields.ImageOffset = 0;
     }
 
     @Override
@@ -64,9 +73,55 @@ public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
             int blue = ((dot & 0x1F) << 3) & 0xFF;
             int repeat = 1;
             if ((dot & 0x0020) == 0x0020) repeat += rawImageData[++n] & 0xFF | ((rawImageData[++n] & 0x0F) << 8);
-            for (int j = 0; j < repeat; j++) buffer.setElem(0, pixel++, (blue << 16) | (green << 8) | red);
+            for (int j = 0; j < repeat; j++) buffer.setElem(0, pixel++, (red << 16) | (green << 8) | blue);
         }
         return pixel;
+    }
+
+    private void RleRGB565(List<Byte> data, int rep,  int color15) {
+        switch (rep) {
+            case 0: return;
+            case 1:
+                data.add((byte)(color15 & ~REPEAT_MASK_RGB565));
+                data.add((byte)((color15 & ~REPEAT_MASK_RGB565) >> 8));
+                break;
+            case 2:
+                for (int i = 0; i < 2; i++) {
+                    data.add((byte)(color15 & ~REPEAT_MASK_RGB565));
+                    data.add((byte)((color15 & ~REPEAT_MASK_RGB565) >> 8));
+                }
+                break;
+            default:
+                data.add((byte)(color15 | REPEAT_MASK_RGB565));
+                data.add((byte)((color15 | REPEAT_MASK_RGB565) >> 8));
+                data.add((byte)((rep - 1) | 0x3000));
+                data.add((byte)(((rep - 1) | 0x3000) >> 8));
+                break;
+        }
+    }
+
+    public Byte[] Encode() {
+        List<Byte> rawData = new LinkedList<>();
+        int rep = 0;
+        int pixel = 0;
+        int color_565 = 0;
+        var buffer = image.getRaster().getDataBuffer();
+        while (pixel < buffer.getSize()) {
+            int pixelColor = buffer.getElem(pixel++);
+            int n_color_565 = (pixelColor >> 3) | ((pixelColor >> 2) << 5) | ((pixelColor >> 3) << 11); // BGR
+            if (n_color_565 == color_565) {
+                if (++rep == 0xFFF) { RleRGB565(rawData, rep, color_565); rep = 0; }
+            } else {
+                RleRGB565(rawData, rep, color_565);
+                color_565 = n_color_565;
+                rep = 1;
+            }
+        }
+
+        RleRGB565(rawData, rep, color_565);
+        fields.ImageLength = rawData.size();
+
+        return rawData.toArray(Byte[]::new);
     }
 
     @Override public Size getResolution() { return fields.Resolution; }

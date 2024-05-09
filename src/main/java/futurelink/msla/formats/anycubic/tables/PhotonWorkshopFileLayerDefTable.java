@@ -10,13 +10,13 @@ import lombok.experimental.Delegate;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * "LAYERDEF" section representation.
  */
 @Getter
 public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
-    public static final String Name = "LAYERDEF";
     @Delegate private final Fields fields;
 
     @Getter
@@ -41,12 +41,11 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     static class Fields implements MSLAFileBlockFields {
         private final PhotonWorkshopFileTable parent;
 
-        @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return PhotonWorkshopFileLayerDefTable.Name; }
+        @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return "LAYERDEF"; }
         // Validation setter checks for what's been read from file
         // and throws an exception when that is something unexpected.
         private void setName(String name) throws MSLAException {
-            if (!PhotonWorkshopFileLayerDefTable.Name.equals(name))
-                throw new MSLAException("Table name '" + name + "' is invalid");
+            if (!"LAYERDEF".equals(name)) throw new MSLAException("Table name '" + name + "' is invalid");
         }
         @MSLAFileField(order = 1, dontCount = true) private Integer TableLength() { return parent.calculateTableLength(); }
         private void setTableLength(Integer length) { parent.TableLength = length; }
@@ -80,8 +79,11 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         fields.layerData.add(null);
         fields.LayerCount = fields.Layers.size();
 
+        var params = new HashMap<String, Object>();
+        params.put("DecodedDataLength", reader.getSize());
+
         // Encode layer data
-        encoders.encode(number, reader, (layerNumber, data) -> {
+        encoders.encode(number, reader, params, (layerNumber, data) -> {
             fields.Layers.get(layerNumber).DataLength = data.sizeInBytes();
             fields.Layers.get(layerNumber).NonZeroPixelCount = data.pixels();
             fields.layerData.set(layerNumber, data.data());
@@ -107,7 +109,9 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     {
         try {
             var input = new PhotonWorkshopCodec.Input(stream.readNBytes(getLayer(layer).DataLength));
-            return decoders.decode(layer, writer,  input, decodedDataLength);
+            var params = new HashMap<String, Object>();
+            params.put("DecodedDataLength", decodedDataLength);
+            return decoders.decode(layer, writer, input, params);
         } catch (IOException e) {
             throw new MSLAException("Error decoding layer data", e);
         }

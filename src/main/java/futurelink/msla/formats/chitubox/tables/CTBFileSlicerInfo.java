@@ -10,6 +10,7 @@ import lombok.Getter;
 
 @Getter
 public class CTBFileSlicerInfo implements MSLAFileBlock {
+    private final String OPTIONS_SECTION_NAME = "SlicerInfo";
     private static final Byte PER_LAYER_SETTINGS_DISALLOW =     0;
     private static final Byte PER_LAYER_SETTINGS_CBD_DLP =   0x10;
     private static final Byte PER_LAYER_SETTINGS_CTBv2 =     0x20; // 15 for ctb v2 files and others (This disallow per layer settings)
@@ -29,10 +30,10 @@ public class CTBFileSlicerInfo implements MSLAFileBlock {
         @MSLAFileField(order = 4) private Float RetractHeight2;
         @MSLAFileField(order = 5) private Float RetractSpeed2;
         @MSLAFileField(order = 6) private Float RestTimeAfterLift;
-        @MSLAFileField(order = 7) private Integer MachineNameAddress;
+        @MSLAFileField(order = 7) private Integer MachineNameOffset;
         @MSLAFileField(order = 8) private final Integer MachineNameSize = 0;
         @MSLAFileField(order = 9) private final Byte AntiAliasFlag = 0x0F;
-        @MSLAFileField(order = 10) private Short Padding;
+        @MSLAFileField(order = 10) private final Short Padding = 0;
         @MSLAFileField(order = 11) private Byte PerLayerSettings;
         @MSLAFileField(order = 12) private Integer ModifiedTimestampMinutes;
         @MSLAFileField(order = 13) private final Integer AntiAliasLevel = 1;
@@ -41,8 +42,8 @@ public class CTBFileSlicerInfo implements MSLAFileBlock {
         @MSLAFileField(order = 16) private Float RestTimeAfterLift2;
         @MSLAFileField(order = 17) private Integer TransitionLayerCount; // CTB not all printers
         @MSLAFileField(order = 18) private Integer PrintParametersV4Offset; // V4 Only
-        @MSLAFileField(order = 19) private Integer Padding2;
-        @MSLAFileField(order = 20) private Integer Padding3;
+        @MSLAFileField(order = 19) private final Integer Padding2 = 0;
+        @MSLAFileField(order = 20) private final Integer Padding3 = 0;
         @MSLAFileField(order = 21, lengthAt = "MachineNameSize") public String MachineName = "";
     }
 
@@ -52,7 +53,7 @@ public class CTBFileSlicerInfo implements MSLAFileBlock {
 
     public CTBFileSlicerInfo(MSLAFileDefaults defaults) throws MSLAException {
         this();
-        defaults.setFields("SlicerInfo", fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fields);
     }
 
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }

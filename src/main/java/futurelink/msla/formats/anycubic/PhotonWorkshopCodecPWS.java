@@ -7,6 +7,7 @@ import futurelink.msla.formats.iface.MSLALayerEncodeOutput;
 import futurelink.msla.formats.iface.MSLALayerEncodeReader;
 
 public class PhotonWorkshopCodecPWS extends PhotonWorkshopCodec {
+
     @Override
     public final MSLALayerEncodeOutput<byte[]> Encode(int layerNumber,
                                                       MSLALayerEncodeReader input) throws MSLAException
@@ -15,8 +16,9 @@ public class PhotonWorkshopCodecPWS extends PhotonWorkshopCodec {
     }
 
     @Override
-    public final int Decode(int layerNumber, MSLALayerDecodeInput<byte[]> data,
-                            int decodedDataLength, MSLALayerDecodeWriter writer) throws MSLAException
+    public final int Decode(int layerNumber,
+                            MSLALayerDecodeInput<byte[]> data,
+                            MSLALayerDecodeWriter writer) throws MSLAException
     {
         throw new MSLAException("PWS is not implemented yet");
     }

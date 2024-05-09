@@ -94,7 +94,6 @@ public class CXDLPLayerCodec implements MSLALayerCodec<List<CXDLPFileLayerLine>>
     public int Decode(
             int layerNumber,
             MSLALayerDecodeInput<List<CXDLPFileLayerLine>> input,
-            int decodedDataLength,
             MSLALayerDecodeWriter writer) throws MSLAException
     {
         if (input == null) throw new MSLAException("Input data can't be null");

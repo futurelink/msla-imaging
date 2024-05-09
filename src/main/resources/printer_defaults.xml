@@ -304,4 +304,53 @@
             <option name="PixelSizeUm" value="35.0f"/>
         </options>
     </printer>
+
+    <printer manufacturer="ELEGOO" name="Saturn" extension="ctb" file="CTBFile">
+        <options name="Header">
+            <option name="Resolution" value="5760x3600"/>
+            <option name="PixelSizeUm" value="35.0f"/>
+            <option name="Version" value="4"/>
+            <option name="BedSizeX" value="192.0"/>
+            <option name="BedSizeY" value="120.0"/>
+            <option name="BedSizeZ" value="200.0"/>
+            <option name="LightOffDelay" value="0"/>
+            <option name="AntiAliasLevel" value="1"/>
+            <option name="LightPWM" value="255"/>
+            <option name="BottomLightPWM" value="255"/>
+        </options>
+        <options name="SlicerInfo">
+            <option name="BottomLiftHeight2" value="0.0"/>
+            <option name="BottomLiftSpeed2" value="0.0"/>
+            <option name="LiftHeight2" value="0.0"/>
+            <option name="LiftSpeed2" value="0.0"/>
+            <option name="RetractHeight2" value="0.0"/>
+            <option name="RetractSpeed2" value="0.0"/>
+            <option name="RestTimeAfterLift" value="0.0"/>
+            <option name="AntiAliasFlag" value="15"/>
+            <option name="PerLayerSettings" value="0"/>
+            <option name="AntiAliasLevel" value="4"/>
+            <option name="RestTimeAfterRetract" value="0.5"/>
+            <option name="RestTimeAfterLift2" value="0.0"/>
+            <option name="TransitionLayerCount" value="10"/>
+            <option name="MachineName" value="ELEGOO SATURN"/>
+        </options>
+        <options name="PrintParams">
+            <option name="BottomLiftHeight" value="7"/>
+            <option name="BottomLiftSpeed" value="70"/>
+            <option name="LiftHeight" value="7"/>
+            <option name="LiftSpeed" value="70"/>
+            <option name="RetractSpeed" value="180"/>
+            <option name="BottomLightOffDelay" value="0"/>
+            <option name="LightOffDelay" value="0"/>
+            <option name="BottomLayerCount" value="5"/>
+        </options>
+        <options name="PrintParamsV4">
+            <option name="BottomRetractSpeed" value="180"/>
+            <option name="BottomRetractSpeed2" value="0"/>
+            <option name="RestTimeAfterRetract" value="0.5"/>
+            <option name="RestTimeAfterLift" value="0"/>
+            <option name="RestTimeBeforeLift" value="0"/>
+            <option name="BottomRetractHeight2" value="0"/>
+        </options>
+    </printer>
 </printers>

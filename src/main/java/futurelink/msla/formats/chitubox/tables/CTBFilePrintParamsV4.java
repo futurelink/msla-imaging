@@ -10,6 +10,7 @@ import lombok.Getter;
 
 @Getter
 public class CTBFilePrintParamsV4 implements MSLAFileBlock {
+    private final String OPTIONS_SECTION_NAME = "PrintParamsV4";
     private static final int CTBv4_RESERVED_SIZE = 380;
     private static final Integer CTBv4_DISCLAIMER_SIZE = 320;
     private static final String CTBv4_DISCLAIMER = "Layout and record format for the ctb and cbddlp file types are the " +
@@ -24,9 +25,9 @@ public class CTBFilePrintParamsV4 implements MSLAFileBlock {
     public static class Fields implements MSLAFileBlockFields {
         @MSLAFileField private Float BottomRetractSpeed;
         @MSLAFileField(order = 1) private Float BottomRetractSpeed2;
-        @MSLAFileField(order = 2) private Integer Padding1;
+        @MSLAFileField(order = 2) private final Integer Padding1 = 0;
         @MSLAFileField(order = 3) private final Float Four1 = 4.0F; // 4?
-        @MSLAFileField(order = 4) private Integer Padding2;
+        @MSLAFileField(order = 4) private final Integer Padding2 = 0;
         @MSLAFileField(order = 5) private final Float Four2 = 4.0f; // ?
         @MSLAFileField(order = 6) private Float RestTimeAfterRetract;
         @MSLAFileField(order = 7) private Float RestTimeAfterLift;
@@ -36,10 +37,10 @@ public class CTBFilePrintParamsV4 implements MSLAFileBlock {
         @MSLAFileField(order = 11) private Integer Unknown2; // 73470 but changes
         @MSLAFileField(order = 12) private final Integer Unknown3 = 5; // 5?
         @MSLAFileField(order = 13) private Integer LastLayerIndex;
-        @MSLAFileField(order = 14) private Integer Padding3;
-        @MSLAFileField(order = 15) private Integer Padding4;
-        @MSLAFileField(order = 16) private Integer Padding5;
-        @MSLAFileField(order = 17) private Integer Padding6;
+        @MSLAFileField(order = 14) private final Integer Padding3 = 0;
+        @MSLAFileField(order = 15) private final Integer Padding4 = 0;
+        @MSLAFileField(order = 16) private final Integer Padding5 = 0;
+        @MSLAFileField(order = 17) private final Integer Padding6 = 0;
         @MSLAFileField(order = 18) private Integer DisclaimerOffset;
         @MSLAFileField(order = 18) private final Integer DisclaimerLength = CTBv4_DISCLAIMER_SIZE;
         @MSLAFileField(order = 19) private Integer ResinParametersOffset; // CTBv5
@@ -52,7 +53,7 @@ public class CTBFilePrintParamsV4 implements MSLAFileBlock {
 
     public CTBFilePrintParamsV4(MSLAFileDefaults defaults) throws MSLAException {
         this();
-        defaults.setFields("PrintParamsV4", fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fields);
     }
 
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }

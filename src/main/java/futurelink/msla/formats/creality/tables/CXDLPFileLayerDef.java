@@ -86,7 +86,7 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
         logger.finest("Encoding layer " + layer + "...");
         reader.setReadDirection(MSLALayerEncodeReader.ReadDirection.READ_COLUMN);
         var number = layers.indexOf(layer);
-        encoders.encode(number, reader, (layerNumber, data) -> {
+        encoders.encode(number, reader, null, (layerNumber, data) -> {
             // When encoding is done then fill layer with lines
             for (var line : data.data()) layer.addLine(line);
             if (callback != null) callback.onFinish(layerNumber, data);
@@ -120,6 +120,6 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
         logger.finest("CXDLP file position " + position +
                 ", data length is " + encodedDataLength +
                 ", expected data length " + decodedDataLength);
-        return decoders.decode(layer, writer, new CXDLPLayerCodec.Input(dis, encodedDataLength), decodedDataLength);
+        return decoders.decode(layer, writer, new CXDLPLayerCodec.Input(dis, encodedDataLength), null);
     }
 }

@@ -14,6 +14,8 @@ import java.util.Objects;
 
 @Getter
 public class CTBFileHeader implements MSLAFileBlock {
+    private final String OPTIONS_SECTION_NAME = "Header";
+
     public static final int MAGIC_CBD_DLP = 0x12FD0019; // 318570521
     public static final int MAGIC_CTB = 0x12FD0086; // 318570630
     public static final int MAGIC_CTBv4 = 0x12FD0106; // 318570758
@@ -29,13 +31,19 @@ public class CTBFileHeader implements MSLAFileBlock {
     @SuppressWarnings("unused")
     static public class Fields implements MSLAFileBlockFields {
         private Size Resolution = new Size(0, 0);
+        private float PixelSizeUm;
 
         @MSLAFileField private Integer Magic;
         @MSLAFileField(order = 1) private Integer Version;
         public void setVersion(Integer version) throws MSLAException {
+            // When file is being read - Magic is set first, so version should match,
+            // oppositely, when file is created then version defines Magic.
             if ((Magic != null) && !Objects.equals(Magic, getMagicByVersion(version)))
                 throw new MSLAException("Version is not valid for magic number");
-            else Version = version;
+            else {
+                Version = version;
+                Magic = getMagicByVersion(version);
+            }
         }
         @MSLAFileField(order = 2) private Float BedSizeX;
         @MSLAFileField(order = 3) private Float BedSizeY;
@@ -49,9 +57,9 @@ public class CTBFileHeader implements MSLAFileBlock {
         @MSLAFileField(order = 11) private Float LightOffDelay;
         @MSLAFileField(order = 12) @MSLAOption(MSLAOption.BottomLayersCount) private final Integer BottomLayersCount = 1;
         @MSLAFileField(order = 13) private Integer ResolutionX() { return Resolution.getWidth(); }
-        private void setResolutionX(short width) { Resolution = new Size(width, Resolution.getHeight()); }
+        private void setResolutionX(Integer width) { Resolution = new Size(width, Resolution.getHeight()); }
         @MSLAFileField(order = 14) private Integer ResolutionY() { return Resolution.getHeight(); }
-        private void setResolutionY(short height) { Resolution = new Size(Resolution.getWidth(), height); }
+        private void setResolutionY(Integer height) { Resolution = new Size(Resolution.getWidth(), height); }
         @MSLAFileField(order = 15) private Integer PreviewLargeOffset;
         @MSLAFileField(order = 16) private Integer LayersDefinitionOffset;
         @MSLAFileField(order = 17) private Integer LayerCount;
@@ -83,7 +91,7 @@ public class CTBFileHeader implements MSLAFileBlock {
 
     public CTBFileHeader(MSLAFileDefaults defaults) throws MSLAException {
         this();
-        defaults.setFields("Header", fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fields);
     }
 
     @Override public int getDataLength() { return 0; }

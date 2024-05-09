@@ -75,7 +75,6 @@ public class PhotonWorkshopCodecPW0 extends PhotonWorkshopCodec {
     public final int Decode(
             int layerNumber,
             MSLALayerDecodeInput<byte[]> input,
-            int decodedDataLength,
             MSLALayerDecodeWriter writer) throws MSLAException {
         if (input == null) throw new MSLAException("Input data can't be null");
         if (writer == null) throw new MSLAException("Writer can't be null");

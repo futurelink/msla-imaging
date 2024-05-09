@@ -2,6 +2,7 @@ package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
@@ -16,7 +17,7 @@ import java.io.OutputStream;
 @MSLAOptionContainer(PhotonWorkshopFileExtraTable.Fields.class)
 @Getter @Setter
 public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
-    public static final String Name = "EXTRA";
+    private static final String OPTIONS_SECTION_NAME = "Extra";
     private final Fields fields;
 
     @SuppressWarnings("unused")
@@ -24,12 +25,11 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     static class Fields implements MSLAFileBlockFields {
         private final PhotonWorkshopFileTable parent;
 
-        @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return PhotonWorkshopFileExtraTable.Name; }
+        @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return "EXTRA"; }
         // Validation setter checks for what's been read from file
         // and throws an exception when that is something unexpected.
         private void setName(String name) throws MSLAException {
-            if (!PhotonWorkshopFileExtraTable.Name.equals(name))
-                throw new MSLAException("Table name '" + name + "' is invalid");
+            if (!"EXTRA".equals(name)) throw new MSLAException("Table name '" + name + "' is invalid");
         }
         @MSLAFileField(order = 1, dontCount = true) private Integer TableLength() { return parent.calculateTableLength(); }
         private void setTableLength(Integer length) { parent.TableLength = length; }
@@ -56,6 +56,12 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
         super(versionMajor, versionMinor);
         TableLength = 24; // Constant that doesn't mean anything...
         fields = new Fields(this);
+    }
+
+    public PhotonWorkshopFileExtraTable(MSLAFileDefaults defaults, byte versionMajor, byte versionMinor)
+            throws MSLAException {
+        this(versionMajor, versionMinor);
+        defaults.setFields(OPTIONS_SECTION_NAME, fields);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         software = new PhotonWorkshopFileSoftwareTable(VersionMajor, VersionMinor);
         layerDef = new PhotonWorkshopFileLayerDefTable(VersionMajor, VersionMinor);
         if ((VersionMajor >= 2) && (VersionMinor >= 4)) {
-            extra = new PhotonWorkshopFileExtraTable(VersionMajor, VersionMinor);
+            extra = new PhotonWorkshopFileExtraTable(defaults, VersionMajor, VersionMinor);
         }
         optionMapper = new PhotonWorkshopFileOptionMapper(this);
         initCodec();
