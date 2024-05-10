@@ -6,6 +6,7 @@ import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class CTBFileLayerDefExtra implements MSLAFileBlock {
@@ -13,6 +14,7 @@ public class CTBFileLayerDefExtra implements MSLAFileBlock {
     public static final int TABLE_SIZE = 48;
 
     @Getter
+    @Setter
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
         @MSLAFileField private Integer TotalSize;

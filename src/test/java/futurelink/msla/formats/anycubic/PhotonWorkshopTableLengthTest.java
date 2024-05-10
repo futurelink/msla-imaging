@@ -13,7 +13,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
     @Test
     void HeaderTableTest() throws FileFieldsException {
         var block = new PhotonWorkshopFileHeaderTable((byte) 2, (byte) 0);
-        var length = FileFieldsIO.getBlockLength(block.getFileFields());
+        var length = FileFieldsIO.getBlockLength(block);
         assertEquals(96, length);
         System.out.println(length);
     }
@@ -21,7 +21,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
     @Test
     void ExtraTableTest() throws FileFieldsException {
         var block = new PhotonWorkshopFileExtraTable((byte) 2, (byte) 0);
-        var length = FileFieldsIO.getBlockLength(block.getFileFields());
+        var length = FileFieldsIO.getBlockLength(block);
         assertEquals(72, length);
         System.out.println(length);
     }
@@ -29,7 +29,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
     @Test
     void MachineTableTest() throws FileFieldsException {
         var block = new PhotonWorkshopFileMachineTable((byte) 2, (byte) 0);
-        var length = FileFieldsIO.getBlockLength(block.getFileFields());
+        var length = FileFieldsIO.getBlockLength(block);
         assertEquals(156, length);
         System.out.println(length);
     }
@@ -37,7 +37,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
     @Test
     void PreviewTableTest() throws FileFieldsException {
         var block = new PhotonWorkshopFilePreviewTable((byte) 2, (byte) 0);
-        var length = FileFieldsIO.getBlockLength(block.getFileFields());
+        var length = FileFieldsIO.getBlockLength(block);
 
         // Add 16 bytes of shades of gray table that should not be counted
         assertEquals(75304 + 16, length);
@@ -47,7 +47,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
     @Test
     void SoftwareTableTest() throws FileFieldsException {
         var block = new PhotonWorkshopFileSoftwareTable((byte) 2, (byte) 0);
-        var length = FileFieldsIO.getBlockLength(block.getFileFields());
+        var length = FileFieldsIO.getBlockLength(block);
         assertEquals(164, length);
         System.out.println(length);
     }
@@ -57,7 +57,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
         // Test empty layer definition table
         var block = new PhotonWorkshopFileLayerDefTable((byte) 2, (byte) 0);
         block.addLayer(new PhotonWorkshopFileLayerDefTable.PhotonWorkshopFileLayerDef(), new byte[]{});
-        var length = FileFieldsIO.getBlockLength(block.getFileFields());
+        var length = FileFieldsIO.getBlockLength(block);
         assertEquals(52, length);
         System.out.println(block.calculateTableLength());
         System.out.println(length);

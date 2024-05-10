@@ -1,7 +1,6 @@
 package futurelink.msla.formats.chitubox.tables;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
@@ -11,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class CTBFilePrintParamsV4 implements MSLAFileBlock {
+public class CTBFilePrintParamsV4 extends CTBFileBlock {
     private final String OPTIONS_SECTION_NAME = "PrintParamsV4";
     private static final int CTBv4_RESERVED_SIZE = 380;
 
@@ -44,17 +43,18 @@ public class CTBFilePrintParamsV4 implements MSLAFileBlock {
         @MSLAFileField(order = 22, length = CTBv4_RESERVED_SIZE) private final byte[] Reserved = new byte[CTBv4_RESERVED_SIZE]; // 384 bytes
     }
 
-    public CTBFilePrintParamsV4() {
+    public CTBFilePrintParamsV4(int version) {
+        super(version);
         fileFields = new Fields();
     }
 
-    public CTBFilePrintParamsV4(MSLAFileDefaults defaults) throws MSLAException {
-        this();
+    public CTBFilePrintParamsV4(int version, MSLAFileDefaults defaults) throws MSLAException {
+        this(version);
         defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
     }
 
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
-    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this.fileFields); }
+    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
         return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);

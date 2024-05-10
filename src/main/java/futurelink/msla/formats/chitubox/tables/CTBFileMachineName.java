@@ -17,7 +17,7 @@ public class CTBFileMachineName implements MSLAFileBlock {
 
     @Override
     public int getDataLength() throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(getFileFields());
+        return FileFieldsIO.getBlockLength(this);
     }
 
     @Override

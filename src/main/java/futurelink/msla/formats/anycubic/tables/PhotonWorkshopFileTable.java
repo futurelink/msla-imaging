@@ -30,11 +30,11 @@ abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {
 
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
     @Override public int getDataLength() throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getFileFields());
+        return FileFieldsIO.getBlockLength(this);
     }
 
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(this, fieldName);
     }
 }

@@ -1,24 +1,25 @@
 package futurelink.msla.formats.chitubox.tables;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class CTBFilePrintParams implements MSLAFileBlock {
+@MSLAOptionContainer(CTBFilePrintParams.Fields.class)
+public class CTBFilePrintParams extends CTBFileBlock {
     private final String OPTIONS_SECTION_NAME = "PrintParams";
     private final Fields fileFields;
 
     @Getter
     @SuppressWarnings("unused")
-    static class Fields implements MSLAFileBlockFields {
+    public static class Fields implements MSLAFileBlockFields {
         @MSLAFileField @MSLAOption(MSLAOption.BottomLiftHeight) private Float BottomLiftHeight;
         @MSLAFileField(order = 1) @MSLAOption(MSLAOption.BottomLiftSpeed) private Float BottomLiftSpeed;
         @MSLAFileField(order = 2) @MSLAOption(MSLAOption.LiftHeight) private Float LiftHeight;
@@ -36,17 +37,18 @@ public class CTBFilePrintParams implements MSLAFileBlock {
         @MSLAFileField(order = 14) private final Integer Padding4 = 0;
     }
 
-    public CTBFilePrintParams() {
+    public CTBFilePrintParams(int version) {
+        super(version);
         fileFields = new Fields();
     }
 
-    public CTBFilePrintParams(MSLAFileDefaults defaults) throws MSLAException {
-        this();
+    public CTBFilePrintParams(int version, MSLAFileDefaults defaults) throws MSLAException {
+        this(version);
         defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
     }
 
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
-    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this.fileFields); }
+    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
         return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);

@@ -46,7 +46,7 @@ public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
     public CTBFilePreview(Type previewType) {
         fileFields.Resolution = switch (previewType) {
             case Large -> new Size(400, 300);
-            case Small -> new Size(200, 150);
+            case Small -> new Size(200, 125);
         };
         setImage(null);
         fileFields.ImageOffset = 0;
@@ -122,7 +122,11 @@ public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
         var buffer = Image.getRaster().getDataBuffer();
         while (pixel < buffer.getSize()) {
             int pixelColor = buffer.getElem(pixel++);
-            int n_color_565 = (pixelColor >> 3) | ((pixelColor >> 2) << 5) | ((pixelColor >> 3) << 11); // BGR
+            //int n_color_565 = (pixelColor >> 3) | ((pixelColor >> 2) << 5) | ((pixelColor >> 3) << 11); // BGR
+            int r = (pixelColor >> 19) & 0x1f;
+            int g = (pixelColor >> 10) & 0x3f;
+            int b = (pixelColor >> 3) & 0x1f;
+            int n_color_565 = (r << 11) | (g << 5) | b; // RGB
             if (n_color_565 == color_565) {
                 if (++rep == 0xFFF) { RleRGB565(rawData, rep, color_565); rep = 0; }
             } else {
@@ -140,7 +144,7 @@ public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
 
     @Override public Size getResolution() { return fileFields.Resolution; }
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
-    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this.fileFields); }
+    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
         return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);

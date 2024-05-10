@@ -23,13 +23,13 @@ public class CBDDLPCodec implements MSLALayerCodec<byte[][]> {
         for (byte antialias_bit = 0; antialias_bit < antialias_level; antialias_bit++) {
             var layer = encodedRLE[antialias_bit];
             int n = 0;
-            for (int index = 0; index < layer.length; index++) {
+            for (byte b : layer) {
                 // Lower 7 bits is the repeat count for the bit (0..127)
-                int reps = layer[index] & 0x7f;
+                int reps = b & 0x7f;
 
                 // We only need to set the non-zero pixels
                 // High bit is on for white, off for black
-                if ((layer[index] & 0x80) != 0) for (int i = 0; i < reps; i++) span[n + i]++;
+                if ((b & 0x80) != 0) for (int i = 0; i < reps; i++) span[n + i]++;
 
                 n += reps;
                 if (n == imageLength) break;

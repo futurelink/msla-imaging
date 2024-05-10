@@ -1,5 +1,6 @@
 package futurelink.msla.formats.utils;
 
+import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import lombok.Getter;
@@ -138,12 +139,10 @@ public class FileFieldsIO {
 
     /**
      * Internal function that calculates block field length.
-     * @param blockFields
-     * @param field
-     * @return
-     * @throws FileFieldsException
+     * @param blockFields file data block fields object to calculate length
+     * @param field a field description
      */
-    public static Integer getBlockFieldLength(MSLAFileBlockFields blockFields, MSLAField field)
+    private static Integer getBlockFieldLength(MSLAFileBlockFields blockFields, MSLAField field, Object value)
             throws FileFieldsException
     {
         var len = 0;
@@ -158,9 +157,9 @@ public class FileFieldsIO {
             if (ParameterizedType.class.isAssignableFrom(type.getClass())) {
                 var internalType = ((ParameterizedType) type).getRawType();
                 if (List.class.isAssignableFrom((Class<?>) internalType)) {
-                    var value = getFieldOrMethodValue(blockFields, field.name);
+                    var val = getFieldOrMethodValue(blockFields, field.name);
                     var listElementType = ((ParameterizedType) type).getActualTypeArguments()[0];
-                    for (var t : (List<?>) value) {
+                    for (var t : (List<?>) val) {
                         if (MSLAFileBlockFields.class.isAssignableFrom((Class<?>) listElementType)) {
                             len += getBlockLength((MSLAFileBlockFields) t);
                         } else throw new FileFieldsException("List of " + listElementType + " is not supported");
@@ -170,6 +169,10 @@ public class FileFieldsIO {
             // Field is an instance of MSLAFileBlockFields
             else if (MSLAFileBlockFields.class.isAssignableFrom((Class<?>) type)) {
                 len = getBlockLength((MSLAFileBlockFields) getFieldOrMethodValue(blockFields, field.name));
+            }
+            // Field is an instance of MSLAFileBlock
+            else if (MSLAFileBlock.class.isAssignableFrom((Class<?>) type)) {
+                len = getBlockLength((MSLAFileBlock) value);
             }
             // Field is a string or array of bytes
             else if (isStringOrByteArray(type)) {
@@ -187,27 +190,44 @@ public class FileFieldsIO {
     }
 
     /**
-     * Calculates file fields block length up to the field specified by {@param fieldName}.
+     * Calculates file fields block length up to the field specified by {@param lastFieldName}.
      * Effectively this returns an offset of a specific field in a block.
-     * @param blockFields
-     * @param fieldName
+     * @param block file data block fields object to calculate length
+     * @param lastFieldName calculate length of a block up to this field
      */
-    public static Integer getBlockLength(MSLAFileBlockFields blockFields, String fieldName) throws FileFieldsException {
+    public static Integer getBlockLength(MSLAFileBlockFields block, String lastFieldName)
+            throws FileFieldsException
+    {
         var length = 0;
-        var fields = getFields(blockFields.getClass());
+        var fields = getFields(block.getClass());
         for (var field : fields) {
-            if (fieldName != null && fieldName.equals(field.name)) break;
-            if (blockFields.isFieldExcluded(field.name)) continue;
-            length += getBlockFieldLength(blockFields, field);
+            if (lastFieldName != null && lastFieldName.equals(field.name)) break;
+            if (block.isFieldExcluded(field.name)) continue;
+            length += getBlockFieldLength(block, field, getFieldOrMethodValue(block, field.name));
         }
         return length;
     }
 
+    public static Integer getBlockLength(MSLAFileBlockFields block)
+            throws FileFieldsException
+    {
+        return getBlockLength(block, null);
+    }
+
     /**
      * Calculates file fields block length.
-     * @param blockFields
+     * @param block file data block object to calculate length
+     * @param lastFieldName calculate length of a block up to this field
      */
-    public static Integer getBlockLength(MSLAFileBlockFields blockFields) throws FileFieldsException {
-        return getBlockLength(blockFields, null);
+    public static Integer getBlockLength(MSLAFileBlock block, String lastFieldName) throws FileFieldsException {
+        return getBlockLength(block.getFileFields(), lastFieldName);
+    }
+
+    /**
+     * Calculates file fields block length.
+     * @param block file data block object to calculate length
+     */
+    public static Integer getBlockLength(MSLAFileBlock block) throws FileFieldsException {
+        return getBlockLength(block.getFileFields(), null);
     }
 }

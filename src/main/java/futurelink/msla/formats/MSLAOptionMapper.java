@@ -1,5 +1,7 @@
 package futurelink.msla.formats;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.Set;
 
@@ -9,6 +11,17 @@ import java.util.Set;
  * This mapper aims to manage all possible print options in one place.
  */
 public abstract class MSLAOptionMapper {
+
+    @Getter
+    public static class Option {
+        private final Class<?> optionClass;
+        private final String location;
+        public Option(Class<?> optionsClass, String location) {
+            this.optionClass = optionsClass;
+            this.location = location;
+        }
+    }
+
     /**
      * Gets option type.
      * @param option option name

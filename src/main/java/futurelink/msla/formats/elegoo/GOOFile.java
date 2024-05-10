@@ -58,7 +58,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
         if (index == 0) return header.getSmallPreview();
         else return header.getBigPreview();
     }
-    @Override public void setPreview(int index, BufferedImage image) throws MSLAException {
+    @Override public void setPreview(int index, BufferedImage image) {
         if (index == 0) header.getSmallPreview().setImage(image);
         else header.getBigPreview().setImage(image);
     }

@@ -306,10 +306,12 @@
     </printer>
 
     <printer manufacturer="ELEGOO" name="Saturn" extension="ctb" file="CTBFile">
-        <options name="Header">
-            <option name="Resolution" value="5760x3600"/>
-            <option name="PixelSizeUm" value="35.0f"/>
+        <file_options>
             <option name="Version" value="4"/>
+        </file_options>
+        <options name="Header">
+            <option name="Resolution" value="3840x2400"/>
+            <option name="PixelSizeUm" value="35.0f"/>
             <option name="BedSizeX" value="192.0"/>
             <option name="BedSizeY" value="120.0"/>
             <option name="BedSizeZ" value="200.0"/>

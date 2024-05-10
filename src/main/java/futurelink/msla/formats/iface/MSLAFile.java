@@ -35,9 +35,8 @@ public interface MSLAFile<T> {
 
     /**
      * Sets preview.
-     * @param index
-     * @param image
-     * @throws MSLAException
+     * @param index preview number
+     * @param image a {@link BufferedImage} containing preview data
      */
     void setPreview(int index, BufferedImage image) throws MSLAException;
 

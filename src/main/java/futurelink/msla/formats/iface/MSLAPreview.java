@@ -7,19 +7,17 @@ import java.awt.image.BufferedImage;
 public interface MSLAPreview {
     /**
      * Preview image data.
-     * @return
      */
     BufferedImage getImage();
 
     /**
      * Sets image.
-     * @param image
+     * @param image {@link BufferedImage} containing preview image data
      */
     void setImage(BufferedImage image);
 
     /**
      * Preview image resolution.
-     * @return
      */
     Size getResolution();
 }

@@ -10,7 +10,6 @@ import java.util.Set;
 
 class CXDLPFileOptionMapper extends MSLAOptionMapper {
     private final CXDLPFile file;
-    private record Option(Class<?> aClass, String location) {}
     private final HashMap<String, Option> optionsMap;
 
     public CXDLPFileOptionMapper(CXDLPFile file) {
@@ -32,18 +31,18 @@ class CXDLPFileOptionMapper extends MSLAOptionMapper {
     @Override
     protected boolean hasOption(String option, Class<? extends Serializable> aClass) {
         if (!this.optionsMap.containsKey(option)) return false;
-        if (aClass != null) return this.optionsMap.get(option).aClass.isAssignableFrom(aClass);
+        if (aClass != null) return this.optionsMap.get(option).getOptionClass().isAssignableFrom(aClass);
         return true;
     }
 
     @Override
-    public Class<?> getType(String option) { return this.optionsMap.get(option).aClass; }
+    public Class<?> getType(String option) { return this.optionsMap.get(option).getOptionClass(); }
 
     @Override
     protected void populateOption(String option, Serializable value) throws MSLAException {
         try {
-            var loc = this.optionsMap.get(option).location;
-            var cls = this.optionsMap.get(option).aClass;
+            var loc = this.optionsMap.get(option).getLocation();
+            var cls = this.optionsMap.get(option).getOptionClass();
             if (loc.equals("SliceInfo")) {
                 var m = file.sliceInfo.getClass().getMethod("set" + option, cls);
                 m.invoke(file.sliceInfoV3, cls.cast(value));
@@ -59,7 +58,7 @@ class CXDLPFileOptionMapper extends MSLAOptionMapper {
     @Override
     protected Serializable fetchOption(String option) throws MSLAException {
         try {
-            var loc = this.optionsMap.get(option).location;
+            var loc = this.optionsMap.get(option).getLocation();
             if (loc.equals("SliceInfo")) {
                 return (Serializable) file.sliceInfo.getClass().getMethod("get" + option).invoke(file.sliceInfo);
             } else if (loc.equals("SliceInfoV3")) {
