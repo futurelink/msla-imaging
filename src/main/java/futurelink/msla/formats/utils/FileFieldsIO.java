@@ -1,12 +1,9 @@
 package futurelink.msla.formats.utils;
 
-import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import lombok.Getter;
 
-import java.io.IOException;
 import java.lang.reflect.*;
 import java.nio.charset.Charset;
 import java.util.*;

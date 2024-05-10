@@ -1,11 +1,7 @@
 package futurelink.msla.formats;
 
-import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileHeaderTable;
 import futurelink.msla.formats.iface.MSLAFile;
-import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.FileFieldsIO;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;

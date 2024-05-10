@@ -10,8 +10,6 @@ import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Time;
-
 @Getter
 public class CTBFileSlicerInfo implements MSLAFileBlock {
     private final String OPTIONS_SECTION_NAME = "SlicerInfo";
