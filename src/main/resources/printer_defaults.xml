@@ -313,10 +313,14 @@
             <option name="BedSizeX" value="192.0"/>
             <option name="BedSizeY" value="120.0"/>
             <option name="BedSizeZ" value="200.0"/>
+            <option name="BottomLayersCount" value="5"/>
             <option name="LightOffDelay" value="0"/>
             <option name="AntiAliasLevel" value="1"/>
             <option name="LightPWM" value="255"/>
             <option name="BottomLightPWM" value="255"/>
+            <option name="LayerHeightMillimeter" value="0.05"/>
+            <option name="LayerExposureSeconds" value="2.5"/>
+            <option name="BottomExposureSeconds" value="30"/>
         </options>
         <options name="SlicerInfo">
             <option name="BottomLiftHeight2" value="0.0"/>
@@ -332,6 +336,8 @@
             <option name="RestTimeAfterRetract" value="0.5"/>
             <option name="RestTimeAfterLift2" value="0.0"/>
             <option name="TransitionLayerCount" value="10"/>
+        </options>
+        <options name="MachineName">
             <option name="MachineName" value="ELEGOO SATURN"/>
         </options>
         <options name="PrintParams">

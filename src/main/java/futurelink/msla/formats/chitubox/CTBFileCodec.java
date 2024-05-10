@@ -95,14 +95,13 @@ public class CTBFileCodec implements MSLALayerCodec<byte[]> {
                 var grey7 = (byte) (input.read() >> 1);
                 if (grey7 == color) stride++;
                 else {
-                    AddRep(data, stride, color);
+                    AddRep(data, stride, color); // Add stride
                     color = grey7;
                     stride = 1;
                 }
             }
 
-            AddRep(data, stride, color);
-
+            AddRep(data, stride, color); // Final stride
 
             var key = (Integer) getParam("EncryptionKey");
             if (key == null) logger.warning("No EncryptionKey parameter set to codec, make sure if that is correct");
@@ -120,7 +119,7 @@ public class CTBFileCodec implements MSLALayerCodec<byte[]> {
             MSLALayerDecodeInput<byte[]> data,
             MSLALayerDecodeWriter writer) throws MSLAException
     {
-        logger.info("Starting decoding " + data.size() + " bytes");
+        logger.info("Starting decoding layer " + layerNumber + ", " + data.size() + " bytes");
         var encodedRLE = data.data();
 
         var key = (Integer) getParam("EncryptionKey");

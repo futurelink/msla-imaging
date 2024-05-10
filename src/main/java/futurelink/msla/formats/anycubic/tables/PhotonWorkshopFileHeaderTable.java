@@ -5,6 +5,7 @@ import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import futurelink.msla.formats.utils.FileFieldsReader;
 import futurelink.msla.formats.utils.Size;
@@ -24,7 +25,7 @@ import java.io.OutputStream;
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     private static final String OPTIONS_SECTION_NAME = "Header";
 
-    @Delegate private final Fields fields;
+    @Delegate private final Fields fileFields;
 
     @Getter @Setter
     @SuppressWarnings("unused")
@@ -75,22 +76,29 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         // boolean, when true, normal exposure time will be auto set, use false for traditional way
         @MSLAFileField(order = 26) @MSLAOption("Intelligent mode") private int IntelligentMode = 0;
 
-        public Fields(PhotonWorkshopFileTable parent) { this.parent = parent; }
+        public Fields(PhotonWorkshopFileHeaderTable parent) { this.parent = parent; }
 
         @Override
         public boolean isFieldExcluded(String fieldName) {
-            if ((TableLength() < 96) && "IntelligentMode".equals(fieldName)) return true;
-            if ((TableLength() < 92) && "ResinType".equals(fieldName)) return true;
-            if ((TableLength() < 88) && "BlurLevel".equals(fieldName)) return true;
-            if ((TableLength() < 86) && "Grey".equals(fieldName)) return true;
-            if ((TableLength() < 84) && "AdvancedMode".equals(fieldName)) return true;
+            if (parent.versionMajor < 2) {
+                return "IntelligentMode".equals(fieldName) || "ResinType".equals(fieldName) ||
+                        "BlurLevel".equals(fieldName) || "Grey".equals(fieldName) ||
+                        "AdvancedMode".equals(fieldName);
+            } else {
+                if (parent.versionMinor < 6 && "IntelligentMode".equals(fieldName)) return true;
+                if (parent.versionMinor < 5) {
+                    if ("ResinType".equals(fieldName) || "BlurLevel".equals(fieldName) || "Grey".equals(fieldName))
+                        return true;
+                }
+                if (parent.versionMinor < 4 && "AdvancedMode".equals(fieldName)) return true;
+            }
             return false;
         }
     }
 
     public PhotonWorkshopFileHeaderTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        this.fields = new Fields(this);
+        this.fileFields = new Fields(this);
     }
 
     public PhotonWorkshopFileHeaderTable(
@@ -99,7 +107,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
             byte versionMinor) throws MSLAException
     {
         this(versionMajor, versionMinor);
-        defaults.setFields(OPTIONS_SECTION_NAME, fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
     }
 
     @Override
@@ -111,7 +119,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
                 "Header was not completely read out (" + dataRead + " of " + TableLength + "), some extra data left unread"
             );
             return dataRead;
-        } catch (IOException e) { throw new MSLAException("Error reading Header table", e); }
+        } catch (FileFieldsException e) { throw new MSLAException("Error reading Header table", e); }
     }
 
     public int calculateTableLength() {
@@ -132,5 +140,5 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         super.write(stream);
     }
 
-    @Override public String toString() { return fields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
 }

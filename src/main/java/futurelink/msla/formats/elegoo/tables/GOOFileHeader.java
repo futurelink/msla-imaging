@@ -23,7 +23,7 @@ public class GOOFileHeader extends GOOFileTable {
     private static final int HEADER_LENGTH = 195477;
     private static final byte DefaultBottomLightPWM = 0x01;
     private static final byte DefaultLightPWM = 0x02;
-    @Delegate private final Fields fields;
+    @Delegate private final Fields fileFields;
 
     @Getter
     @SuppressWarnings("unused")
@@ -101,14 +101,14 @@ public class GOOFileHeader extends GOOFileTable {
         }
     }
 
-    public GOOFileHeader() { fields = new Fields(); }
+    public GOOFileHeader() { fileFields = new Fields(); }
     public GOOFileHeader(MSLAFileDefaults defaults) throws MSLAException {
         this();
-        defaults.setFields("Header", fields);
-        fields.MachineName = defaults.getName();
+        defaults.setFields("Header", fileFields);
+        fileFields.MachineName = defaults.getName();
     }
 
     @Override public int getDataLength() { return HEADER_LENGTH; }
-    @Override public String toString() { return "-- Header --\n" + fields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return "-- Header --\n" + fileFields.fieldsAsString(" = ", "\n"); }
 
 }

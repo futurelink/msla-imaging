@@ -14,7 +14,7 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
     private final ArrayList<CXDLPFileLayer> layers = new ArrayList<>();
 
     @Override
-    public MSLAFileBlockFields getFields() {
+    public MSLAFileBlockFields getFileFields() {
         return null;
     }
 

@@ -9,6 +9,7 @@ import futurelink.msla.formats.elegoo.tables.GOOFileLayerDef;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.utils.Size;
 
+import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,7 +54,15 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     }
 
     @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return GOOFileCodec.class; }
-    @Override public MSLAPreview getPreview() { return header.getSmallPreview(); }
+    @Override public MSLAPreview getPreview(int index) {
+        if (index == 0) return header.getSmallPreview();
+        else return header.getBigPreview();
+    }
+    @Override public void setPreview(int index, BufferedImage image) throws MSLAException {
+        if (index == 0) header.getSmallPreview().setImage(image);
+        else header.getBigPreview().setImage(image);
+    }
+
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return header.getResolution(); }
     @Override public float getPixelSizeUm() { return header.getPixelSizeUm(); }
@@ -81,7 +90,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        var input = new GOOFileCodec.Input(layersDef.get(layer).getFields().getData());
+        var input = new GOOFileCodec.Input(layersDef.get(layer).getFileFields().getData());
         return getDecodersPool().decode(layer, writer, input, null);
     }
 

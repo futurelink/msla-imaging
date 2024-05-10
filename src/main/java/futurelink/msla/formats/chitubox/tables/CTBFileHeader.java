@@ -6,11 +6,14 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
+import java.util.Random;
 
 @Getter
 public class CTBFileHeader implements MSLAFileBlock {
@@ -25,7 +28,7 @@ public class CTBFileHeader implements MSLAFileBlock {
     private static final short DefaultLightPWM = 255;
     private static final short DefaultBottomLightPWM = 255;
 
-    private final Fields fields;
+    private final Fields fileFields;
 
     @Getter
     @SuppressWarnings("unused")
@@ -48,10 +51,10 @@ public class CTBFileHeader implements MSLAFileBlock {
         @MSLAFileField(order = 2) private Float BedSizeX;
         @MSLAFileField(order = 3) private Float BedSizeY;
         @MSLAFileField(order = 4) private Float BedSizeZ;
-        @MSLAFileField(order = 5) private Integer Unknown1;
-        @MSLAFileField(order = 6) private Integer Unknown2;
-        @MSLAFileField(order = 7) private Float TotalHeightMillimeter;
-        @MSLAFileField(order = 8) private Float LayerHeightMillimeter;
+        @MSLAFileField(order = 5) private final Integer Unknown1 = 0;
+        @MSLAFileField(order = 6) private final Integer Unknown2 = 0;
+        @MSLAFileField(order = 7) private @Setter Float TotalHeightMillimeter = 0.0f;
+        @MSLAFileField(order = 8) @MSLAOption(MSLAOption.LayerHeight) private Float LayerHeightMillimeter;
         @MSLAFileField(order = 9) @MSLAOption(MSLAOption.ExposureTime) private Float LayerExposureSeconds;
         @MSLAFileField(order = 10) @MSLAOption(MSLAOption.BottomExposureTime) private Float BottomExposureSeconds;
         @MSLAFileField(order = 11) private Float LightOffDelay;
@@ -60,20 +63,20 @@ public class CTBFileHeader implements MSLAFileBlock {
         private void setResolutionX(Integer width) { Resolution = new Size(width, Resolution.getHeight()); }
         @MSLAFileField(order = 14) private Integer ResolutionY() { return Resolution.getHeight(); }
         private void setResolutionY(Integer height) { Resolution = new Size(Resolution.getWidth(), height); }
-        @MSLAFileField(order = 15) private Integer PreviewLargeOffset;
-        @MSLAFileField(order = 16) private Integer LayersDefinitionOffset;
-        @MSLAFileField(order = 17) private Integer LayerCount;
-        @MSLAFileField(order = 18) private Integer PreviewSmallOffset;
-        @MSLAFileField(order = 19) private Integer PrintTime;
-        @MSLAFileField(order = 20) private Integer ProjectorType;
-        @MSLAFileField(order = 21) private Integer PrintParametersOffset;
-        @MSLAFileField(order = 22) private Integer PrintParametersSize;
+        @MSLAFileField(order = 15) @Setter private Integer PreviewLargeOffset;
+        @MSLAFileField(order = 16) @Setter private Integer LayersDefinitionOffset;
+        @MSLAFileField(order = 17) @Setter private Integer LayerCount;
+        @MSLAFileField(order = 18) @Setter private Integer PreviewSmallOffset;
+        @MSLAFileField(order = 19) @Setter private Integer PrintTime;
+        @MSLAFileField(order = 20) private final Integer ProjectorType = 1;
+        @MSLAFileField(order = 21) @Setter private Integer PrintParametersOffset;
+        @MSLAFileField(order = 22) @Setter private Integer PrintParametersSize;
         @MSLAFileField(order = 23) private Integer AntiAliasLevel;
         @MSLAFileField(order = 24) private final Short LightPWM = DefaultLightPWM;
         @MSLAFileField(order = 25) private final Short BottomLightPWM = DefaultBottomLightPWM;
-        @MSLAFileField(order = 26) private Integer EncryptionKey;
-        @MSLAFileField(order = 27) private Integer SlicerOffset;
-        @MSLAFileField(order = 28) private Integer SlicerSize;
+        @MSLAFileField(order = 26) @Setter private Integer EncryptionKey;
+        @MSLAFileField(order = 27) @Setter private Integer SlicerOffset;
+        @MSLAFileField(order = 28) @Setter private Integer SlicerSize;
 
         private Integer getMagicByVersion(Integer version) {
             return switch (version) {
@@ -86,15 +89,21 @@ public class CTBFileHeader implements MSLAFileBlock {
     }
 
     public CTBFileHeader() {
-        fields = new Fields();
+        fileFields = new Fields();
+        var r = new Random();
+        fileFields.EncryptionKey = r.nextInt(Integer.MAX_VALUE);
     }
 
     public CTBFileHeader(MSLAFileDefaults defaults) throws MSLAException {
         this();
-        defaults.setFields(OPTIONS_SECTION_NAME, fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
     }
 
-    @Override public int getDataLength() { return 0; }
+    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this.fileFields); }
+    @Override
+    public int getDataFieldOffset(String fieldName) throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+    }
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
-    @Override public String toString() { return fields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
 }

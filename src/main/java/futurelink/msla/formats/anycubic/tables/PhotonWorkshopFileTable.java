@@ -1,6 +1,7 @@
 package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.iface.MSLAFileBlock;
+import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
 
@@ -28,5 +29,12 @@ abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {
     abstract int calculateTableLength();
 
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
-    @Override public int getDataLength() { return calculateTableLength() + MarkLength + 4; }
+    @Override public int getDataLength() throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(this.getFileFields());
+    }
+
+    @Override
+    public int getDataFieldOffset(String fieldName) throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+    }
 }

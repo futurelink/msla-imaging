@@ -11,7 +11,7 @@ import lombok.experimental.Delegate;
 @MSLAOptionContainer(CXDLPFileSliceInfo.Fields.class)
 @Getter
 public class CXDLPFileSliceInfo extends CXDLPFileTable {
-    @Delegate private final Fields fields;
+    @Delegate private final Fields fileFields;
 
     @SuppressWarnings("unused")
     @Getter
@@ -62,15 +62,15 @@ public class CXDLPFileSliceInfo extends CXDLPFileTable {
     }
 
     public CXDLPFileSliceInfo() {
-        fields = new Fields();
+        fileFields = new Fields();
     }
     public CXDLPFileSliceInfo(MSLAFileDefaults defaults) throws MSLAException {
         this();
-        defaults.setFields("SliceInfo", fields);
+        defaults.setFields("SliceInfo", fileFields);
     }
 
     @Override
-    public int getDataLength() { return fields.getDataLength(); }
+    public int getDataLength() { return fileFields.getDataLength(); }
 
     @Override
     public String toString() { return fieldsAsString(" = ", "\n"); }

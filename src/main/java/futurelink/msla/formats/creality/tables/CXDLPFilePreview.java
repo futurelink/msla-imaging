@@ -11,15 +11,15 @@ import java.awt.image.BufferedImage;
 @Getter
 @SuppressWarnings("unused")
 public class CXDLPFilePreview implements MSLAFileBlockFields, MSLAPreview {
-    private final BufferedImage image;
+    private BufferedImage Image;
     private final Size resolution;
 
     @MSLAFileField(lengthAt = "getImageDataLength") Short[] ImageData() {
         var data =  new Short[getResolution().length()];
-        if (image == null) return data;
+        if (Image == null) return data;
         var length = getImageDataLength();
         for (int i = 0; i < length; i++)
-            data[i] = (short) image.getRaster().getDataBuffer().getElem(i);
+            data[i] = (short) Image.getRaster().getDataBuffer().getElem(i);
         return data;
     }
     @MSLAFileField(order = 1, length = 2) byte[] PageBreak = new byte[]{ 0x0d, 0x0a };
@@ -31,7 +31,7 @@ public class CXDLPFilePreview implements MSLAFileBlockFields, MSLAPreview {
             var r = (imageData[i] >> 10) & 0x1f;
             var b = (imageData[i] >> 5) & 0x1f;
             var g = imageData[i] & 0x1f;
-            image.getRaster().getDataBuffer().setElem(i, (r << 10) | (g << 5) | b);
+            Image.getRaster().getDataBuffer().setElem(i, (r << 10) | (g << 5) | b);
         }
     }
 
@@ -39,10 +39,15 @@ public class CXDLPFilePreview implements MSLAFileBlockFields, MSLAPreview {
 
     public CXDLPFilePreview(Size resolution) {
         this.resolution = new Size(resolution);
-        this.image = new BufferedImage(
+        setImage(null);
+    }
+
+    @Override public void setImage(BufferedImage image) {
+        Image = new BufferedImage(
                 resolution.getWidth(),
                 resolution.getHeight(),
                 BufferedImage.TYPE_USHORT_555_RGB);
+        if (image != null) Image.getGraphics().drawImage(image, 0, 0, null);
     }
 
     @Override public String toString() { return "CXDLPFilePreview { " + getResolution() + " }"; }

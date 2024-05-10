@@ -3,12 +3,13 @@ package futurelink.msla.formats.chitubox.tables;
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
 
 @Getter
 public class CTBFileLayerDefExtra implements MSLAFileBlock {
-    private final Fields fields = new Fields();
+    private final Fields fileFields = new Fields();
     public static final int TABLE_SIZE = 48;
 
     @Getter
@@ -30,5 +31,9 @@ public class CTBFileLayerDefExtra implements MSLAFileBlock {
 
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
     @Override public int getDataLength() { return TABLE_SIZE; }
-    @Override public String toString() { return "{ " + fields.fieldsAsString(":", ", ") +" }"; }
+    @Override
+    public int getDataFieldOffset(String fieldName) throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+    }
+    @Override public String toString() { return "{ " + fileFields.fieldsAsString(":", ", ") +" }"; }
 }

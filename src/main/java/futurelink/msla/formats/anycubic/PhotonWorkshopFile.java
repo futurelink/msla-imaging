@@ -1,5 +1,6 @@
 package futurelink.msla.formats.anycubic;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 import com.google.common.io.LittleEndianDataInputStream;
@@ -7,6 +8,7 @@ import com.google.common.io.LittleEndianDataOutputStream;
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.tables.*;
 import futurelink.msla.formats.iface.*;
+import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
@@ -139,7 +141,8 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
                 header.getResolution().length(), getDecodersPool(), writer);
     }
 
-    @Override  public MSLAPreview getPreview() { return preview; }
+    @Override public MSLAPreview getPreview(int index) { return preview; }
+    @Override public void setPreview(int index, BufferedImage image) { preview.setImage(image); }
 
     @Override
     public final void addLayer(
@@ -194,33 +197,36 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
          * (order is important!)
          */
         var offset = descriptor.calculateDataLength();
-        descriptor.getFields().setHeaderAddress(offset);
-        offset += header.getDataLength();
+        try {
+            descriptor.getFields().setHeaderAddress(offset);
+            offset += header.getDataLength();
 
-        if (software != null) {
-            descriptor.getFields().setSoftwareAddress(offset);
-            offset += software.getDataLength();
-        }
+            if (software != null) {
+                descriptor.getFields().setSoftwareAddress(offset);
+                offset += software.getDataLength();
+            }
 
-        if (getPreview() != null) {
-            descriptor.getFields().setPreviewAddress(offset);
-            offset += 16; // 16 bytes of color data is not counted in preview table length
-            offset += preview.getDataLength();
-            // Color table is not a standalone table and has no header mark, it's a part of a preview
-            descriptor.getFields().setLayerImageColorTableAddress(offset - 28);
-        }
+            if (getPreview((short) 0) != null) {
+                descriptor.getFields().setPreviewAddress(offset);
+                offset += preview.getDataLength();
+                // Color table is not a standalone table and has no header mark, it's a part of a preview
+                descriptor.getFields().setLayerImageColorTableAddress(offset - 28);
+            }
 
-        descriptor.getFields().setLayerDefinitionAddress(offset);
-        offset += layerDef.getDataLength();
+            descriptor.getFields().setLayerDefinitionAddress(offset);
+            offset += layerDef.getDataLength();
 
-        if (extra != null) {
-            descriptor.getFields().setExtraAddress(offset);
-            offset += extra.getDataLength();
-        }
+            if (extra != null) {
+                descriptor.getFields().setExtraAddress(offset);
+                offset += extra.getDataLength();
+            }
 
-        if (machine != null) {
-            descriptor.getFields().setMachineAddress(offset);
-            offset += machine.getDataLength();
+            if (machine != null) {
+                descriptor.getFields().setMachineAddress(offset);
+                offset += machine.getDataLength();
+            }
+        } catch (FileFieldsException ex) {
+            throw new MSLAException("Error determining file section length", ex);
         }
 
         descriptor.getFields().setLayerImageAddress(offset);

@@ -1,14 +1,13 @@
 package futurelink.msla.formats.utils;
 
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import lombok.Getter;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -17,7 +16,7 @@ public class FileFieldsIO {
     public enum Endianness { BigEndian, LittleEndian }
 
     @Getter
-    static class MSLAField {
+    public static class MSLAField {
         public enum Type { Field, Method }
         private final String name;
         private final Type type;
@@ -45,6 +44,10 @@ public class FileFieldsIO {
             this.charset = Charset.forName(anno.charset());
         }
         @Override public String toString() { return name + ":" + length; }
+    }
+
+    static boolean isStringOrByteArray(Type type) {
+        return type == String.class || type == byte[].class || type == Byte[].class;
     }
 
     static String getReadMethodName(Type elementType) {
@@ -83,7 +86,7 @@ public class FileFieldsIO {
         else return null;
     }
 
-    static int getTypeSize(Type type, int length) {
+    static int getTypeSize(Type type) throws FileFieldsException {
         if (type == int.class || type == Integer.class) return 4;
         else if (type == long.class || type == Long.class) return 8;
         else if (type == float.class || type == Float.class) return 4;
@@ -92,11 +95,13 @@ public class FileFieldsIO {
         else if (type == char.class || type == Character.class) return 1;
         else if (type == byte.class || type == Byte.class) return 1;
         else if (type == short.class || type == Short.class) return 2;
-        else if (type == String.class || type == byte[].class) return length;
-        return 0;
+        throw new FileFieldsException("Type " + type + " is unknown, can't determine size");
     }
 
-    static Object getFieldOrMethodValue(MSLAFileBlockFields fields, String fieldOrMethodName) throws IOException {
+    static Object getFieldOrMethodValue(MSLAFileBlockFields fields, String fieldOrMethodName) throws FileFieldsException {
+        if (fields == null) throw new FileFieldsException("Field block can't be null");
+        if (fieldOrMethodName == null || fieldOrMethodName.isEmpty())
+            throw new FileFieldsException("Field or method can't be null or empty");
         Object value;
         try {
             var f = fields.getClass().getDeclaredField(fieldOrMethodName);
@@ -110,7 +115,7 @@ public class FileFieldsIO {
                 value = m.invoke(fields);
                 m.setAccessible(false);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e2) {
-                throw new IOException("No such field or method " + fieldOrMethodName);
+                throw new FileFieldsException("No such field or method " + fieldOrMethodName);
             }
         }
 
@@ -132,5 +137,80 @@ public class FileFieldsIO {
             list.sort(Comparator.comparingInt(item -> item.order)); // Sort by order and output
         }
         return fields.get(cls);
+    }
+
+    /**
+     * Internal function that calculates block field length.
+     * @param blockFields
+     * @param field
+     * @return
+     * @throws FileFieldsException
+     */
+    public static Integer getBlockFieldLength(MSLAFileBlockFields blockFields, MSLAField field)
+            throws FileFieldsException
+    {
+        var len = 0;
+        try {
+            // Get field / method type
+            var type = switch (field.getType()) {
+                case Field -> blockFields.getClass().getDeclaredField(field.getName()).getGenericType();
+                case Method -> blockFields.getClass().getDeclaredMethod(field.getName()).getGenericReturnType();
+            };
+
+            // Field is a generic type
+            if (ParameterizedType.class.isAssignableFrom(type.getClass())) {
+                var internalType = ((ParameterizedType) type).getRawType();
+                if (List.class.isAssignableFrom((Class<?>) internalType)) {
+                    var value = getFieldOrMethodValue(blockFields, field.name);
+                    var listElementType = ((ParameterizedType) type).getActualTypeArguments()[0];
+                    for (var t : (List<?>) value) {
+                        if (MSLAFileBlockFields.class.isAssignableFrom((Class<?>) listElementType)) {
+                            len += getBlockLength((MSLAFileBlockFields) t);
+                        } else throw new FileFieldsException("List of " + listElementType + " is not supported");
+                    }
+                } else throw new FileFieldsException("Unknown generic internal type " + internalType);
+            }
+            // Field is an instance of MSLAFileBlockFields
+            else if (MSLAFileBlockFields.class.isAssignableFrom((Class<?>) type)) {
+                len = getBlockLength((MSLAFileBlockFields) getFieldOrMethodValue(blockFields, field.name));
+            }
+            // Field is a string or array of bytes
+            else if (isStringOrByteArray(type)) {
+                len = field.length;
+                if (len == 0) len = (int) getFieldOrMethodValue(blockFields, field.lengthAt);
+            }
+            // Any other type either primitive or primitive wrapper (int, double, long etc.)
+            else len = getTypeSize(type);
+
+        } catch (NoSuchFieldException | NoSuchMethodException e) {
+            throw new FileFieldsException("No such field " + field.getName());
+        }
+
+        return len;
+    }
+
+    /**
+     * Calculates file fields block length up to the field specified by {@param fieldName}.
+     * Effectively this returns an offset of a specific field in a block.
+     * @param blockFields
+     * @param fieldName
+     */
+    public static Integer getBlockLength(MSLAFileBlockFields blockFields, String fieldName) throws FileFieldsException {
+        var length = 0;
+        var fields = getFields(blockFields.getClass());
+        for (var field : fields) {
+            if (fieldName != null && fieldName.equals(field.name)) break;
+            if (blockFields.isFieldExcluded(field.name)) continue;
+            length += getBlockFieldLength(blockFields, field);
+        }
+        return length;
+    }
+
+    /**
+     * Calculates file fields block length.
+     * @param blockFields
+     */
+    public static Integer getBlockLength(MSLAFileBlockFields blockFields) throws FileFieldsException {
+        return getBlockLength(blockFields, null);
     }
 }

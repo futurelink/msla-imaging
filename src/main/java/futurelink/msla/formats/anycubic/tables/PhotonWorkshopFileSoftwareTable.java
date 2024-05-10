@@ -3,6 +3,8 @@ package futurelink.msla.formats.anycubic.tables;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.utils.About;
+import futurelink.msla.formats.utils.FileFieldsException;
+import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
 
 /**
@@ -10,7 +12,7 @@ import lombok.Getter;
  */
 @Getter
 public class PhotonWorkshopFileSoftwareTable extends PhotonWorkshopFileTable {
-    private final Fields fields = new Fields();
+    private final Fields fileFields = new Fields();
 
     @SuppressWarnings("unused")
     @Getter
@@ -32,8 +34,5 @@ public class PhotonWorkshopFileSoftwareTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public int getDataLength() { return 164; }
-
-    @Override
-    public String toString() { return fields.fieldsAsString(" = ", "\n"); }
+    public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
 }

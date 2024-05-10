@@ -5,6 +5,7 @@ import futurelink.msla.formats.creality.tables.*;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.utils.Size;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.List;
 
@@ -53,7 +54,11 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
         return CXDLPLayerCodec.class;
     }
 
-    @Override public MSLAPreview getPreview() { return previews.getPreview(0); }
+    @Override public MSLAPreview getPreview(int index) { return previews.getPreview(index); }
+    @Override public void setPreview(int index, BufferedImage image) throws MSLAException {
+        previews.getPreview(index).setImage(image);
+    }
+
     @Override public float getDPI() { return 0; }
     @Override public float getPixelSizeUm() { return header.getPixelSizeUm(); }
 

@@ -5,6 +5,7 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import futurelink.msla.formats.utils.FileFieldsReader;
 import lombok.Getter;
@@ -22,7 +23,7 @@ import java.io.OutputStream;
 @MSLAOptionContainer(PhotonWorkshopFileMachineTable.Fields.class)
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     private static final String OPTIONS_SECTION_NAME = "Machine";
-    @Delegate private final Fields fields;
+    @Delegate private final Fields fileFields;
 
     @Getter @Setter
     @SuppressWarnings("unused")
@@ -92,11 +93,11 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
         }
     }
 
-    public String getLayerImageFormat() { return fields.getLayerImageFormat(); }
+    public String getLayerImageFormat() { return fileFields.getLayerImageFormat(); }
 
     public PhotonWorkshopFileMachineTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        fields = new Fields(this);
+        fileFields = new Fields(this);
     }
     public PhotonWorkshopFileMachineTable(
             MSLAFileDefaults defaults,
@@ -104,19 +105,12 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
             byte versionMinor) throws MSLAException
     {
         this(versionMajor, versionMinor);
-        defaults.setFields(OPTIONS_SECTION_NAME, fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
     }
 
     @Override
     int calculateTableLength() {
         return 156; // for the time being make it constant
-    }
-
-    @Override
-    public int getDataLength() {
-        // Need to subtract 16 from data length because for some reason
-        // the value of TableLength is 16 bytes greater than factual table length...
-        return calculateTableLength() + MarkLength + 4 - 16;
     }
 
     @Override
@@ -129,9 +123,7 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
                             "), some extra data left unread"
             );
             return dataRead;
-        } catch (IOException e) {
-            throw new MSLAException("Error reading Machine table", e);
-        }
+        } catch (FileFieldsException e) { throw new MSLAException("Error reading Machine table", e); }
     }
 
     @Override
@@ -141,5 +133,5 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public String toString() { return "-- Machine data --\n" + fields.fieldsAsString(" = ", "\n"); }
+    public String toString() { return "-- Machine data --\n" + fileFields.fieldsAsString(" = ", "\n"); }
 }

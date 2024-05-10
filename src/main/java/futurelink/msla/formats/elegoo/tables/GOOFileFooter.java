@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class GOOFileFooter extends GOOFileTable {
-    private final Fields fields = new Fields();
+    private final Fields fileFields = new Fields();
 
     @SuppressWarnings("unused")
     static class Fields implements MSLAFileBlockFields {

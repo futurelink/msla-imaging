@@ -16,8 +16,8 @@ import java.io.OutputStream;
  */
 @Getter
 public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable implements MSLAPreview  {
-    private final Fields fields;
-    private BufferedImage image;
+    private final Fields fileFields;
+    private BufferedImage Image;
 
     @Getter
     @SuppressWarnings("unused")
@@ -57,29 +57,35 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable impl
 
     public PhotonWorkshopFilePreviewTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        fields = new Fields(this);
-        image = new BufferedImage(224, 168, BufferedImage.TYPE_USHORT_GRAY);
+        fileFields = new Fields(this);
+        setImage(null);
     }
 
-    @Override public Size getResolution() { return fields.Resolution; }
-    @Override int calculateTableLength() { return 12 + 12 + fields.ImageDataSize; }
+    @Override
+    public void setImage(BufferedImage image) {
+        Image = new BufferedImage(224, 168, BufferedImage.TYPE_USHORT_GRAY);
+        if (image != null) Image.getGraphics().drawImage(image, 0, 0, null);
+    }
+
+    @Override public Size getResolution() { return fileFields.Resolution; }
+    @Override int calculateTableLength() { return 12 + 12 + fileFields.ImageDataSize; }
 
     @Override
     public void afterRead() {
-        this.image = new BufferedImage(getResolution().getWidth(), getResolution().getHeight(), BufferedImage.TYPE_USHORT_GRAY);
+        this.Image = new BufferedImage(getResolution().getWidth(), getResolution().getHeight(), BufferedImage.TYPE_USHORT_GRAY);
     }
 
     @Override public void beforeWrite() throws MSLAException {
         var buffer = getImage().getData().getDataBuffer();
         var size = buffer.getSize() * 2;
-        if (fields.getImageDataSize() != size)
-            throw new MSLAException("Preview size " + size + " does not match resolution size " + fields.getImageDataSize());
+        if (fileFields.getImageDataSize() != size)
+            throw new MSLAException("Preview size " + size + " does not match resolution size " + fileFields.getImageDataSize());
 
-        fields.ImageData = new byte[size];
+        fileFields.ImageData = new byte[size];
         for (int i = 0; i < size; i+=2) {
             int elem = buffer.getElem(i / 2);
-            fields.ImageData[i] = (byte) ((elem >> 8) & 0xff);
-            fields.ImageData[i+1] = (byte) (elem & 0xff);
+            fileFields.ImageData[i] = (byte) ((elem >> 8) & 0xff);
+            fileFields.ImageData[i+1] = (byte) (elem & 0xff);
         }
     }
 
@@ -99,5 +105,5 @@ public class PhotonWorkshopFilePreviewTable extends PhotonWorkshopFileTable impl
         super.write(stream);
     }
 
-    public String toString() { return "-- Preview --\n" + fields.fieldsAsString(" = ", "\n"); }
+    public String toString() { return "-- Preview --\n" + fileFields.fieldsAsString(" = ", "\n"); }
 }

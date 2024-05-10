@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public class CXDLPFilePreviews extends CXDLPFileTable {
-    private final Fields fields = new Fields();
+    private final Fields fileFields = new Fields();
 
     @SuppressWarnings("unused")
     static class Fields implements MSLAFileBlockFields {
@@ -19,20 +19,20 @@ public class CXDLPFilePreviews extends CXDLPFileTable {
 
     public final MSLAPreview getPreview(int index) {
         return switch (index) {
-            case 0 -> fields.Preview1;
-            case 1 -> fields.Preview2;
-            case 2 -> fields.Preview3;
+            case 0 -> fileFields.Preview1;
+            case 1 -> fileFields.Preview2;
+            case 2 -> fileFields.Preview3;
             default -> null;
         };
     }
 
     @Override
     public int getDataLength() {
-        return (fields.Preview1.getResolution().length() +
-                fields.Preview2.getResolution().length() +
-                fields.Preview3.getResolution().length()) * 2 + 6;
+        return (fileFields.Preview1.getResolution().length() +
+                fileFields.Preview2.getResolution().length() +
+                fileFields.Preview3.getResolution().length()) * 2 + 6;
     }
 
     @Override
-    public String toString() { return fields.fieldsAsString(" = ", "\n"); }
+    public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
 }

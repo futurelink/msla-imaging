@@ -5,12 +5,10 @@ import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class FileFieldsReader {
@@ -25,7 +23,7 @@ public class FileFieldsReader {
         this.endianness = endianness;
     }
 
-    private long readField(DataInput dis, MSLAFileBlockFields fields, FileFieldsIO.MSLAField field) throws IOException {
+    private long readField(DataInput dis, MSLAFileBlockFields fields, FileFieldsIO.MSLAField field) throws FileFieldsException {
         var dataRead = 0L;
         try {
             var length = !"".equals(field.getLengthAt()) ?
@@ -65,7 +63,7 @@ public class FileFieldsReader {
                             dataRead += readFields(dis, (MSLAFileBlockFields) instance);
                             array.add(instance);
                         }
-                    } else throw new IOException("Unknown internal type " + internalType);
+                    } else throw new FileFieldsException("Unknown internal type " + internalType);
                 }
 
                 // Field type is a MSLAFileBlockFields
@@ -97,13 +95,21 @@ public class FileFieldsReader {
                         f.set(fields, value);
                         f.setAccessible(false);
                     }
-                    if (!field.isDontCount()) dataRead = FileFieldsIO.getTypeSize(type, (int) length);
+                    if (!field.isDontCount()) {
+                        if (FileFieldsIO.isStringOrByteArray(type)) dataRead += (int) length;
+                        else dataRead = FileFieldsIO.getTypeSize(type);
+                    }
                 }
             } else {
                 var m = fields.getClass().getDeclaredMethod(field.getName());
                 var type = m.getReturnType();
                 var value = readFieldValue(dis, type, (int) length, field.getCharset());
-                if (!field.isDontCount()) dataRead = FileFieldsIO.getTypeSize(type, (int) length);
+                if (!field.isDontCount()) {
+                    if (type == String.class) dataRead = (int) length; // Assume string character has 1 byte length
+                    else if (value.getClass().isArray()) {
+                        dataRead = (long) ((int) length) * FileFieldsIO.getTypeSize(value.getClass().getComponentType());
+                    } else dataRead = FileFieldsIO.getTypeSize(type);
+                }
 
                 boolean hasSetter = false;
                 try { m = fields.getClass().getDeclaredMethod("set" + field.getName(), type); hasSetter = true; }
@@ -116,9 +122,9 @@ public class FileFieldsReader {
                 }
             }
         } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new IOException("Can't set field '" + field.getName() + "' with value that has been read", e);
+            throw new FileFieldsException("Can't set field '" + field.getName() + "' with value that has been read", e);
         } catch (InstantiationException e) {
-            throw new IOException("Can't instantiate internal data block object", e);
+            throw new FileFieldsException("Can't instantiate internal data block object", e);
         }
         return dataRead;
     }
@@ -130,52 +136,62 @@ public class FileFieldsReader {
         else if (elementType == int.class) return new Integer[length];
         else if (elementType == short.class) return new Short[length];
         else if (elementType == float.class) return new Float[length];
+        else if (elementType == Byte.class) return new Byte[length];
         return null;
     }
 
-    private Object readStringOrBytes(DataInput stream, Type type, int length, Charset charset) throws IOException {
+    private Object readStringOrBytes(DataInput stream, Type type, int length, Charset charset) throws FileFieldsException {
         logger.fine("Reading String or byte[] of " + type + " length " + length);
-        if (length <= 0) throw new IOException("Length is not set for String or byte[] field - don't know how much to read");
-        if (length > MAX_LENGTH) throw new IOException("Field length " + length + " is too large");
-        byte[] b = new byte[length];
-        stream.readFully(b, 0, length);
-        return (type == String.class) ? new String(b, charset).trim() : b;
+        if (length <= 0) throw new FileFieldsException("Length is not set for String or byte[] field - don't know how much to read");
+        if (length > MAX_LENGTH) throw new FileFieldsException("Field length " + length + " is too large");
+        var data = new byte[length];
+        try {
+            stream.readFully(data, 0, length);
+        } catch (IOException e) { throw new FileFieldsException("Could not read data", e); }
+        if (type == String.class) return new String(data, charset).trim();
+        else if (type == byte[].class) return data;
+        else if (type == Byte[].class) {
+            var b = new Byte[length];
+            Arrays.setAll(b, i -> data[i]);
+            return b;
+        }
+        else throw new FileFieldsException("Could not read String or byte[] data, type is invalid");
     }
 
-    private Object readFieldArray(DataInput stream, Type arrayType, int length) throws IOException {
+    private Object readFieldArray(DataInput stream, Type arrayType, int length) throws FileFieldsException {
         logger.fine("Reading array of " + arrayType + " length " + length);
-        if (length <= 0) throw new IOException("Length is not set for array field - don't know how much to read");
-        if (length > MAX_LENGTH) throw new IOException("Array field length " + length + " is too large");
-        if (!((Class<?>) arrayType).isArray()) throw new IOException("Type " + arrayType + " is not an array ");
+        if (length <= 0) throw new FileFieldsException("Length is not set for array field - don't know how much to read");
+        if (length > MAX_LENGTH) throw new FileFieldsException("Array field length " + length + " is too large");
+        if (!((Class<?>) arrayType).isArray()) throw new FileFieldsException("Type " + arrayType + " is not an array ");
         try {
             var elementType = ((Class<?>) arrayType).getComponentType();
             var readMethodName = FileFieldsIO.getReadMethodName(elementType);
-            if (readMethodName == null) throw new IOException("Unknown array component type " + elementType);
+            if (readMethodName == null) throw new FileFieldsException("Unknown array component type " + elementType);
             var inst = getReadArrayObject(elementType, length);
-            if (inst == null) throw new IOException("Can't instantiate internal data block object");
+            if (inst == null) throw new FileFieldsException("Can't instantiate internal data block object");
             var method = stream.getClass().getDeclaredMethod(readMethodName);
             for (int i = 0; i < length; i++) inst[i] = method.invoke(stream);
             return inst;
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            throw new IOException("Can't read array into internal data block object", e);
+            throw new FileFieldsException("Can't read array into internal data block object", e);
         }
     }
 
-    private Object readFieldValue(DataInput stream, Type type, int length, Charset charset) throws IOException {
+    private Object readFieldValue(DataInput stream, Type type, int length, Charset charset) throws FileFieldsException {
         var readMethodName = FileFieldsIO.getReadMethodName(type);
         if (readMethodName != null) {
             try {
                 return stream.getClass().getDeclaredMethod(readMethodName).invoke(stream);
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                throw new IOException("Can't read value", e);
+                throw new FileFieldsException("Can't read value", e);
             }
         }
-        else if (type == String.class || type == byte[].class) return readStringOrBytes(stream, type, length, charset);
+        else if (FileFieldsIO.isStringOrByteArray(type)) return readStringOrBytes(stream, type, length, charset);
         else if (((Class<?>) type).isArray()) return readFieldArray(stream, type, length);
-        else throw new IOException("Unknown type " + type);
+        else throw new FileFieldsException("Unknown type " + type);
     }
 
-    private long readFields(DataInput dis, MSLAFileBlockFields fields) throws IOException {
+    private long readFields(DataInput dis, MSLAFileBlockFields fields) throws FileFieldsException {
         var dataRead = 0L;
         var fieldsList = FileFieldsIO.getFields(fields.getClass());
         logger.fine(fieldsList.toString());
@@ -186,14 +202,14 @@ public class FileFieldsReader {
         return dataRead;
     }
 
-    private long readBlock(DataInput dis, MSLAFileBlock block) throws IOException {
+    private long readBlock(DataInput dis, MSLAFileBlock block) throws FileFieldsException {
         block.beforeRead();
-        var readBytes = readFields(dis, block.getFields());
+        var readBytes = readFields(dis, block.getFileFields());
         block.afterRead();
         return readBytes;
     }
 
-    public final long read(MSLAFileBlock block) throws IOException {
+    public final long read(MSLAFileBlock block) throws FileFieldsException {
         var dis = (endianness == FileFieldsIO.Endianness.BigEndian) ?
                 new DataInputStream(stream) :
                 new LittleEndianDataInputStream(stream);

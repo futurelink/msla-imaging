@@ -130,7 +130,7 @@ public class PCBCalibration {
     }
 
     public static void createPreview(MSLAFile<?> file) throws MSLAException {
-        var preview = file.getPreview();
+        var preview = file.getPreview((short) 0);
         if (preview != null) {
             var graphics = preview.getImage().getGraphics();
             graphics.setFont(graphics.getFont().deriveFont(20.0f));

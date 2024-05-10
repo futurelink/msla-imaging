@@ -6,13 +6,15 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class CTBFilePrintParams implements MSLAFileBlock {
     private final String OPTIONS_SECTION_NAME = "PrintParams";
-    private final Fields fields;
+    private final Fields fileFields;
 
     @Getter
     @SuppressWarnings("unused")
@@ -22,28 +24,32 @@ public class CTBFilePrintParams implements MSLAFileBlock {
         @MSLAFileField(order = 2) @MSLAOption(MSLAOption.LiftHeight) private Float LiftHeight;
         @MSLAFileField(order = 3) @MSLAOption(MSLAOption.LiftSpeed) private Float LiftSpeed;
         @MSLAFileField(order = 4) @MSLAOption(MSLAOption.RetractSpeed) private Float RetractSpeed;
-        @MSLAFileField(order = 5) @MSLAOption(MSLAOption.Volume) private Float VolumeMl;
-        @MSLAFileField(order = 6) @MSLAOption(MSLAOption.Weight) private Float WeightG;
-        @MSLAFileField(order = 7) private Float CostDollars;
-        @MSLAFileField(order = 8) private Float BottomLightOffDelay;
-        @MSLAFileField(order = 9)  private Float LightOffDelay;
+        @MSLAFileField(order = 5) @MSLAOption(MSLAOption.Volume) @Setter private Float VolumeMl = 0.0f;
+        @MSLAFileField(order = 6) @MSLAOption(MSLAOption.Weight) @Setter private Float WeightG = 0.0f;
+        @MSLAFileField(order = 7) @Setter private Float CostDollars = 0.0f;
+        @MSLAFileField(order = 8) @MSLAOption("Bottom layers light off delay") private final Float BottomLightOffDelay = 0.0f;
+        @MSLAFileField(order = 9) @MSLAOption("Normal layers light off delay")  private final Float LightOffDelay = 0.0f;
         @MSLAFileField(order = 10) @MSLAOption(MSLAOption.BottomLayersCount) private Integer BottomLayerCount;
-        @MSLAFileField(order = 11) private Integer Padding1;
-        @MSLAFileField(order = 12) private Integer Padding2;
-        @MSLAFileField(order = 13) private Integer Padding3;
-        @MSLAFileField(order = 14) private Integer Padding4;
+        @MSLAFileField(order = 11) private final Integer Padding1 = 0;
+        @MSLAFileField(order = 12) private final Integer Padding2 = 0;
+        @MSLAFileField(order = 13) private final Integer Padding3 = 0;
+        @MSLAFileField(order = 14) private final Integer Padding4 = 0;
     }
 
     public CTBFilePrintParams() {
-        fields = new Fields();
+        fileFields = new Fields();
     }
 
     public CTBFilePrintParams(MSLAFileDefaults defaults) throws MSLAException {
         this();
-        defaults.setFields(OPTIONS_SECTION_NAME, fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
     }
 
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
-    @Override public int getDataLength() { return 0; }
-    @Override public String toString() { return fields.fieldsAsString(" = ", "\n"); }
+    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this.fileFields); }
+    @Override
+    public int getDataFieldOffset(String fieldName) throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+    }
+    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
 }

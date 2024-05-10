@@ -4,6 +4,7 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.utils.Size;
 
+import java.awt.image.BufferedImage;
 import java.io.OutputStream;
 import java.util.UUID;
 
@@ -30,7 +31,15 @@ public interface MSLAFile<T> {
     /**
      * Returns {@code MSLAPreview} object.
      */
-    MSLAPreview getPreview();
+    MSLAPreview getPreview(int index);
+
+    /**
+     * Sets preview.
+     * @param index
+     * @param image
+     * @throws MSLAException
+     */
+    void setPreview(int index, BufferedImage image) throws MSLAException;
 
     /**
      * Gets file UUID

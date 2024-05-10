@@ -56,7 +56,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
                 resourceFile("test_data/CXDLPFileTest/Example_HALOT_ONE_PLUS.cxdlp")
         );
 
-        ImageIO.write(file.getPreview().getImage(), "png", new File(temp_dir + "cxdlp_preview.png"));
+        ImageIO.write(file.getPreview((short) 0).getImage(), "png", new File(temp_dir + "cxdlp_preview.png"));
         assertFileExactSize(temp_dir + "cxdlp_preview.png", 1871);
 
         // Asynchronously extract image files

@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 @SuppressWarnings("unused")
 public class GOOFilePreview implements MSLAFileBlockFields, MSLAPreview {
     private final Size Resolution;
-    private BufferedImage image;
+    private BufferedImage Image;
 
     int getImageLength() { return Resolution.length() * 2; }
     @MSLAFileField(lengthAt = "getImageLength") byte[] Data;
@@ -21,7 +21,9 @@ public class GOOFilePreview implements MSLAFileBlockFields, MSLAPreview {
         this.Data = new byte[getImageLength()];
     }
 
-    @Override public BufferedImage getImage() { return image; }
+    @Override public BufferedImage getImage() { return Image; }
+    @Override public void setImage(BufferedImage image) {}
+
     @Override public Size getResolution() { return Resolution; }
 
     @Override

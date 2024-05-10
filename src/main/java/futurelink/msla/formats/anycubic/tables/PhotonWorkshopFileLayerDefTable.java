@@ -4,6 +4,8 @@ import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.PhotonWorkshopCodec;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.utils.FileFieldsException;
+import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
@@ -17,13 +19,12 @@ import java.util.HashMap;
  */
 @Getter
 public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
-    @Delegate private final Fields fields;
+    @Delegate private final Fields fileFields;
 
     @Getter
     public static class PhotonWorkshopFileLayerDef implements MSLAFileBlockFields {
-        @MSLAFileField
-        @Setter private Integer DataAddress = 0;
-        @MSLAFileField(order = 1) private Integer DataLength;
+        @MSLAFileField @Setter private Integer DataAddress = 0;
+        @MSLAFileField(order = 1) private Integer DataLength = 0;
         @MSLAFileField(order = 2) @Setter private Float LiftHeight = 0.0f;
         @MSLAFileField(order = 3) @Setter private Float LiftSpeed = 0.0f;
         @MSLAFileField(order = 4) @Setter private Float ExposureTime = 0.0f;
@@ -58,8 +59,8 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
 
     public PhotonWorkshopFileLayerDefTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        this.fields = new Fields(this);
-        this.fields.LayerCount = 0;
+        this.fileFields = new Fields(this);
+        this.fileFields.LayerCount = 0;
     }
 
     /**
@@ -74,19 +75,19 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
                                   MSLALayerEncoder<byte[]> encoders,
                                   MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException {
         // Add empty layer
-        var number = fields.Layers.size();
-        fields.Layers.add(def);
-        fields.layerData.add(null);
-        fields.LayerCount = fields.Layers.size();
+        var number = fileFields.Layers.size();
+        fileFields.Layers.add(def);
+        fileFields.layerData.add(null);
+        fileFields.LayerCount = fileFields.Layers.size();
 
         var params = new HashMap<String, Object>();
         params.put("DecodedDataLength", reader.getSize());
 
         // Encode layer data
         encoders.encode(number, reader, params, (layerNumber, data) -> {
-            fields.Layers.get(layerNumber).DataLength = data.sizeInBytes();
-            fields.Layers.get(layerNumber).NonZeroPixelCount = data.pixels();
-            fields.layerData.set(layerNumber, data.data());
+            fileFields.Layers.get(layerNumber).DataLength = data.sizeInBytes();
+            fileFields.Layers.get(layerNumber).NonZeroPixelCount = data.pixels();
+            fileFields.layerData.set(layerNumber, data.data());
             if (callback != null) callback.onFinish(layerNumber, data);
         });
     }
@@ -125,9 +126,9 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     public final void addLayer(PhotonWorkshopFileLayerDef def, byte[] data) throws MSLAException {
         if ((data != null) && (def != null)) {
             if (data.length != def.DataLength) throw new MSLAException("DataLength in layer definition does not match data size");
-            fields.Layers.add(def);
-            fields.layerData.add(data);
-            fields.LayerCount = fields.Layers.size();
+            fileFields.Layers.add(def);
+            fileFields.layerData.add(data);
+            fileFields.LayerCount = fileFields.Layers.size();
         }
     }
 
@@ -148,16 +149,16 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
     }
 
     public final PhotonWorkshopFileLayerDef getLayer(int i) {
-        return fields.Layers.get(i);
+        return fileFields.Layers.get(i);
     }
 
     public final  byte[] getLayerData(int i) {
-        return fields.layerData.get(i);
+        return fileFields.layerData.get(i);
     }
 
     @Override
-    final int calculateTableLength() {
-        return 4 + fields.getLayerCount() * 32;
+    public final int calculateTableLength() {
+        return 4 + fileFields.getLayerCount() * 32;
     }
 
     @Override
@@ -181,8 +182,8 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         var b = new StringBuilder();
         b.append("-- Layer definition data --\n");
         b.append("TableLength: ").append(TableLength).append("\n");
-        b.append("Layers count: ").append(fields.Layers.size()).append("\n");
-        for (var layer : fields.Layers) {
+        b.append("Layers count: ").append(fileFields.Layers.size()).append("\n");
+        for (var layer : fileFields.Layers) {
             b.append("-> ").append(layer).append("\n");
         }
 

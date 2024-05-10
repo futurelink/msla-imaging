@@ -12,6 +12,12 @@ public interface MSLAPreview {
     BufferedImage getImage();
 
     /**
+     * Sets image.
+     * @param image
+     */
+    void setImage(BufferedImage image);
+
+    /**
      * Preview image resolution.
      * @return
      */

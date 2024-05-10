@@ -10,6 +10,7 @@ import lombok.experimental.Delegate;
 
 @Getter
 public class CXDLPFileHeader extends CXDLPFileTable {
+    @Delegate private Fields fileFields;
 
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
@@ -35,16 +36,14 @@ public class CXDLPFileHeader extends CXDLPFileTable {
         public int getDataLength() { return HeaderSize + PrinterModelSize + 16 + 64; }
     }
 
-    @Delegate private Fields fields;
-
-    public CXDLPFileHeader() { fields = new Fields(); }
+    public CXDLPFileHeader() { fileFields = new Fields(); }
     public CXDLPFileHeader(MSLAFileDefaults defaults) throws MSLAException {
         this();
-        defaults.setFields("Header", fields);
+        defaults.setFields("Header", fileFields);
     }
 
     public void setLayerCount(short count) {
-        fields.LayerCount = count;
+        fileFields.LayerCount = count;
     }
 
     @Override

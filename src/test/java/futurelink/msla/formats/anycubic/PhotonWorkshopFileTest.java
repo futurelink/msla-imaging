@@ -53,6 +53,9 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
 
             assertFileMinSize(layerFiles[0], 11000);
             assertFileMinSize(layerFiles[1], 11000);
+
+            // Save previews
+            file.getPreview((short) 0).getImage();
         } catch (MSLAException e) {
             throw new RuntimeException(e);
         }

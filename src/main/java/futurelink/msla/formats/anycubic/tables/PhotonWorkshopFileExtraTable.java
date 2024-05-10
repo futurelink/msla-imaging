@@ -6,6 +6,8 @@ import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.utils.FileFieldsException;
+import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +20,7 @@ import java.io.OutputStream;
 @Getter @Setter
 public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     private static final String OPTIONS_SECTION_NAME = "Extra";
-    private final Fields fields;
+    private final Fields fileFields;
 
     @SuppressWarnings("unused")
     @Getter
@@ -55,24 +57,18 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     public PhotonWorkshopFileExtraTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
         TableLength = 24; // Constant that doesn't mean anything...
-        fields = new Fields(this);
+        fileFields = new Fields(this);
     }
 
     public PhotonWorkshopFileExtraTable(MSLAFileDefaults defaults, byte versionMajor, byte versionMinor)
             throws MSLAException {
         this(versionMajor, versionMinor);
-        defaults.setFields(OPTIONS_SECTION_NAME, fields);
+        defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
     }
 
     @Override
     int calculateTableLength() {
         return TableLength;
-    }
-
-    @Override
-    public int getDataLength() {
-        // 14 fields of 4 bytes + Mark length + 4 bytes for table length
-        return 56 + MarkLength + 4;
     }
 
     @Override
@@ -82,5 +78,5 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public String toString() { return "-- Extra table --" + "\n" + fields.fieldsAsString(" = ", "\n"); }
+    public String toString() { return "-- Extra table --" + "\n" + fileFields.fieldsAsString(" = ", "\n"); }
 }

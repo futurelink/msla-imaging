@@ -6,6 +6,7 @@ import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -25,26 +26,27 @@ public class FileFieldsWriter {
     }
 
     private void writeArray(DataOutput stream, Type arrayType, Object value, int length) throws IOException {
+        if (!((Class<?>) arrayType).isArray()) throw new IOException("Not an array");
+        var arrayLength = Array.getLength(value);
+        if (length > arrayLength) throw new IOException("Length " + length + " too large (max is " + arrayLength + ")");
         var elementType = ((Class<?>) arrayType).getComponentType();
-        if ((elementType == byte.class) || (elementType == Byte.class))
-            stream.write((length > 0) ? Arrays.copyOfRange((byte[]) value, 0, length) : (byte[]) value);
-        else {
-            for (int i = 0; i < length; i++) {
-                if (elementType == int.class) stream.writeInt(((int[]) value)[i]);
-                else if (elementType == Integer.class) stream.writeInt(((Integer[]) value)[i]);
-                else if (elementType == short.class) stream.writeShort(((short[]) value)[i]);
-                else if (elementType == Short.class) stream.writeShort(((Short[]) value)[i]);
-                else if (elementType == double.class) stream.writeDouble(((double[]) value)[i]);
-                else if (elementType == Double.class) stream.writeDouble(((Double[]) value)[i]);
-                else if (elementType == long.class) stream.writeLong(((long[]) value)[i]);
-                else if (elementType == Long.class) stream.writeLong(((Long[]) value)[i]);
-                else throw new IOException("Unknown array component type " + elementType);
-            }
+        for (int i = 0; i < length; i++) {
+            if (elementType == int.class) stream.writeInt(((int[]) value)[i]);
+            else if (elementType == Integer.class) stream.writeInt(((Integer[]) value)[i]);
+            else if (elementType == short.class) stream.writeShort(((short[]) value)[i]);
+            else if (elementType == Short.class) stream.writeShort(((Short[]) value)[i]);
+            else if (elementType == double.class) stream.writeDouble(((double[]) value)[i]);
+            else if (elementType == Double.class) stream.writeDouble(((Double[]) value)[i]);
+            else if (elementType == long.class) stream.writeLong(((long[]) value)[i]);
+            else if (elementType == Long.class) stream.writeLong(((Long[]) value)[i]);
+            else if (elementType == byte.class) stream.writeByte(((byte[]) value)[i]);
+            else if (elementType == Byte.class) stream.writeByte(((Byte[]) value)[i]);
+            else throw new IOException("Unknown array component type " + elementType);
         }
     }
 
     private void writeField(DataOutput stream, Type type, Object value, int length, Charset charset)
-            throws MSLAException, IOException
+            throws FileFieldsException, IOException
     {
         var writeMethodName = FileFieldsIO.getWriteMethodName(type);
         if (writeMethodName != null) {
@@ -82,7 +84,7 @@ public class FileFieldsWriter {
         } else throw new IOException("Unknown type " + type);
     }
 
-    private void writeFields(DataOutput dos, MSLAFileBlockFields fields) throws MSLAException, IOException {
+    private void writeFields(DataOutput dos, MSLAFileBlockFields fields) throws FileFieldsException, IOException {
         var fieldsList = FileFieldsIO.getFields(fields.getClass());
         logger.fine(fieldsList.toString());
         try {
@@ -113,12 +115,16 @@ public class FileFieldsWriter {
         }
     }
 
-    private void writeBlock(DataOutput dos, MSLAFileBlock block) throws MSLAException, IOException {
-        block.beforeWrite();
-        writeFields(dos, block.getFields());
+    private void writeBlock(DataOutput dos, MSLAFileBlock block) throws FileFieldsException, IOException {
+        try {
+            block.beforeWrite();
+        } catch (MSLAException e) {
+            throw new FileFieldsException("Could not execute before write operations", e);
+        }
+        writeFields(dos, block.getFileFields());
     }
 
-    public final void write(MSLAFileBlock block) throws MSLAException, IOException {
+    public final void write(MSLAFileBlock block) throws FileFieldsException, IOException {
         var dos = (endianness == FileFieldsIO.Endianness.BigEndian) ?
                 new DataOutputStream(stream) :
                 new LittleEndianDataOutputStream(stream);

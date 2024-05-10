@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class GOOFileLayerDef extends GOOFileTable {
-    private final Fields fields = new Fields();
+    private final Fields fileFields = new Fields();
 
     @SuppressWarnings("unused")
     static public class Fields implements MSLAFileBlockFields {
@@ -33,6 +33,6 @@ public class GOOFileLayerDef extends GOOFileTable {
         @MSLAFileField(order = 20, length = 2) public byte[] Delimiter2 = new byte[]{ 0x0d, 0x0a };
     }
 
-    @Override public int getDataLength() { return 72 + fields.DataLength; }
-    @Override public String toString() { return fields.fieldsAsString(" = ", "\n"); }
+    @Override public int getDataLength() { return 72 + fileFields.DataLength; }
+    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
 }

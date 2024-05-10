@@ -19,7 +19,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
         var file = FileFactory.instance.load(filePath);
         logger.info(file.toString());
 
-        assertEquals("224 x 168", file.getPreview().getResolution().toString());
+        assertEquals("224 x 168", file.getPreview((short) 0).getResolution().toString());
         assertEquals("5760 x 3600", file.getResolution().toString());
         assertEquals(10, file.getLayerCount());
         assertEquals(2.0F, file.options().get("LiftSpeed"));
@@ -39,7 +39,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
         var file = FileFactory.instance.load(filePath);
         logger.info(file.toString());
 
-        assertEquals("116 x 116", file.getPreview().getResolution().toString());
+        assertEquals("116 x 116", file.getPreview((short) 0).getResolution().toString());
         assertEquals("4320 x 2560", file.getResolution().toString());
         assertEquals(10, file.getLayerCount());
         assertEquals(1, (short) file.options().get("LiftSpeed"));
