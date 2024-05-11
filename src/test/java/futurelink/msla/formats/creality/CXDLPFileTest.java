@@ -20,7 +20,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
         delete_file(outFile); // Clean up files just in case
 
         var file = (CXDLPFile) FileFactory.instance.create("CREALITY HALOT-ONE PLUS");
-        file.options().set("BottomExposureTime", (short) 12);
+        file.getOptions().set("Bottom layers exposure time", (short) 12);
 
         var pngFileLayers = new String[]{
                 resourceFile("test_data/CXDLPFileTest/Layer_1.png"),

@@ -5,7 +5,6 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +13,6 @@ import java.io.OutputStream;
 /**
  * "EXTRA" section representation.
  */
-@MSLAOptionContainer(PhotonWorkshopFileExtraTable.Fields.class)
 @Getter @Setter
 public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     private static final String OPTIONS_SECTION_NAME = "Extra";

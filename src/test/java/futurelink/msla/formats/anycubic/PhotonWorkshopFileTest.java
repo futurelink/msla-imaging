@@ -68,7 +68,7 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
         delete_file(outFile); // Clean up files just in case
 
         var file = (PhotonWorkshopFile) FileFactory.instance.create("Anycubic Photon Mono X 6K");
-        file.options().set("BottomExposureTime", 12.0F);
+        file.getOptions().set("Bottom layers exposure time", 12.0F);
 
         var pngFileLayers = new String[]{
                 resourceFile("test_data/PhotonFileTest/Layer_1.png"),

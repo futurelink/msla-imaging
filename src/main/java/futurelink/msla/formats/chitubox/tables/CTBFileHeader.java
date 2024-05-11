@@ -5,7 +5,6 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import futurelink.msla.formats.utils.Size;
@@ -16,7 +15,6 @@ import java.util.Objects;
 import java.util.Random;
 
 @Getter
-@MSLAOptionContainer(CTBFileHeader.Fields.class)
 public class CTBFileHeader extends CTBFileBlock {
     private final String OPTIONS_SECTION_NAME = "Header";
 

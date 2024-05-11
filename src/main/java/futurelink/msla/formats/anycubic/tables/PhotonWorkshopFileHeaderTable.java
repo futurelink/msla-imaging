@@ -4,7 +4,6 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import futurelink.msla.formats.utils.FileFieldsReader;
@@ -20,7 +19,6 @@ import java.io.OutputStream;
  * "HEADER" section representation.
  */
 @Getter
-@MSLAOptionContainer(PhotonWorkshopFileHeaderTable.Fields.class)
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     private static final String OPTIONS_SECTION_NAME = "Header";
 

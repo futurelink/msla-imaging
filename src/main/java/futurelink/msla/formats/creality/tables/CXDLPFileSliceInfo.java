@@ -4,11 +4,9 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 
-@MSLAOptionContainer(CXDLPFileSliceInfo.Fields.class)
 @Getter
 public class CXDLPFileSliceInfo extends CXDLPFileTable {
     @Delegate private final Fields fileFields;

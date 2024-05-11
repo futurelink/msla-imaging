@@ -4,7 +4,6 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import futurelink.msla.formats.utils.FileFieldsReader;
@@ -19,7 +18,6 @@ import java.io.OutputStream;
  * "MACHINE" section representation.
  */
 @Getter
-@MSLAOptionContainer(PhotonWorkshopFileMachineTable.Fields.class)
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     private static final String OPTIONS_SECTION_NAME = "Machine";
     @Delegate private final Fields fileFields;

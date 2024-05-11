@@ -22,9 +22,9 @@ public class PCBCalibrationTest extends CommonTestRoutines {
         assertEquals("224 x 168", file.getPreview((short) 0).getResolution().toString());
         assertEquals("5760 x 3600", file.getResolution().toString());
         assertEquals(10, file.getLayerCount());
-        assertEquals(2.0F, file.options().get("LiftSpeed"));
-        assertEquals(10, file.options().get("TransitionLayerCount"));
-        assertEquals(1, file.options().get("AdvancedMode"));
+        assertEquals(2.0F, file.getOptions().get("Normal layers lift speed"));
+        assertEquals(10, file.getOptions().get("Transition layers count"));
+        assertEquals(1, file.getOptions().get("Advanced mode"));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
         assertEquals("116 x 116", file.getPreview((short) 0).getResolution().toString());
         assertEquals("4320 x 2560", file.getResolution().toString());
         assertEquals(10, file.getLayerCount());
-        assertEquals(1, (short) file.options().get("LiftSpeed"));
-        assertEquals(0, (byte) file.options().get("AntiAliasEnabled"));
+        assertEquals(1, (short) file.getOptions().get("Normal layers lift speed"));
+        assertEquals(0, (byte) file.getOptions().get("Antialias"));
     }
 }

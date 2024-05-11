@@ -12,19 +12,19 @@ public class PhotonWorkshopOptionsTest extends CommonTestRoutines {
     @Test
     void AvailableOptionsTest() throws MSLAException {
         var file = FileFactory.instance.create("Anycubic Photon Mono X 6K");
-        var options = file.options().getAvailable();
+        var options = file.getOptions().getOptions();
         logger.info(options.toString());
-        assertEquals("BottomLiftSpeed1", options.toArray()[4]);
+        assertEquals("Transition layer type", options.toArray()[4]);
     }
 
     @Test
     void SetOptionTest() throws MSLAException {
         var file = FileFactory.instance.create("Anycubic Photon Mono X 6K");
-        file.options().set("AdvancedMode", 1);
-        var option = file.options().get("AdvancedMode");
+        file.getOptions().set("Advanced mode", 1);
+        var option = file.getOptions().get("Advanced mode");
         assertEquals(1, option);
-        assertThrows(ClassCastException.class, () -> file.options().set("AdvancedMode", "string"));
-        assertThrows(MSLAException.class, () -> file.options().set("UnavailableOption", true));
+        assertThrows(ClassCastException.class, () -> file.getOptions().set("Advanced mode", "string"));
+        assertThrows(MSLAException.class, () -> file.getOptions().set("UnavailableOption", true));
     }
 
     @Test

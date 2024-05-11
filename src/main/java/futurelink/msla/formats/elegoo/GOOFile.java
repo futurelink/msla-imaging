@@ -7,7 +7,10 @@ import futurelink.msla.formats.elegoo.tables.GOOFileFooter;
 import futurelink.msla.formats.elegoo.tables.GOOFileHeader;
 import futurelink.msla.formats.elegoo.tables.GOOFileLayerDef;
 import futurelink.msla.formats.iface.*;
+import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.utils.OptionMapper;
 import futurelink.msla.formats.utils.Size;
+import lombok.Getter;
 
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
@@ -17,56 +20,57 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class GOOFile extends MSLAFileGeneric<byte[]> {
-    private final GOOFileHeader header;
-    private final List<GOOFileLayerDef> layersDef;
-    private final GOOFileFooter footer = new GOOFileFooter();
-    private final GOOFileOptionMapper optionMapper;
+    @Getter private final MSLAOptionMapper options;
+
+    @Getter @MSLAOptionContainer private final GOOFileHeader Header;
+    private final List<GOOFileLayerDef> LayersDef;
+    private final GOOFileFooter Footer = new GOOFileFooter();
 
     public GOOFile(MSLAFileDefaults defaults) throws MSLAException {
         super();
-        header = new GOOFileHeader(defaults);
-        layersDef =  new LinkedList<>();
-        optionMapper = new GOOFileOptionMapper(this);
+        Header = new GOOFileHeader(defaults);
+        LayersDef =  new LinkedList<>();
+        options = new OptionMapper(this);
     }
 
     public GOOFile(FileInputStream stream) throws IOException, MSLAException {
         super();
-        header = new GOOFileHeader();
-        layersDef =  new LinkedList<>();
+        Header = new GOOFileHeader();
+        LayersDef =  new LinkedList<>();
         readTables(stream);
-        optionMapper = new GOOFileOptionMapper(this);
+        options = new OptionMapper(this);
     }
 
     private void readTables(FileInputStream input) throws MSLAException {
-        var pos = header.read(input, 0);
-        if (pos != header.getLayerDefAddress()) throw new MSLAException("Invalid layer definition at position " + pos);
+        var pos = Header.read(input, 0);
+        if (pos != Header.getLayerDefAddress()) throw new MSLAException("Invalid layer definition at position " + pos);
 
         var layerOffset = 0L;
-        for (var i = 0; i < header.getLayerCount(); i++) {
+        for (var i = 0; i < Header.getLayerCount(); i++) {
             var layer = new GOOFileLayerDef();
             pos += layer.read(input, pos);
             layerOffset += layer.getDataLength();
             // Check if stream position is still ok while reading layers
-            if (header.getLayerDefAddress() + layerOffset != pos)
+            if (Header.getLayerDefAddress() + layerOffset != pos)
                 throw new MSLAException("Invalid layer " + layer + " definition at position " + pos);
-            layersDef.add(layer);
+            LayersDef.add(layer);
         }
     }
 
     @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return GOOFileCodec.class; }
     @Override public MSLAPreview getPreview(int index) {
-        if (index == 0) return header.getSmallPreview();
-        else return header.getBigPreview();
+        if (index == 0) return Header.getSmallPreview();
+        else return Header.getBigPreview();
     }
     @Override public void setPreview(int index, BufferedImage image) {
-        if (index == 0) header.getSmallPreview().setImage(image);
-        else header.getBigPreview().setImage(image);
+        if (index == 0) Header.getSmallPreview().setImage(image);
+        else Header.getBigPreview().setImage(image);
     }
 
     @Override public float getDPI() { return 0; }
-    @Override public Size getResolution() { return header.getResolution(); }
-    @Override public float getPixelSizeUm() { return header.getPixelSizeUm(); }
-    @Override public int getLayerCount() { return layersDef.size(); }
+    @Override public Size getResolution() { return Header.getResolution(); }
+    @Override public float getPixelSizeUm() { return Header.getPixelSizeUm(); }
+    @Override public int getLayerCount() { return LayersDef.size(); }
 
     @Override
     public void addLayer(
@@ -83,37 +87,31 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
             float layerHeight, float exposureTime, float liftSpeed, float liftHeight) throws MSLAException
     {
         var layer = new GOOFileLayerDef();
-        var layerNumber = layersDef.size();
-        layersDef.add(layer);
+        var layerNumber = LayersDef.size();
+        LayersDef.add(layer);
         getEncodersPool().encode(layerNumber, reader, null, callback);
     }
 
     @Override
     public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        var input = new GOOFileCodec.Input(layersDef.get(layer).getFileFields().getData());
+        var input = new GOOFileCodec.Input(LayersDef.get(layer).getFileFields().getData());
         return getDecodersPool().decode(layer, writer, input, null);
     }
 
     @Override
     public void write(OutputStream stream) throws MSLAException {
-        header.write(stream);
-        for (var layer : layersDef) { layer.write(stream); }
-        footer.write(stream);
+        Header.write(stream);
+        for (var layer : LayersDef) { layer.write(stream); }
+        Footer.write(stream);
     }
 
-    @Override
-    public boolean isValid() {
-        return (header != null && layersDef != null);
-    }
-
-    @Override
-    public MSLAOptionMapper options() {
-        return null;
+    @Override public boolean isValid() {
+        return (Header != null && LayersDef != null);
     }
 
     @Override
     public String toString() {
-        return header.toString();
+        return Header.toString();
                 //layersDef.toString() + "\n" +
                 //footer.toString();
     }

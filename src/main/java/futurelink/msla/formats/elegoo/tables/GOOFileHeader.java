@@ -4,7 +4,6 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.About;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
@@ -14,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Getter
-@MSLAOptionContainer(GOOFileHeader.Fields.class)
 public class GOOFileHeader extends GOOFileTable {
     enum DelayModes {
         LightOff((byte) 0), WaitTime((byte) 1);

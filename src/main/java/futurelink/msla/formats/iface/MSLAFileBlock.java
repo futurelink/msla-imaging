@@ -2,7 +2,6 @@ package futurelink.msla.formats.iface;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import futurelink.msla.formats.utils.FileFieldsReader;
@@ -47,16 +46,21 @@ public interface MSLAFileBlock {
         }
     }
 
+    default HashMap<String, String> getOptionNames() {
+        var optionsMap = new HashMap<String, String>();
+        Arrays.stream(getFileFields().getClass().getDeclaredFields())
+                .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
+                .forEach((f) -> optionsMap.put(
+                        !f.getAnnotation(MSLAOption.class).value().isEmpty() ? f.getAnnotation(MSLAOption.class).value() : f.getName(),
+                        f.getName()));
+        return optionsMap;
+    }
+
     default HashMap<String, Class<?>> getOptions() {
-        var a = getClass().getAnnotation(MSLAOptionContainer.class);
-        if (a != null) {
-            var optionContainerClass = a.value() != null ? a.value() : getClass();
-            var optionsMap = new HashMap<String, Class<?>>();
-            Arrays.stream(optionContainerClass.getDeclaredFields())
-                    .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
-                    .forEach((f) -> optionsMap.put(f.getName(), f.getType()));
+        var optionsMap = new HashMap<String, Class<?>>();
+        Arrays.stream(getFileFields().getClass().getDeclaredFields())
+                .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
+                .forEach((f) -> optionsMap.put(f.getName(), f.getType()));
             return optionsMap;
-        }
-        return null;
     }
 }

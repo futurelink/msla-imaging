@@ -109,5 +109,5 @@ public interface MSLAFile<T> {
     /**
      * Returns file- and printer-specific option mapper.
      */
-    MSLAOptionMapper options();
+    MSLAOptionMapper getOptions();
 }

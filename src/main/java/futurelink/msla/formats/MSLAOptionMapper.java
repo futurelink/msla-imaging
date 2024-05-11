@@ -41,7 +41,12 @@ public abstract class MSLAOptionMapper {
     /**
      * Lists all available options
      */
-    abstract public Set<String> getAvailable();
+    abstract public Set<String> getOptions();
+
+    /**
+     * Lists all available layer options
+     */
+    abstract public Set<String> getLayerOptions();
 
     public final void set(String option, Serializable value) throws MSLAException {
         if (value == null) {
@@ -50,7 +55,7 @@ public abstract class MSLAOptionMapper {
         } else {
             if (!hasOption(option, value.getClass())) {
                 if (!hasOption(option, null)) {
-                    throw new MSLAException("Option '" + option + " is not available at all");
+                    throw new MSLAException("Option '" + option + "' is not available at all");
                 } else {
                     populateOption(option, value);
                 }

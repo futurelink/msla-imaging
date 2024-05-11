@@ -5,14 +5,12 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@MSLAOptionContainer(CTBFilePrintParams.Fields.class)
 public class CTBFilePrintParams extends CTBFileBlock {
     private final String OPTIONS_SECTION_NAME = "PrintParams";
     private final Fields fileFields;

@@ -64,7 +64,7 @@ public class ImageTools {
         var wsFile = FileFactory.instance.create(machineName);
         if (wsFile != null) {
             if (!wsFile.isValid()) throw new MSLAException("File header has no resolution info");
-            wsFile.options().set("BottomExposureTime", 12);
+            wsFile.getOptions().set("BottomExposureTime", 12);
             wsFile.addLayer(new ImageReader(wsFile, image), null);
         }
     }

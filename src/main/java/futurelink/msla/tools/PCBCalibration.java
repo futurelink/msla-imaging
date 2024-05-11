@@ -51,13 +51,13 @@ public class PCBCalibration {
     }
 
     public static void setOptionFromString(MSLAFile<?> file, String optionName, String value) throws MSLAException {
-        var optionType = file.options().getType(optionName);
-        if (optionType == Integer.class) file.options().set(optionName, Integer.parseInt(value));
-        if (optionType == Float.class) file.options().set(optionName, Float.parseFloat(value));
-        if (optionType == Double.class) file.options().set(optionName, Double.parseDouble(value));
-        if (optionType == Short.class) file.options().set(optionName, Short.parseShort(value));
-        if (optionType == Byte.class) file.options().set(optionName, Byte.parseByte(value));
-        if (optionType == Character.class) file.options().set(optionName, value.toCharArray()[0]);
+        var optionType = file.getOptions().getType(optionName);
+        if (optionType == Integer.class) file.getOptions().set(optionName, Integer.parseInt(value));
+        if (optionType == Float.class) file.getOptions().set(optionName, Float.parseFloat(value));
+        if (optionType == Double.class) file.getOptions().set(optionName, Double.parseDouble(value));
+        if (optionType == Short.class) file.getOptions().set(optionName, Short.parseShort(value));
+        if (optionType == Byte.class) file.getOptions().set(optionName, Byte.parseByte(value));
+        if (optionType == Character.class) file.getOptions().set(optionName, value.toCharArray()[0]);
     }
 
     /**
@@ -88,10 +88,10 @@ public class PCBCalibration {
                 filePath + "." + defaults.getFileExtension();
         try (var fos = new FileOutputStream(filePath)) {
             // Set options
-            setOptionFromString(wsFile, "BottomLayersCount", "1");
-            setOptionFromString(wsFile, "BottomExposureTime", String.valueOf(startTime));
-            setOptionFromString(wsFile, "ExposureTime", String.valueOf(interval));
-            setOptionFromString(wsFile, "LiftHeight", "1");
+            setOptionFromString(wsFile, "Bottom layers count", "1");
+            setOptionFromString(wsFile, "Bottom layers exposure time", String.valueOf(startTime));
+            setOptionFromString(wsFile, "Exposure time", String.valueOf(interval));
+            setOptionFromString(wsFile, "Lift height", "1");
 
             //wsFile.setOption("PerLayerOverride", 0);
             //wsFile.setOption("TransitionLayerCount", 0);
