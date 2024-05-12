@@ -58,7 +58,7 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
         return CXDLPLayerCodec.class;
     }
 
-    @Override public MSLAPreview getPreview(int index) { return Previews.getPreview(index); }
+    @Override public MSLAPreview getPreview(int index) throws MSLAException { return Previews.getPreview(index); }
     @Override public void setPreview(int index, BufferedImage image) throws MSLAException {
         Previews.getPreview(index).setImage(image);
     }

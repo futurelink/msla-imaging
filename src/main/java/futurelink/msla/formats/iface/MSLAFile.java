@@ -31,7 +31,7 @@ public interface MSLAFile<T> {
     /**
      * Returns {@code MSLAPreview} object.
      */
-    MSLAPreview getPreview(int index);
+    MSLAPreview getPreview(int index) throws MSLAException;
 
     /**
      * Sets preview.

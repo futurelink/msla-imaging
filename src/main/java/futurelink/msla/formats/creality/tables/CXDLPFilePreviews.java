@@ -1,5 +1,6 @@
 package futurelink.msla.formats.creality.tables;
 
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.MSLAPreview;
@@ -17,12 +18,12 @@ public class CXDLPFilePreviews extends CXDLPFileTable {
         @MSLAFileField(order = 2) CXDLPFilePreview Preview3 = new CXDLPFilePreview(new Size(290, 290));
     }
 
-    public final MSLAPreview getPreview(int index) {
+    public final MSLAPreview getPreview(int index) throws MSLAException {
         return switch (index) {
             case 0 -> fileFields.Preview1;
             case 1 -> fileFields.Preview2;
             case 2 -> fileFields.Preview3;
-            default -> null;
+            default -> throw new MSLAException("Preview is not available");
         };
     }
 
