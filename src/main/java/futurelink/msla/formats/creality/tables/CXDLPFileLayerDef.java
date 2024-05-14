@@ -2,7 +2,6 @@ package futurelink.msla.formats.creality.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.creality.CXDLPLayerCodec;
 
 import java.io.*;
 import java.util.ArrayList;

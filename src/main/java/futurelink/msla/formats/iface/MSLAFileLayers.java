@@ -1,7 +1,6 @@
 package futurelink.msla.formats.iface;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.chitubox.tables.CTBFileLayerDef;
 
 import java.util.Map;
 

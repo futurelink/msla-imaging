@@ -53,7 +53,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
     }
 
     @Test
-    void LayerDefTableTest() throws FileFieldsException, MSLAException {
+    void LayerDefTableTest() throws FileFieldsException {
         // Test empty layer definition table
         var block = new PhotonWorkshopFileLayerDefTable((byte) 2, (byte) 0);
         block.allocate();

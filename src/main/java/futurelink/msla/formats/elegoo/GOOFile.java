@@ -5,7 +5,6 @@ import futurelink.msla.formats.MSLAFileGeneric;
 import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.elegoo.tables.GOOFileFooter;
 import futurelink.msla.formats.elegoo.tables.GOOFileHeader;
-import futurelink.msla.formats.elegoo.tables.GOOFileLayerDef;
 import futurelink.msla.formats.elegoo.tables.GOOFileLayers;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
