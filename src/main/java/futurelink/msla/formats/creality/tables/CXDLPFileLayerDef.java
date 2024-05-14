@@ -7,23 +7,19 @@ import futurelink.msla.formats.creality.CXDLPLayerCodec;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
-public class CXDLPFileLayerDef extends CXDLPFileTable {
+public class CXDLPFileLayerDef extends CXDLPFileTable implements MSLAFileLayers<CXDLPFileLayer, List<CXDLPFileLayerLine>> {
     private static final Logger logger = Logger.getLogger(CXDLPFileLayerDef.class.getName());
-    private final ArrayList<CXDLPFileLayer> layers = new ArrayList<>();
-
-    @Override
-    public MSLAFileBlockFields getFileFields() {
-        return null;
-    }
+    private final ArrayList<CXDLPFileLayer> Layers = new ArrayList<>();
 
     @Override
     public final long read(FileInputStream iStream, long layerDataPosition) throws MSLAException {
         var dis = new DataInputStream(iStream);
         var currentPosition = layerDataPosition;
         try {
-            for (var layer : layers) {
+            for (var layer : Layers) {
                 var fc = iStream.getChannel();
                 fc.position(currentPosition);
                 layer.LayerArea = dis.readInt();
@@ -33,93 +29,97 @@ public class CXDLPFileLayerDef extends CXDLPFileTable {
                 layer.DataOffset = currentPosition;
                 currentPosition += layer.DataLength;
             }
-            return currentPosition;
         } catch (IOException e) {
             throw new MSLAException("Can't read layer definition", e);
         }
-    }
 
-    @Override
-    public final int getDataLength() {
-        return 0;
+        try {
+            for (var layer : Layers) {
+                var encodedDataLength = layer.DataLength;
+                var decodedDataLength = layer.DataLength;
+                var fc = iStream.getChannel();
+                var pos = layer.getDataOffset();
+                fc.position(pos);
+
+                var bytesRead = 0;
+                dis.readInt(); // Skip integer
+                var lineCount = dis.readInt();
+                bytesRead += 8;
+                while (bytesRead < encodedDataLength - 2) { // Minus 2, because there's one extra 2 bytes at the end
+                    layer.addLine(CXDLPFileLayerLine.fromByteArray(dis.readNBytes(6)));
+                    bytesRead += 6;
+                    lineCount--;
+                }
+
+                if (lineCount != 0)
+                    throw new MSLAException("Error decoding data, not all " + lineCount + " lines were read");
+
+                logger.finest("CXDLP file position " + pos +
+                        ", data length is " + encodedDataLength +
+                        ", expected data length " + decodedDataLength);
+            }
+        } catch (IOException e) {
+            throw new MSLAException("Can't read layer data", e);
+        }
+
+        return currentPosition;
     }
 
     @Override
     public final void write(OutputStream stream) throws MSLAException {
-        logger.finest("Writing " + layers.size() + " layers into a stream");
+        logger.finest("Writing " + Layers.size() + " layers into a stream");
         try {
-            for (var layer : layers) layer.writeData(stream);
+            for (var layer : Layers) layer.writeData(stream);
         } catch (IOException e) {
             throw new MSLAException("Can't write layer definition", e);
         }
     }
 
-    public final Integer getLayersCount() {
-        return layers.size();
+    @Override public final int getDataLength() {
+        return 0;
+    }
+    @Override public MSLAFileBlockFields getFileFields() { return null; }
+
+    @Override public final int count() {
+        return Layers.size();
+    }
+    @Override public final CXDLPFileLayer get(int index) {
+        return Layers.get(index);
     }
 
-    public final CXDLPFileLayer get(int index) {
-        return layers.get(index);
+    @Override
+    public void add(MSLALayerEncoder<List<CXDLPFileLayerLine>> encoder,
+                    MSLALayerEncodeReader reader,
+                    Map<String, Object> params,
+                    MSLALayerEncoder.Callback<List<CXDLPFileLayerLine>> callback) throws MSLAException
+    {
+        var layerNumber = Layers.size();
+        allocate();
+        logger.finest("Encoding layer " + layerNumber + "...");
+        reader.setReadDirection(MSLALayerEncodeReader.ReadDirection.READ_COLUMN);
+        encoder.encode(layerNumber, reader, params, (layer, data) -> {
+            Layers.get(layerNumber).DataLength = data.sizeInBytes();
+            Layers.get(layerNumber).LayerArea = data.pixels();
+            for (var line : data.data()) Layers.get(layerNumber).addLine(line);
+            if (callback != null) callback.onFinish(layerNumber, data);
+        });
     }
 
-    public final CXDLPFileLayer allocateLayer() {
+    @Override
+    public final CXDLPFileLayer allocate() {
         var layer = new CXDLPFileLayer();
-        layers.add(layer);
+        Layers.add(layer);
         return layer;
     }
 
     public final void writeLayerAreas(OutputStream stream) throws MSLAException {
         var dos = new DataOutputStream(stream);
         try {
-            for (var layer : layers) { dos.writeInt(layer.LayerArea); }
+            for (var layer : Layers) { dos.writeInt(layer.LayerArea); }
             stream.write(0x0d); stream.write(0x0a);
         } catch (IOException e) {
             throw new MSLAException("Can't write layer areas", e);
         }
     }
 
-    public final void encodeLayer(CXDLPFileLayer layer,
-                                MSLALayerEncodeReader reader,
-                                MSLALayerEncoder<List<CXDLPFileLayerLine>> encoders,
-                                  MSLALayerEncoder.Callback<List<CXDLPFileLayerLine>> callback) throws MSLAException
-    {
-        logger.finest("Encoding layer " + layer + "...");
-        reader.setReadDirection(MSLALayerEncodeReader.ReadDirection.READ_COLUMN);
-        var number = layers.indexOf(layer);
-        encoders.encode(number, reader, null, (layerNumber, data) -> {
-            // When encoding is done then fill layer with lines
-            for (var line : data.data()) layer.addLine(line);
-            if (callback != null) callback.onFinish(layerNumber, data);
-        });
-    }
-
-    /**
-     * Decode layer
-     * --------------------------------------------------------------------------------------------------------
-     * Layers stored as a set of lines of particular color, each line consists of 6 bytes - 5 bytes of geometry
-     * and 1 byte of grey shade (0 - black, 0xff - white).
-     */
-    public final boolean decodeLayer(
-            FileInputStream iStream,
-            int layer,
-            MSLALayerDecoder<List<CXDLPFileLayerLine>> decoders,
-            MSLALayerDecodeWriter writer) throws MSLAException
-    {
-        logger.finest("Decoding layer " + layer + "...");
-        var position = layers.get(layer).getDataOffset();
-        var decodedDataLength = layers.get(layer).DataLength;
-        var dis = new DataInputStream(iStream);
-        try {
-            var fc = iStream.getChannel();
-            fc.position(position);
-        } catch (IOException e) {
-            throw new MSLAException("Can't go to layer data position", e);
-        }
-
-        var encodedDataLength = layers.get(layer).DataLength;
-        logger.finest("CXDLP file position " + position +
-                ", data length is " + encodedDataLength +
-                ", expected data length " + decodedDataLength);
-        return decoders.decode(layer, writer, new CXDLPLayerCodec.Input(dis, encodedDataLength), null);
-    }
 }

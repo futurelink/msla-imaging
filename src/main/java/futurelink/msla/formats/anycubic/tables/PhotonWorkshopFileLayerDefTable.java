@@ -6,18 +6,20 @@ import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Delegate;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * "LAYERDEF" section representation.
  */
 @Getter
-public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
-    @Delegate private final Fields fileFields;
+public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
+        implements MSLAFileLayers<PhotonWorkshopFileLayerDefTable.PhotonWorkshopFileLayerDef, byte[]>
+{
+    private final Fields fileFields;
 
     @Getter
     public static class PhotonWorkshopFileLayerDef implements MSLAFileBlockFields {
@@ -50,7 +52,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         private void setTableLength(Integer length) { parent.TableLength = length; }
         @MSLAFileField(order = 2) @Getter private Integer LayerCount;
         @MSLAFileField(order = 3, lengthAt = "LayerCount") private final ArrayList<PhotonWorkshopFileLayerDef> Layers = new ArrayList<>();
-        private final ArrayList<byte[]> layerData = new ArrayList<>();
+        private final ArrayList<byte[]> LayerData = new ArrayList<>();
 
         public Fields(PhotonWorkshopFileTable parent) { this.parent = parent; }
     }
@@ -59,35 +61,6 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         super(versionMajor, versionMinor);
         this.fileFields = new Fields(this);
         this.fileFields.LayerCount = 0;
-    }
-
-    /**
-     * Asynchronously encodes a layer.
-     *
-     * @param def PhotonWorkshopFileLayerDef instance
-     * @param reader MSLAEncodeReader instance
-     * @throws MSLAException if no codec defined or something went wrong
-     */
-    public final void encodeLayer(PhotonWorkshopFileLayerDef def,
-                                  MSLALayerEncodeReader reader,
-                                  MSLALayerEncoder<byte[]> encoders,
-                                  MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException {
-        // Add empty layer
-        var number = fileFields.Layers.size();
-        fileFields.Layers.add(def);
-        fileFields.layerData.add(null);
-        fileFields.LayerCount = fileFields.Layers.size();
-
-        var params = new HashMap<String, Object>();
-        params.put("DecodedDataLength", reader.getSize());
-
-        // Encode layer data
-        encoders.encode(number, reader, params, (layerNumber, data) -> {
-            fileFields.Layers.get(layerNumber).DataLength = data.sizeInBytes();
-            fileFields.Layers.get(layerNumber).NonZeroPixelCount = data.pixels();
-            fileFields.layerData.set(layerNumber, data.data());
-            if (callback != null) callback.onFinish(layerNumber, data);
-        });
     }
 
     /**
@@ -107,7 +80,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
             MSLALayerDecodeWriter writer) throws MSLAException
     {
         try {
-            var input = new PhotonWorkshopCodec.Input(stream.readNBytes(getLayer(layer).DataLength));
+            var input = new PhotonWorkshopCodec.Input(stream.readNBytes(get(layer).DataLength));
             var params = new HashMap<String, Object>();
             params.put("DecodedDataLength", decodedDataLength);
             return decoders.decode(layer, writer, input, params);
@@ -116,42 +89,59 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable {
         }
     }
 
-    /**
-     * Adds raw encoded data layer.
-     * @param def layer definition
-     * @param data bytes
-     */
-    public final void addLayer(PhotonWorkshopFileLayerDef def, byte[] data) throws MSLAException {
-        if ((data != null) && (def != null)) {
-            if (data.length != def.DataLength) throw new MSLAException("DataLength in layer definition does not match data size");
-            fileFields.Layers.add(def);
-            fileFields.layerData.add(data);
-            fileFields.LayerCount = fileFields.Layers.size();
-        }
+    @Override
+    public int count() {
+        return fileFields.getLayerCount();
     }
 
-    /**
-     * Adds raw encoded data layer from InputStream.
-     * @param def layer definition
-     * @param stream stream
-     */
-    @SuppressWarnings("unused")
-    public final void addLayer(PhotonWorkshopFileLayerDef def, InputStream stream) throws MSLAException {
-        if ((stream != null) && (def != null)) {
-            try {
-                addLayer(def, stream.readAllBytes());
-            } catch (IOException e) {
-                throw new MSLAException("Error reading layer", e);
-            }
-        }
-    }
-
-    public final PhotonWorkshopFileLayerDef getLayer(int i) {
+    @Override
+    public final PhotonWorkshopFileLayerDef get(int i) {
         return fileFields.Layers.get(i);
     }
 
+    @Override
+    public PhotonWorkshopFileLayerDef allocate() {
+        var layer = new PhotonWorkshopFileLayerDef();
+        fileFields.Layers.add(layer);
+        fileFields.LayerData.add(null);
+        fileFields.LayerCount = fileFields.Layers.size();
+        return layer;
+    }
+
+    /**
+     * Asynchronously encodes a layer.
+     *
+     * @param encoder encoder object
+     * @param reader MSLAEncodeReader instance
+     * @param params layer codec parameters (encryption key, expected data size etc.)
+     * @throws MSLAException if no codec defined or something went wrong
+     */
+    @Override
+    public void add(MSLALayerEncoder<byte[]> encoder,
+                    MSLALayerEncodeReader reader,
+                    Map<String, Object> params,
+                    MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
+    {
+        var layerNumber = fileFields.Layers.size();
+        var def = allocate();
+
+        /*layer.setLayerHeight(layerHeight);
+        layer.setExposureTime(exposureTime);
+        layer.setLiftSpeed(liftSpeed);
+        layer.setLiftHeight(liftHeight);*/
+
+        // Encode layer data
+        params.put("DecodedDataLength", reader.getSize());
+        encoder.encode(layerNumber, reader, params, (layer, data) -> {
+            fileFields.Layers.get(layerNumber).DataLength = data.sizeInBytes();
+            fileFields.Layers.get(layerNumber).NonZeroPixelCount = data.pixels();
+            fileFields.LayerData.set(layerNumber, data.data());
+            if (callback != null) callback.onFinish(layerNumber, data);
+        });
+    }
+
     public final  byte[] getLayerData(int i) {
-        return fileFields.layerData.get(i);
+        return fileFields.LayerData.get(i);
     }
 
     @Override

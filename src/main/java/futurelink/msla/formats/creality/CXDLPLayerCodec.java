@@ -1,6 +1,7 @@
 package futurelink.msla.formats.creality;
 
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.creality.tables.CXDLPFileLayer;
 import futurelink.msla.formats.creality.tables.CXDLPFileLayerLine;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.tools.BufferedImageInputStream;
@@ -15,21 +16,8 @@ public class CXDLPLayerCodec implements MSLALayerCodec<List<CXDLPFileLayerLine>>
 
     public static class Input implements MSLALayerDecodeInput<List<CXDLPFileLayerLine>> {
         private final List<CXDLPFileLayerLine> data = new LinkedList<>();
-        public Input(DataInputStream stream, int encodedDataSize) throws MSLAException {
-            try {
-                var bytesRead = 0;
-                stream.readInt(); // Skip integer
-                var lineCount = stream.readInt();
-                bytesRead += 8;
-                while (bytesRead < encodedDataSize - 2) { // Minus 2, because there's one extra 2 bytes at the end
-                    this.data.add(CXDLPFileLayerLine.fromByteArray(stream.readNBytes(6)));
-                    bytesRead += 6;
-                    lineCount--;
-                }
-                if (lineCount != 0) throw new MSLAException("Error decoding data, not all " + lineCount + " lines were read");
-            } catch (IOException e) {
-                throw new MSLAException("Error decoding data", e);
-            }
+        public Input(CXDLPFileLayer layer) throws MSLAException {
+            data.addAll(layer.getLines());
         }
 
         @Override public int size() { return data.size(); }
@@ -38,14 +26,18 @@ public class CXDLPLayerCodec implements MSLALayerCodec<List<CXDLPFileLayerLine>>
 
     public static class Output implements MSLALayerEncodeOutput<List<CXDLPFileLayerLine>> {
         private final List<CXDLPFileLayerLine> data = new LinkedList<>();
+        private Integer totalLinesLength = 0;
 
         public Output() {}
         @Override public int size() { return this.data.size(); }
         @Override public int sizeInBytes() { return this.data.size() * 6; }
-        @Override public int pixels() { return 0; }
+        @Override public int pixels() { return totalLinesLength; }
         @Override public void write(List<CXDLPFileLayerLine> data) throws IOException { this.data.addAll(data); }
         @Override public List<CXDLPFileLayerLine> data() { return this.data; }
-        public void writeLine(CXDLPFileLayerLine line) { this.data.add(line); }
+        public void writeLine(CXDLPFileLayerLine line) {
+            this.totalLinesLength += line.getLength();
+            this.data.add(line);
+        }
     }
 
     /**

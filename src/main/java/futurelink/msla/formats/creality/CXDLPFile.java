@@ -11,8 +11,10 @@ import lombok.Getter;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
+    private static final Logger logger = Logger.getLogger(CXDLPFile.class.getName());
     private final FileInputStream iStream;
     @Getter private final MSLAOptionMapper options;
 
@@ -20,7 +22,7 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     @Getter @MSLAOptionContainer private final CXDLPFileSliceInfo SliceInfo;
     @Getter @MSLAOptionContainer private final CXDLPFileSliceInfoV3 SliceInfoV3;
     private final CXDLPFilePreviews Previews = new CXDLPFilePreviews();
-    private final CXDLPFileLayerDef Layers = new CXDLPFileLayerDef();
+    @Getter private final CXDLPFileLayerDef Layers = new CXDLPFileLayerDef();
 
     public CXDLPFile(MSLAFileDefaults defaults) throws MSLAException {
         iStream = null;
@@ -49,7 +51,7 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
 
         // Scan layer data and get layer data lengths and offsets
         // ------------------------------------------------------
-        for (int i = 0; i < Header.getLayerCount(); i++) Layers.allocateLayer();
+        for (int i = 0; i < Header.getLayerCount(); i++) Layers.allocate();
         Layers.read(iStream, position);
     }
 
@@ -71,31 +73,22 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
                          MSLALayerEncoder.Callback<List<CXDLPFileLayerLine>> callback)
             throws MSLAException
     {
-        addLayer(reader, callback, 0, 0, 0, 0);
-    }
-
-    @Override
-    public void addLayer(MSLALayerEncodeReader reader,
-                         MSLALayerEncoder.Callback<List<CXDLPFileLayerLine>> callback,
-                         float layerHeight, float exposureTime, float liftSpeed, float liftHeight)
-            throws MSLAException
-    {
-        var layer = Layers.allocateLayer();
-        Header.setLayerCount(Layers.getLayersCount().shortValue());
-        Layers.encodeLayer(layer, reader, getEncodersPool(), callback);
+        Layers.add(getEncodersPool(), reader, null, callback);
     }
 
     public final CXDLPFileLayer getLayer(int index) { return Layers.get(index); }
 
     @Override
     public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        return Layers.decodeLayer(iStream, layer, getDecodersPool(), writer);
+        logger.finest("Reading layer " + layer + "...");
+        return getDecodersPool().decode(layer, writer, new CXDLPLayerCodec.Input(Layers.get(layer)), null);
     }
 
     @Override
     public void write(OutputStream stream) throws MSLAException {
         if (Header == null) throw new MSLAException("Header is empty, a file cannot be written");
         if (SliceInfo == null) throw new MSLAException("SliceInfo is empty, a file cannot be written");
+        Header.setLayerCount((short) Layers.count());
         Header.write(stream);
         Previews.write(stream);
         SliceInfo.write(stream);
@@ -105,7 +98,6 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     }
 
     @Override public Size getResolution() { return Header.getResolution(); }
-    @Override public int getLayerCount() { return Header.getLayerCount(); }
     @Override public boolean isValid() { return (Header != null) && (SliceInfo != null); }
 
     @Override public String toString() {

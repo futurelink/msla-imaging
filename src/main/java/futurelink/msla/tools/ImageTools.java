@@ -20,7 +20,7 @@ public class ImageTools {
         var wsFile = FileFactory.instance.load(fileName);
         if (wsFile != null) {
             if (wsFile.isValid()) {
-                for (int i = 0; i < wsFile.getLayerCount(); i++)
+                for (int i = 0; i < wsFile.getLayers().count(); i++)
                     // Wait while layer can be read (returns false when busy)
                     while (!wsFile.readLayer(new ImageWriter(wsFile, destinationDir, "png"), i))
                         Thread.sleep(100);

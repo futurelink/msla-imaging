@@ -61,9 +61,9 @@ public interface MSLAFile<T> {
     float getPixelSizeUm();
 
     /**
-     * Returns file layers count.
+     * Returns layers object.
      */
-    int getLayerCount();
+    MSLAFileLayers<?, ?> getLayers();
 
     /**
      * Adds new layer to a file.
@@ -73,20 +73,6 @@ public interface MSLAFile<T> {
     void addLayer(
             MSLALayerEncodeReader reader,
             MSLALayerEncoder.Callback<T> callback) throws MSLAException;
-
-    /**
-     * Adds new layer to a file using {@code MSLAEncodeReader} reader and parameters.
-     * @param reader is {@link MSLALayerEncodeReader} object to be used as data input channel
-     * @param callback is {@link MSLALayerEncoder.Callback} to be executed when encoding is done
-     * @param layerHeight is layer height
-     * @param exposureTime is a time to expose a layer
-     * @param liftSpeed is a lift speed in mm/min after layer was exposed
-     * @param liftHeight is a lift height mm after layer was exposed
-     */
-    void addLayer(
-            MSLALayerEncodeReader reader,
-            MSLALayerEncoder.Callback<T> callback,
-            float layerHeight, float exposureTime, float liftSpeed, float liftHeight) throws MSLAException;
 
     /**
      * Reads layer from a file.

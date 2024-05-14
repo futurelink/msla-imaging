@@ -15,7 +15,6 @@ import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -29,11 +28,11 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     @Getter @MSLAOptionContainer private CTBFileSlicerInfo SlicerInfo = null;
     private CTBFileMachineName MachineName = null;
     private CTBFileDisclaimer Disclaimer = null;
-    private CTBFilePrintParamsV4 PrintParamsV4 = null;
+    @Getter private CTBFilePrintParamsV4 PrintParamsV4 = null;
     private CTBFileResinParams ResinParams = null;
     private final CTBFilePreview PreviewSmall = new CTBFilePreview(CTBFilePreview.Type.Small);
     private final CTBFilePreview PreviewLarge = new CTBFilePreview(CTBFilePreview.Type.Large);
-    private final ArrayList<CTBFileLayerDef> LayerDefinition = new ArrayList<>();
+    @Getter private CTBFileLayers Layers = null;
 
     public CTBFile(MSLAFileDefaults defaults) throws MSLAException {
         super();
@@ -48,6 +47,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
         MachineName = new CTBFileMachineName(defaults);
         PrintParams = new CTBFilePrintParams(Version, defaults);
         SlicerInfo = new CTBFileSlicerInfo(Version, defaults);
+        Layers = new CTBFileLayers(this);
 
         // Version 4 or later data
         if (Header.getFileFields().getVersion() >= 4) {
@@ -75,61 +75,19 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return Header.getFileFields().getResolution(); }
     @Override public float getPixelSizeUm() { return 0; }
-    @Override public int getLayerCount() { return Header.getFileFields().getLayerCount(); }
 
     @Override
     public void addLayer(
             MSLALayerEncodeReader reader,
             MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
     {
-        addLayer(reader, callback, 0, 0, 0, 0);
-    }
-
-    @Override
-    public void addLayer(
-            MSLALayerEncodeReader reader, MSLALayerEncoder.Callback<byte[]> callback,
-            float layerHeight, float exposureTime, float liftSpeed, float liftHeight) throws MSLAException
-    {
-        var layer = new CTBFileLayerDef(Header.getFileFields().getVersion());
-        var layerNumber = LayerDefinition.size();
-        layer.getFileFields().setPositionZ((layerNumber + 1) * Header.getFileFields().getLayerHeightMillimeter());
-        layer.getFileFields().setExposureTime(Header.getFileFields().getLayerExposureSeconds());
-        layer.getFileFields().setLightOffSeconds(PrintParams.getFileFields().getLightOffDelay());
-
-        // Fill in layer overrides with defaults
-        var extra = layer.getFileFields().getExtra();
-        if (extra != null) {
-            var extraFields = extra.getFileFields();
-            extraFields.setLiftHeight(PrintParams.getFileFields().getLiftHeight());
-            extraFields.setLiftSpeed(PrintParams.getFileFields().getLiftSpeed());
-            extraFields.setLiftHeight2(SlicerInfo.getFileFields().getLiftHeight2());
-            extraFields.setLiftSpeed2(SlicerInfo.getFileFields().getLiftSpeed2());
-            extraFields.setRetractSpeed(PrintParams.getFileFields().getRetractSpeed());
-            extraFields.setRetractHeight2(SlicerInfo.getFileFields().getRetractHeight2());
-            extraFields.setRetractSpeed2(SlicerInfo.getFileFields().getRetractSpeed2());
-            if (PrintParamsV4 != null) {
-                extraFields.setRestTimeBeforeLift(PrintParamsV4.getFileFields().getRestTimeBeforeLift());
-                extraFields.setRestTimeAfterLift(PrintParamsV4.getFileFields().getRestTimeAfterLift());
-                extraFields.setRestTimeAfterRetract(PrintParamsV4.getFileFields().getRestTimeAfterRetract());
-            } else {
-                extraFields.setRestTimeBeforeLift(0.0f);
-                extraFields.setRestTimeAfterLift(SlicerInfo.getFileFields().getRestTimeAfterLift());
-                extraFields.setRestTimeAfterRetract(SlicerInfo.getFileFields().getRestTimeAfterRetract());
-            }
-            extraFields.setLightPWM(Header.getFileFields().getLightPWM().floatValue());
-        }
-        LayerDefinition.add(layer);
-
         var params = new HashMap<String, Object>();
         params.put("EncryptionKey", Header.getFileFields().getEncryptionKey());
-        getEncodersPool().encode(layerNumber, reader, params, (ln, data) -> {
-            layer.getFileFields().setData(data.data());
-            if (callback != null) callback.onFinish(ln, data);
-        });
+        Layers.add(getEncodersPool(), reader, params, callback);
     }
 
     @Override public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        var layerData = new CTBFileCodec.Input(LayerDefinition.get(layer).getFileFields().getData());
+        var layerData = new CTBFileCodec.Input(Layers.get(layer).getFileFields().getData());
         var params = new HashMap<String, Object>();
         params.put("EncryptionKey", Header.getFileFields().getEncryptionKey());
         return getDecodersPool().decode(layer, writer, layerData, params);
@@ -196,33 +154,8 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
             var pixels = PreviewSmall.readImage(stream);
         }
 
-        // Read preliminary layer definitions
-        try {
-            logger.info("Reading preliminary layer definitions");
-            var layerDefOffset = Header.getFileFields().getLayersDefinitionOffset();
-            for (int i = 0; i < Header.getFileFields().getLayerCount(); i++) {
-                var layerDef = new CTBFileLayerDef(Header.getFileFields().getVersion());
-                layerDef.setBriefMode(true);
-                LayerDefinition.add(layerDef);
-                var bytesRead = layerDef.read(stream, layerDefOffset);
-                if (bytesRead != layerDef.getDataLength())
-                    throw new MSLAException("Error reading brief layer definition for layer " + i + ": data size mismatch");
-                layerDefOffset += layerDef.getDataLength();
-            }
-        } catch (FileFieldsException e) {
-            throw new MSLAException("Error reading brief layer definition", e);
-        }
-
-        // Read main layer data with definitions & extra layer settings
-        logger.info("Reading layers");
-        for (int i = 0; i < Header.getFileFields().getLayerCount(); i++) {
-            var def = LayerDefinition.get(i);
-            def.setBriefMode(false);
-            var defOffset = def.getFileFields().getDataAddress() - def.getFileFields().getTableSize();
-            var bytesRead = def.read(stream, defOffset);
-            if (bytesRead != def.getFileFields().getDataSize() + def.getFileFields().getTableSize())
-                throw new MSLAException("Error reading layer " + i + ": data size mismatch");
-        }
+        Layers = new CTBFileLayers(this);
+        Layers.read(stream, Header.getFileFields().getLayersDefinitionOffset());
     }
 
     @Override public void write(OutputStream stream) throws MSLAException {
@@ -256,7 +189,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
                 PrintParamsV4.getFileFields().setDisclaimerLength(Disclaimer.getFileFields().getDisclaimer().length());
                 offset += Disclaimer.getDataLength();
                 SlicerInfo.getFileFields().setPrintParametersV4Offset(offset);
-                PrintParamsV4.getFileFields().setLastLayerIndex(LayerDefinition.size()-1);
+                PrintParamsV4.getFileFields().setLastLayerIndex(Layers.count()-1);
                 offset += PrintParamsV4.getDataLength();
                 if (ResinParams != null) {
                     PrintParamsV4.getFileFields().setResinParametersOffset(offset);
@@ -267,8 +200,8 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
             }
 
             Header.getFileFields().setLayersDefinitionOffset(offset);
-            Header.getFileFields().setTotalHeightMillimeter(LayerDefinition.size() * Header.getFileFields().getLayerHeightMillimeter());
-            Header.getFileFields().setLayerCount(LayerDefinition.size());
+            Header.getFileFields().setTotalHeightMillimeter(Layers.count() * Header.getFileFields().getLayerHeightMillimeter());
+            Header.getFileFields().setLayerCount(Layers.count());
             Header.getFileFields().setPrintTime(0);
         } catch (FileFieldsException e) {
             throw new MSLAException("Error writing file fields", e);
@@ -289,8 +222,9 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
 
         try {
             // Write brief layer definitions
-            var wholeBriefLayerDefSize = LayerDefinition.size() * CTBFileLayerDef.BRIEF_TABLE_SIZE;
-            for (var def : LayerDefinition) {
+            var wholeBriefLayerDefSize = Layers.count() * CTBFileLayerDef.BRIEF_TABLE_SIZE;
+            for (var i = 0; i < Layers.count(); i++) {
+                var def = Layers.get(i);
                 def.getFileFields().setDataAddress(wholeBriefLayerDefSize +
                         offset + CTBFileLayerDef.BRIEF_TABLE_SIZE +
                         ((def.getFileFields().getExtra() != null) ? CTBFileLayerDefExtra.TABLE_SIZE : 0)
@@ -307,7 +241,8 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
             }
 
             // Write whole layer definitions
-            for (var def : LayerDefinition) {
+            for (var i = 0; i < Layers.count(); i++) {
+                var def = Layers.get(i);
                 def.setBriefMode(false);
                 def.write(stream);
             }
@@ -335,6 +270,6 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
                 ((ResinParams != null) ? "----- Resin params V4 ----\n" + ResinParams + "\n" : "") +
                 "----- Small preview ----\n" + PreviewSmall + "\n" +
                 "----- Larger preview ----\n" + PreviewLarge + "\n" +
-                LayerDefinition;
+                Layers;
     }
 }

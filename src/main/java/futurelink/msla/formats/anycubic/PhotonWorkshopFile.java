@@ -2,6 +2,7 @@ package futurelink.msla.formats.anycubic;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.HashMap;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
@@ -26,7 +27,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     private PhotonWorkshopFileDescriptor Descriptor;
     @Getter @MSLAOptionContainer private PhotonWorkshopFileHeaderTable Header;
     private PhotonWorkshopFilePreviewTable Preview;
-    private PhotonWorkshopFileLayerDefTable LayerDef;
+    @Getter private PhotonWorkshopFileLayerDefTable Layers;
     private PhotonWorkshopFileSoftwareTable Software;
     @Getter @MSLAOptionContainer private PhotonWorkshopFileExtraTable Extra;
     @Getter @MSLAOptionContainer private PhotonWorkshopFileMachineTable Machine;
@@ -40,7 +41,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         Machine = new PhotonWorkshopFileMachineTable(defaults, VersionMajor, VersionMinor);
         Preview = new PhotonWorkshopFilePreviewTable(VersionMajor, VersionMinor);
         Software = new PhotonWorkshopFileSoftwareTable(VersionMajor, VersionMinor);
-        LayerDef = new PhotonWorkshopFileLayerDefTable(VersionMajor, VersionMinor);
+        Layers = new PhotonWorkshopFileLayerDefTable(VersionMajor, VersionMinor);
         if ((VersionMajor >= 2) && (VersionMinor >= 4)) {
             Extra = new PhotonWorkshopFileExtraTable(defaults, VersionMajor, VersionMinor);
         }
@@ -60,11 +61,8 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     @Override public float getPixelSizeUm() {
         return Header.getPixelSizeUm();
     }
-    @Override public int getLayerCount() {
-        return LayerDef.getLayerCount();
-    }
     @Override public boolean isValid() {
-        return (Header != null) && (LayerDef != null);
+        return (Header != null) && (Layers != null);
     }
 
     @Override
@@ -104,8 +102,8 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         }
 
         if (Descriptor.getFields().getLayerDefinitionAddress() > 0) {
-            LayerDef = new PhotonWorkshopFileLayerDefTable(Descriptor.getVersionMajor(), Descriptor.getVersionMinor());
-            LayerDef.read(stream, Descriptor.getFields().getLayerDefinitionAddress());
+            Layers = new PhotonWorkshopFileLayerDefTable(Descriptor.getVersionMajor(), Descriptor.getVersionMinor());
+            Layers.read(stream, Descriptor.getFields().getLayerDefinitionAddress());
         } else throw new MSLAException("No layer definition section found!");
 
         if (Descriptor.getFields().getExtraAddress() > 0) {
@@ -122,12 +120,12 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     @Override
     public final boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
         if (writer == null) throw new MSLAException("Writer is not specified");
-        if (LayerDef == null) throw new MSLAException("LayerDef does not exist in a file");
+        if (Layers == null) throw new MSLAException("LayerDef does not exist in a file");
         if (Header == null) throw new MSLAException("Header was not defined");
 
-        if (layer > LayerDef.getLayerCount()) throw new MSLAException("Layer is out of range");
-        var address = LayerDef.getLayer(layer).getDataAddress();
-        var length = LayerDef.getLayer(layer).getDataLength();
+        if (layer > Layers.count()) throw new MSLAException("Layer is out of range");
+        var address = Layers.get(layer).getDataAddress();
+        var length = Layers.get(layer).getDataLength();
         if ((address == 0) || (length == 0)) throw new MSLAException("Invalid layer data in Layer definition table");
 
         // Go to data position
@@ -139,7 +137,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         }
 
         // Decode layer using codec
-        return LayerDef.decodeLayer(layer, new DataInputStream(iStream),
+        return Layers.decodeLayer(layer, new DataInputStream(iStream),
                 Header.getResolution().length(), getDecodersPool(), writer);
     }
 
@@ -149,48 +147,16 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     @Override
     public final void addLayer(
             MSLALayerEncodeReader reader,
-            MSLALayerEncoder.Callback<byte[]> callback,
-            float layerHeight, float exposureTime, float liftSpeed, float liftHeight) throws MSLAException
-    {
-        if (LayerDef == null) throw new MSLAException("LayerDef table does not exist!");
-
-        var layer = new PhotonWorkshopFileLayerDefTable.PhotonWorkshopFileLayerDef();
-        layer.setLayerHeight(layerHeight);
-        layer.setExposureTime(exposureTime);
-        layer.setLiftSpeed(liftSpeed);
-        layer.setLiftHeight(liftHeight);
-
-        LayerDef.encodeLayer(layer, reader, getEncodersPool(), callback);
-    }
-
-    @Override
-    public final void addLayer(
-            MSLALayerEncodeReader reader,
             MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
     {
-        if ((LayerDef == null) || (Header == null)) throw new MSLAException("Ho LayerDef or Header created");
-
-        var layerNumber = LayerDef.getLayerCount() + 1;
-        float layerHeight, exposureTime, liftSpeed, liftHeight;
-        if (layerNumber < Header.getBottomLayersCount()) {
-            layerHeight = Header.getLayerHeight();
-            exposureTime = Header.getBottomExposureTime();
-            liftSpeed = Header.getLiftSpeed();
-            liftHeight = Header.getLiftHeight();
-        } else {
-            layerHeight = Header.getLayerHeight();
-            exposureTime = Header.getExposureTime();
-            liftSpeed = Header.getLiftSpeed();
-            liftHeight = Header.getLiftHeight();
-        }
-
-        addLayer(reader, callback, layerHeight, exposureTime, liftSpeed, liftHeight);
+        if ((Layers == null) || (Header == null)) throw new MSLAException("Ho LayerDef or Header created");
+        Layers.add(getEncodersPool(), reader, new HashMap<>(), callback);
     }
 
     @Override
     public final void write(OutputStream stream) throws MSLAException {
         if (Header == null) throw new MSLAException("Header is empty, a file cannot be written");
-        if (LayerDef == null) throw new MSLAException("LayerDef is empty, a file cannot be written");
+        if (Layers == null) throw new MSLAException("LayerDef is empty, a file cannot be written");
 
         var oStream = new LittleEndianDataOutputStream(stream);
 
@@ -216,7 +182,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
             }
 
             Descriptor.getFields().setLayerDefinitionAddress(offset);
-            offset += LayerDef.getDataLength();
+            offset += Layers.getDataLength();
 
             if (Extra != null) {
                 Descriptor.getFields().setExtraAddress(offset);
@@ -236,9 +202,9 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         /*
          * Calculate layer data offsets
          */
-        for (int i = 0; i < LayerDef.getLayerCount(); i++) {
-            LayerDef.getLayer(i).setDataAddress(offset);
-            offset += LayerDef.getLayer(i).getDataLength();
+        for (int i = 0; i < Layers.count(); i++) {
+            Layers.get(i).setDataAddress(offset);
+            offset += Layers.get(i).getDataLength();
         }
 
         // Write descriptor
@@ -250,7 +216,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         Header.write(oStream);
         if (Software != null) Software.write(oStream);
         if (Preview != null) Preview.write(oStream);
-        LayerDef.write(oStream);
+        Layers.write(oStream);
         if (Extra != null) Extra.write(oStream);
         if (Machine != null) Machine.write(oStream);
 
@@ -258,8 +224,8 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
          * Write layers
          */
         try {
-            for (int i = 0; i < LayerDef.getLayerCount(); i++) {
-                oStream.write(LayerDef.getLayerData(i));
+            for (int i = 0; i < Layers.count(); i++) {
+                oStream.write(Layers.getLayerData(i));
             }
         } catch (IOException e) {
             throw new MSLAException("Can't write layer data", e);
@@ -272,7 +238,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
                 "Descriptor:\n" + Descriptor +
                 "Header:\n" + Header +
                 "Preview:\n" + Preview +
-                "LayerDef:\n" + LayerDef +
+                "LayerDef:\n" + Layers +
                 "Software:\n" + Software +
                 "Extra:\n" + Extra +
                 "Machine:\n" + Machine;

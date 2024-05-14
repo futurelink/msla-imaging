@@ -3,6 +3,7 @@ package futurelink.msla.formats;
 import futurelink.msla.formats.iface.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +16,7 @@ public final class MSLALayerEncoders<D> extends ThreadPoolExecutor implements MS
     private final Class<? extends MSLALayerCodec<D>> codec;
     private static final Map<UUID, MSLALayerEncoders<?>> instances = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger();
+    private final Map<String, Object> params = new HashMap<>();
 
     public static synchronized <T> MSLALayerEncoders<?> getInstance(MSLAFile<T> file) throws MSLAException {
         var uuid = file.getUUID();

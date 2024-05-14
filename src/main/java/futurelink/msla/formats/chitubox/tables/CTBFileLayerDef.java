@@ -1,5 +1,6 @@
 package futurelink.msla.formats.chitubox.tables;
 
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.utils.FileFieldsException;
@@ -50,8 +51,9 @@ public class CTBFileLayerDef extends CTBFileBlock {
         }
     }
 
-    public CTBFileLayerDef(int version) {
+    public CTBFileLayerDef(int version) throws MSLAException {
         super(version);
+        if (version <= 0) throw new MSLAException("Can't allocate a layer, version is not set");
         fileFields = new Fields(this);
         fileFields.TableSize = BRIEF_TABLE_SIZE;
         if (version >= 3) {

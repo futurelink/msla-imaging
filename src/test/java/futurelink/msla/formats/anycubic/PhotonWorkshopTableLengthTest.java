@@ -56,7 +56,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
     void LayerDefTableTest() throws FileFieldsException, MSLAException {
         // Test empty layer definition table
         var block = new PhotonWorkshopFileLayerDefTable((byte) 2, (byte) 0);
-        block.addLayer(new PhotonWorkshopFileLayerDefTable.PhotonWorkshopFileLayerDef(), new byte[]{});
+        block.allocate();
         var length = FileFieldsIO.getBlockLength(block);
         assertEquals(52, length);
         System.out.println(block.calculateTableLength());

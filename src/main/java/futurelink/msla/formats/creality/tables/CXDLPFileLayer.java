@@ -40,7 +40,7 @@ public class CXDLPFileLayer {
 
     @Override
     public String toString() {
-        return "ChituBoxDLPFileLayer { " +
+        return "CXDLPFileLayer { " +
                 "DataOffset=" + DataOffset +
                 ", DataLength=" + DataLength +
                 ", LayerArea=" + LayerArea +
