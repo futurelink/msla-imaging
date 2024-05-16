@@ -16,7 +16,7 @@ public class CXDLPLayerCodec implements MSLALayerCodec<List<CXDLPFileLayerLine>>
 
     public static class Input implements MSLALayerDecodeInput<List<CXDLPFileLayerLine>> {
         private final List<CXDLPFileLayerLine> data = new LinkedList<>();
-        public Input(CXDLPFileLayer layer) throws MSLAException {
+        public Input(CXDLPFileLayer layer) {
             data.addAll(layer.getLines());
         }
 

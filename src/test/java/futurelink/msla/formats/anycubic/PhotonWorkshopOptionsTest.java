@@ -12,7 +12,7 @@ public class PhotonWorkshopOptionsTest extends CommonTestRoutines {
     @Test
     void AvailableOptionsTest() throws MSLAException {
         var file = FileFactory.instance.create("Anycubic Photon Mono X 6K");
-        var options = file.getOptions().getOptions();
+        var options = file.getOptions().available();
         logger.info(options.toString());
         assertEquals("Transition layer type", options.toArray()[4]);
     }

@@ -1,6 +1,7 @@
 package futurelink.msla.formats.chitubox.tables;
 
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.chitubox.CTBFile;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileLayers;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFileLayerDef, byte[]> {
+public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFileLayerDef.Fields, byte[]> {
     private final CTBFile parent;
     private final Logger logger = Logger.getLogger(CTBFileLayers.class.getName());
     private final ArrayList<CTBFileLayerDef> LayerDefinition = new ArrayList<>();
@@ -23,21 +24,19 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
         this.parent = parent;
     }
 
-    @Override
-    public int count() {
+    @Override public MSLAOptionMapper options(int layerNumber) { return LayerDefinition.get(layerNumber).options(); }
+    @Override public int count() {
         return LayerDefinition.size();
     }
-
-    @Override
-    public CTBFileLayerDef get(int index) {
-        return LayerDefinition.get(index);
+    @Override public CTBFileLayerDef.Fields get(int index) {
+        return LayerDefinition.get(index).getFileFields();
     }
 
     @Override
-    public CTBFileLayerDef allocate() throws MSLAException {
+    public CTBFileLayerDef.Fields allocate() throws MSLAException {
         var layer = new CTBFileLayerDef(getVersion());
         LayerDefinition.add(layer);
-        return layer;
+        return layer.getFileFields();
     }
 
     @Override
@@ -48,12 +47,12 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
     {
         var layerNumber = count();
         var layer = allocate();
-        layer.getFileFields().setPositionZ((layerNumber + 1) * parent.getHeader().getFileFields().getLayerHeightMillimeter());
-        layer.getFileFields().setExposureTime(parent.getHeader().getFileFields().getLayerExposureSeconds());
-        layer.getFileFields().setLightOffSeconds(parent.getHeader().getFileFields().getLightOffDelay());
+        layer.setPositionZ((layerNumber + 1) * parent.getHeader().getFileFields().getLayerHeightMillimeter());
+        layer.setExposureTime(parent.getHeader().getFileFields().getLayerExposureSeconds());
+        layer.setLightOffSeconds(parent.getHeader().getFileFields().getLightOffDelay());
 
         // Fill in layer overrides with defaults
-        var extra = layer.getFileFields().getExtra();
+        var extra = layer.getExtra();
         if (extra != null) {
             var extraFields = extra.getFileFields();
             extraFields.setLiftHeight(parent.getPrintParams().getFileFields().getLiftHeight());
@@ -76,7 +75,7 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
         }
 
         encoder.encode(layerNumber, reader, params, (ln, data) -> {
-            layer.getFileFields().setData(data.data());
+            layer.setData(data.data());
             if (callback != null) callback.onFinish(ln, data);
         });
     }
@@ -89,11 +88,11 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
             logger.info("Reading preliminary layer definitions");
             for (int i = 0; i < parent.getHeader().getFileFields().getLayerCount(); i++) {
                 var layerDef = allocate();
-                layerDef.setBriefMode(true);
-                var len = layerDef.read(stream, position);
-                if (len != layerDef.getDataLength())
+                layerDef.getParent().setBriefMode(true);
+                var len = layerDef.getParent().read(stream, position);
+                if (len != layerDef.getParent().getDataLength())
                     throw new MSLAException("Error reading brief layer definition for layer " + i + ": data size mismatch");
-                position += layerDef.getDataLength();
+                position += layerDef.getParent().getDataLength();
                 bytesRead += len;
             }
         } catch (FileFieldsException e) {

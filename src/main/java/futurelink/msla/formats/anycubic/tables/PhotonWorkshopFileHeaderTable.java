@@ -53,10 +53,10 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         private void setResolutionX(Integer width) { Resolution = new Size(width, Resolution.getHeight()); }
         @MSLAFileField(order = 14) private Integer ResolutionY() { return Resolution.getHeight(); }
         private void setResolutionY(Integer height) { Resolution = new Size(Resolution.getWidth(), height); }
-        @MSLAFileField(order = 15) @MSLAOption("Weight") private Float WeightG = 0.0F;
-        @MSLAFileField(order = 16) @MSLAOption("Price") private Float Price = 0.0F;
-        @MSLAFileField(order = 17) @MSLAOption("Currency") private Integer PriceCurrencySymbol; /// 24 00 00 00 $ or ¥ C2 A5 00 00 or € = E2 82 AC 00
-        @MSLAFileField(order = 18) @MSLAOption("Layer overrides") private Integer PerLayerOverride = 0; // boolean (80 - true, 00 - false)
+        @MSLAFileField(order = 15) @MSLAOption(MSLAOption.Weight) private Float WeightG = 0.0F;
+        @MSLAFileField(order = 16) @MSLAOption(MSLAOption.Price) private Float Price = 0.0F;
+        @MSLAFileField(order = 17) @MSLAOption(MSLAOption.Currency) private Integer PriceCurrencySymbol; /// 24 00 00 00 $ or ¥ C2 A5 00 00 or € = E2 82 AC 00
+        @MSLAFileField(order = 18) @MSLAOption(MSLAOption.LayerOverrides) private Integer PerLayerOverride = 0; // boolean (80 - true, 00 - false)
         @MSLAFileField(order = 19) @MSLAOption("Print time") private Integer PrintTime = 0;
 
         /* Version 2.4 fields */
@@ -65,7 +65,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         @MSLAFileField(order = 22) @MSLAOption("Advanced mode") private Integer AdvancedMode = 0; /// 0 = Basic mode | 1 = Advanced mode which allows TSMC
 
         /* Version 2.5 fields */
-        @MSLAFileField(order = 23) @MSLAOption("Grey level") private Short Grey = 0;
+        @MSLAFileField(order = 23) @MSLAOption(MSLAOption.Grey) private Short Grey = 0;
         @MSLAFileField(order = 24) @MSLAOption(MSLAOption.BlurLevel) private Short BlurLevel = 0;
         @MSLAFileField(order = 25) @MSLAOption("Resin type") private Integer ResinType = 0;
 

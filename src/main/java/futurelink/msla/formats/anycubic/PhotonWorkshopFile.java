@@ -11,7 +11,7 @@ import futurelink.msla.formats.anycubic.tables.*;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.OptionMapper;
+import futurelink.msla.formats.utils.FileOptionMapper;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
@@ -45,7 +45,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         if ((VersionMajor >= 2) && (VersionMinor >= 4)) {
             Extra = new PhotonWorkshopFileExtraTable(defaults, VersionMajor, VersionMinor);
         }
-        options = new OptionMapper(this);
+        options = new FileOptionMapper(this);
         initCodec();
     }
 
@@ -53,7 +53,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         super();
         iStream = stream;
         readTables(iStream);
-        options = new OptionMapper(this);
+        options = new FileOptionMapper(this);
         initCodec();
     }
 

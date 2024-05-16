@@ -7,7 +7,7 @@ import futurelink.msla.formats.chitubox.tables.*;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.OptionMapper;
+import futurelink.msla.formats.utils.FileOptionMapper;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
@@ -58,13 +58,13 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
             if (Header.getFileFields().getVersion() >= 5) ResinParams = new CTBFileResinParams(Version);
         }
 
-        options = new OptionMapper(this);
+        options = new FileOptionMapper(this);
     }
 
     public CTBFile(FileInputStream stream) throws IOException, MSLAException {
         super();
         read(stream);
-        options = new OptionMapper(this);
+        options = new FileOptionMapper(this);
     }
 
     @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return CTBFileCodec.class; }
@@ -87,13 +87,14 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     }
 
     @Override public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        var layerData = new CTBFileCodec.Input(Layers.get(layer).getFileFields().getData());
+        var layerData = new CTBFileCodec.Input(Layers.get(layer).getData());
         var params = new HashMap<String, Object>();
         params.put("EncryptionKey", Header.getFileFields().getEncryptionKey());
         return getDecodersPool().decode(layer, writer, layerData, params);
     }
 
     /* Internal read method */
+    @SuppressWarnings("unused")
     private void read(FileInputStream stream) throws MSLAException {
         Header = new CTBFileHeader(0); // Version is going to be read from file
         Header.read(stream, 0);
@@ -225,26 +226,26 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
             var wholeBriefLayerDefSize = Layers.count() * CTBFileLayerDef.BRIEF_TABLE_SIZE;
             for (var i = 0; i < Layers.count(); i++) {
                 var def = Layers.get(i);
-                def.getFileFields().setDataAddress(wholeBriefLayerDefSize +
+                def.setDataAddress(wholeBriefLayerDefSize +
                         offset + CTBFileLayerDef.BRIEF_TABLE_SIZE +
-                        ((def.getFileFields().getExtra() != null) ? CTBFileLayerDefExtra.TABLE_SIZE : 0)
+                        ((def.getExtra() != null) ? CTBFileLayerDefExtra.TABLE_SIZE : 0)
                 );
-                def.getFileFields().setDataSize(def.getFileFields().getData().length);
-                def.setBriefMode(false); // Calculate data length for the whole block with Data & Extra
-                var dataLength = def.getDataLength();
-                var extra = def.getFileFields().getExtra();
+                def.setDataSize(def.getData().length);
+                def.getParent().setBriefMode(false); // Calculate data length for the whole block with Data & Extra
+                var dataLength = def.getParent().getDataLength();
+                var extra = def.getParent().getFileFields().getExtra();
                 if (extra != null) extra.getFileFields().setTotalSize(dataLength);
-                def.setBriefMode(true); // Write just in brief mode w/o Data & Extra
-                def.write(stream);
-                def.setBriefMode(false);
+                def.getParent().setBriefMode(true); // Write just in brief mode w/o Data & Extra
+                def.getParent().write(stream);
+                def.getParent().setBriefMode(false);
                 offset += dataLength;
             }
 
             // Write whole layer definitions
             for (var i = 0; i < Layers.count(); i++) {
                 var def = Layers.get(i);
-                def.setBriefMode(false);
-                def.write(stream);
+                def.getParent().setBriefMode(false);
+                def.getParent().write(stream);
             }
         } catch (FileFieldsException e) {
             throw new MSLAException("Error writing file fields", e);

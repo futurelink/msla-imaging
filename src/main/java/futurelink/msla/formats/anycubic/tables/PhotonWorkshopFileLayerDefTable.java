@@ -4,6 +4,8 @@ import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.PhotonWorkshopCodec;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.utils.LayerOptionMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +17,7 @@ import java.util.Map;
 /**
  * "LAYERDEF" section representation.
  */
+
 @Getter
 public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         implements MSLAFileLayers<PhotonWorkshopFileLayerDefTable.PhotonWorkshopFileLayerDef, byte[]>
@@ -25,10 +28,10 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
     public static class PhotonWorkshopFileLayerDef implements MSLAFileBlockFields {
         @MSLAFileField @Setter private Integer DataAddress = 0;
         @MSLAFileField(order = 1) private Integer DataLength = 0;
-        @MSLAFileField(order = 2) @Setter private Float LiftHeight = 0.0f;
-        @MSLAFileField(order = 3) @Setter private Float LiftSpeed = 0.0f;
-        @MSLAFileField(order = 4) @Setter private Float ExposureTime = 0.0f;
-        @MSLAFileField(order = 5) @Setter private Float LayerHeight = 0.0f;
+        @MSLAFileField(order = 2) @MSLAOption(MSLAOption.LiftHeight) @Setter private Float LiftHeight = 0.0f;
+        @MSLAFileField(order = 3) @MSLAOption(MSLAOption.LiftSpeed) @Setter private Float LiftSpeed = 0.0f;
+        @MSLAFileField(order = 4) @MSLAOption(MSLAOption.ExposureTime) @Setter private Float ExposureTime = 0.0f;
+        @MSLAFileField(order = 5) @MSLAOption(MSLAOption.LayerHeight) @Setter private Float LayerHeight = 0.0f;
         @MSLAFileField(order = 6) private Integer NonZeroPixelCount = 0;
         @MSLAFileField(order = 7) private final Integer Padding1 = 0;
 
@@ -39,8 +42,9 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
     }
 
     @SuppressWarnings("unused")
-    static class Fields implements MSLAFileBlockFields {
+    static class Fields implements MSLAFileBlockFields, MSLAFileLayer {
         private final PhotonWorkshopFileTable parent;
+        private final MSLAOptionMapper optionMapper;
 
         @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return "LAYERDEF"; }
         // Validation setter checks for what's been read from file
@@ -54,7 +58,11 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         @MSLAFileField(order = 3, lengthAt = "LayerCount") private final ArrayList<PhotonWorkshopFileLayerDef> Layers = new ArrayList<>();
         private final ArrayList<byte[]> LayerData = new ArrayList<>();
 
-        public Fields(PhotonWorkshopFileTable parent) { this.parent = parent; }
+        public Fields(PhotonWorkshopFileTable parent) {
+            this.parent = parent;
+            this.optionMapper = new LayerOptionMapper(this);
+        }
+        @Override public MSLAOptionMapper options() { return optionMapper; }
     }
 
     public PhotonWorkshopFileLayerDefTable(byte versionMajor, byte versionMinor) {
@@ -62,6 +70,8 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         this.fileFields = new Fields(this);
         this.fileFields.LayerCount = 0;
     }
+
+    @Override public MSLAOptionMapper options(int layerNumber) { return fileFields.options(); }
 
     /**
      * Asynchronously decodes a layer.
@@ -123,12 +133,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
                     MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
     {
         var layerNumber = fileFields.Layers.size();
-        var def = allocate();
-
-        /*layer.setLayerHeight(layerHeight);
-        layer.setExposureTime(exposureTime);
-        layer.setLiftSpeed(liftSpeed);
-        layer.setLiftHeight(liftHeight);*/
+        allocate();
 
         // Encode layer data
         params.put("DecodedDataLength", reader.getSize());

@@ -3,6 +3,8 @@ package futurelink.msla.formats;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -14,11 +16,18 @@ public abstract class MSLAOptionMapper {
 
     @Getter
     public static class Option {
+        private final String name;
         private final Class<?> optionClass;
-        private final String location;
-        public Option(Class<?> optionsClass, String location) {
+        private final List<String> location;
+        public Option(String name, Class<?> optionsClass, List<String> location) {
+            this.name = name;
             this.optionClass = optionsClass;
-            this.location = location;
+            this.location = new LinkedList<>(location);
+        }
+
+        @Override
+        public String toString() {
+            return "{ '" + name + "' of type " + this.optionClass.getName() + " at '" + this.location + "' }";
         }
     }
 
@@ -26,61 +35,29 @@ public abstract class MSLAOptionMapper {
      * Gets option type.
      * @param option option name
      */
-    public abstract Class<?> getType(String option);
-
-    /* File options */
+    abstract public Class<?> getType(String option);
     abstract protected boolean hasOption(String option, Class<? extends Serializable> aClass);
     abstract protected void populateOption(String option, Serializable value) throws MSLAException;
     abstract protected Serializable fetchOption(String option) throws MSLAException;
 
-    /* Layer options */
-    abstract protected boolean hasLayerOption(String option, Class<? extends Serializable> aClass);
-    abstract protected void populateLayerOption(String option, int layer, Serializable value);
-    abstract protected Serializable fetchLayerOption(String option, int layer);
-
     /**
      * Lists all available options
      */
-    abstract public Set<String> getOptions();
-
-    /**
-     * Lists all available layer options
-     */
-    abstract public Set<String> getLayerOptions();
+    abstract public Set<String> available();
 
     public final void set(String option, Serializable value) throws MSLAException {
         if (value == null) {
-            if (!hasOption(option, null)) throw new MSLAException("Option '" + option + "' is not available");
-            populateOption(option, null);
+            if (hasOption(option, null)) populateOption(option, null);
+            else throw new MSLAException("Option '" + option + "' is not available");
         } else {
-            if (!hasOption(option, value.getClass())) {
-                if (!hasOption(option, null)) {
-                    throw new MSLAException("Option '" + option + "' is not available at all");
-                } else {
-                    populateOption(option, value);
-                }
-            }
+            if (hasOption(option, value.getClass())) populateOption(option, value);
+            else if (hasOption(option, null)) populateOption(option, value);
+            else throw new MSLAException("Option '" + option + "' is not available");
         }
     }
 
     public final Serializable get(String option) throws MSLAException {
         if (!hasOption(option, null)) throw new MSLAException("Option '" + option + "' is not available");
         return fetchOption(option);
-    }
-
-    public final void setLayerOption(String option, int layer, Serializable value) throws MSLAException {
-        if (value == null) {
-            if (hasOption(option, null)) {
-                populateLayerOption(option, layer, null);
-            } else {
-                throw new MSLAException("Layer option '" + option + "' is not available");
-            }
-        } else {
-            if (hasOption(option, value.getClass())) {
-                populateLayerOption(option, layer, value);
-            } else {
-                throw new MSLAException("Layer option '" + option + "' of type " + value.getClass() + " is not available");
-            }
-        }
     }
 }

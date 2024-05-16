@@ -4,7 +4,7 @@ import futurelink.msla.formats.*;
 import futurelink.msla.formats.creality.tables.*;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.formats.utils.OptionMapper;
+import futurelink.msla.formats.utils.FileOptionMapper;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
@@ -29,7 +29,7 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
         Header = new CXDLPFileHeader(defaults);
         SliceInfo = new CXDLPFileSliceInfo(defaults);
         SliceInfoV3 = new CXDLPFileSliceInfoV3(defaults);
-        options = new OptionMapper(this);
+        options = new FileOptionMapper(this);
     }
 
     public CXDLPFile(FileInputStream stream) throws MSLAException {
@@ -38,7 +38,7 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
         Header = new CXDLPFileHeader();
         SliceInfo = new CXDLPFileSliceInfo();
         SliceInfoV3 = new CXDLPFileSliceInfoV3();
-        options = new OptionMapper(this);
+        options = new FileOptionMapper(this);
         Header.read(iStream, position); position += Header.getDataLength();
         Previews.read(iStream, position); position += Previews.getDataLength();
         SliceInfo.read(iStream, position); position += SliceInfo.getDataLength();

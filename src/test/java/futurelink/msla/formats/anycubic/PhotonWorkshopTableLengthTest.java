@@ -1,7 +1,6 @@
 package futurelink.msla.formats.anycubic;
 
 import futurelink.msla.formats.CommonTestRoutines;
-import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.anycubic.tables.*;
 import futurelink.msla.formats.utils.FileFieldsException;
 import futurelink.msla.formats.utils.FileFieldsIO;

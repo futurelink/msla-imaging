@@ -3,7 +3,7 @@ package futurelink.msla.formats.chitubox;
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.utils.FileFactory;
-import futurelink.msla.formats.utils.OptionMapper;
+import futurelink.msla.formats.utils.FileOptionMapper;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
 import org.junit.jupiter.api.Test;
@@ -130,7 +130,7 @@ public class CTBFileTest extends CommonTestRoutines {
         var file = (CTBFile) FileFactory.instance.create("ELEGOO Saturn");
         assertTrue(file.isValid());
 
-        var mapper = new OptionMapper(file);
+        var mapper = new FileOptionMapper(file);
         assertEquals(70.0f, mapper.fetchOption("Normal layers lift speed"));
         assertEquals(0.0f, mapper.fetchOption("Bottom layers light off delay"));
 

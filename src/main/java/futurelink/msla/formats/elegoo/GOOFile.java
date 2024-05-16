@@ -8,7 +8,7 @@ import futurelink.msla.formats.elegoo.tables.GOOFileHeader;
 import futurelink.msla.formats.elegoo.tables.GOOFileLayers;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.formats.utils.OptionMapper;
+import futurelink.msla.formats.utils.FileOptionMapper;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
@@ -28,14 +28,14 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     public GOOFile(MSLAFileDefaults defaults) throws MSLAException {
         super();
         Header = new GOOFileHeader(defaults);
-        options = new OptionMapper(this);
+        options = new FileOptionMapper(this);
     }
 
     public GOOFile(FileInputStream stream) throws IOException, MSLAException {
         super();
         Header = new GOOFileHeader();
         readTables(stream);
-        options = new OptionMapper(this);
+        options = new FileOptionMapper(this);
     }
 
     private void readTables(FileInputStream input) throws MSLAException {

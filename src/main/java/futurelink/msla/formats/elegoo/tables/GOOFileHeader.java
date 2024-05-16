@@ -83,12 +83,12 @@ public class GOOFileHeader extends GOOFileTable {
 
         @MSLAFileField(order = 48) @MSLAOption("Bottom layers PWM") short BottomLightPWM = DefaultBottomLightPWM;
         @MSLAFileField(order = 49) @MSLAOption("Normal layers PWM") short LightPWM = DefaultLightPWM;
-        @MSLAFileField(order = 50) @MSLAOption boolean PerLayerSettings; // 0: Normal mode, 1: Advance mode, printing use the value of "Layer Definition Content"
-        @MSLAFileField(order = 51) int PrintTime;
-        @MSLAFileField(order = 52) float Volume; // The volume of all parts. unit: mm3
-        @MSLAFileField(order = 53) float MaterialGrams; // The weight of all parts. unit: g
-        @MSLAFileField(order = 54) @MSLAOption float MaterialCost;
-        @MSLAFileField(length = 8, order = 55) @MSLAOption String PriceCurrencySymbol = "$"; // 8 bytes
+        @MSLAFileField(order = 50) @MSLAOption(MSLAOption.LayerOverrides) boolean PerLayerSettings; // 0: Normal mode, 1: Advance mode, printing use the value of "Layer Definition Content"
+        @MSLAFileField(order = 51) @MSLAOption("Print time") int PrintTime;
+        @MSLAFileField(order = 52) @MSLAOption(MSLAOption.Volume) float Volume; // The volume of all parts. unit: mm3
+        @MSLAFileField(order = 53) @MSLAOption(MSLAOption.Weight) float MaterialGrams; // The weight of all parts. unit: g
+        @MSLAFileField(order = 54) @MSLAOption(MSLAOption.Price) float MaterialCost;
+        @MSLAFileField(length = 8, order = 55) @MSLAOption(MSLAOption.Currency) String PriceCurrencySymbol = "$"; // 8 bytes
         @MSLAFileField(order = 56) int LayerDefAddress; // Always after the header at 195477
         @MSLAFileField(order = 57) byte GrayScaleLevel = 1; // 0：The range of pixel's gray value is from 0x0 ~ 0xf, 1：The range of pixel's gray value is from 0x0 ~ 0xff
         @MSLAFileField(order = 58) @MSLAOption("Transition layers count") short TransitionLayerCount;
