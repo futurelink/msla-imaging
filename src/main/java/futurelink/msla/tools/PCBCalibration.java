@@ -50,16 +50,6 @@ public class PCBCalibration {
         }
     }
 
-    public static void setOptionFromString(MSLAFile<?> file, String optionName, String value) throws MSLAException {
-        var optionType = file.getOptions().getType(optionName);
-        if (optionType == Integer.class) file.getOptions().set(optionName, Integer.parseInt(value));
-        if (optionType == Float.class) file.getOptions().set(optionName, Float.parseFloat(value));
-        if (optionType == Double.class) file.getOptions().set(optionName, Double.parseDouble(value));
-        if (optionType == Short.class) file.getOptions().set(optionName, Short.parseShort(value));
-        if (optionType == Byte.class) file.getOptions().set(optionName, Byte.parseByte(value));
-        if (optionType == Character.class) file.getOptions().set(optionName, value.toCharArray()[0]);
-    }
-
     /**
      * Creates a PCB photo resistive film calibration pattern.
      *
@@ -88,10 +78,10 @@ public class PCBCalibration {
                 filePath + "." + defaults.getFileExtension();
         try (var fos = new FileOutputStream(filePath)) {
             // Set options
-            setOptionFromString(wsFile, "Bottom layers count", "1");
-            setOptionFromString(wsFile, "Bottom layers exposure time", String.valueOf(startTime));
-            setOptionFromString(wsFile, "Exposure time", String.valueOf(interval));
-            setOptionFromString(wsFile, "Lift height", "1");
+            wsFile.getOptions().set("Bottom layers count", "1");
+            wsFile.getOptions().set("Bottom layers exposure time", String.valueOf(startTime));
+            wsFile.getOptions().set("Normal layers exposure time", String.valueOf(interval));
+            wsFile.getOptions().set("Normal layers lift height", "1");
 
             //wsFile.setOption("PerLayerOverride", 0);
             //wsFile.setOption("TransitionLayerCount", 0);

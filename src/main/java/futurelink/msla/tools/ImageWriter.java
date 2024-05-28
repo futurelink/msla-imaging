@@ -87,10 +87,10 @@ public class ImageWriter implements MSLALayerDecodeWriter {
         if (callback != null) callback.onStart(layerNumber);
     }
 
-    @Override public void onFinish(int layerNumber, int pixels) throws MSLAException {
+    @Override public void onFinish(int layerNumber, int nonZeroPixels) throws MSLAException {
         try {
             var fileName = destinationDir + prefix + layerNumber + "." + format;
-            logger.info("Layer " + layerNumber + " writing pixels: " + pixels);
+            logger.info("Layer " + layerNumber + " writing pixels: " + nonZeroPixels);
             logger.info("File name is " + fileName);
             var d = new File(destinationDir);
             if (!d.exists() && !d.mkdirs()) throw new IOException("Unable to create destination directory!");
@@ -99,7 +99,7 @@ public class ImageWriter implements MSLALayerDecodeWriter {
                 f.flush();
             }
             img.remove(layerNumber);
-            if (callback != null) callback.onFinish(layerNumber, fileName, pixels);
+            if (callback != null) callback.onFinish(layerNumber, fileName, nonZeroPixels);
         } catch (IOException e) {
             throw new MSLAException("Error finalizing image file!", e);
         }

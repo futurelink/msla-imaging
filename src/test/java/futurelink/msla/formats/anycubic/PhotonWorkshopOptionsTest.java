@@ -20,11 +20,11 @@ public class PhotonWorkshopOptionsTest extends CommonTestRoutines {
     @Test
     void SetOptionTest() throws MSLAException {
         var file = FileFactory.instance.create("Anycubic Photon Mono X 6K");
-        file.getOptions().set("Advanced mode", 1);
+        file.getOptions().set("Advanced mode", "1");
         var option = file.getOptions().get("Advanced mode");
-        assertEquals(1, option);
-        assertThrows(ClassCastException.class, () -> file.getOptions().set("Advanced mode", "string"));
-        assertThrows(MSLAException.class, () -> file.getOptions().set("UnavailableOption", true));
+        assertEquals(1, Integer.parseInt(option));
+        assertThrows(NumberFormatException.class, () -> file.getOptions().set("Advanced mode", "string"));
+        assertThrows(MSLAException.class, () -> file.getOptions().set("UnavailableOption", "true"));
     }
 
     @Test

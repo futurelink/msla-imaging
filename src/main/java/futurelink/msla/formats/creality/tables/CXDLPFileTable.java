@@ -1,8 +1,8 @@
 package futurelink.msla.formats.creality.tables;
 
 import futurelink.msla.formats.iface.MSLAFileBlock;
-import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.FileFieldsIO;
+import futurelink.msla.formats.utils.fields.FileFieldsException;
+import futurelink.msla.formats.utils.fields.FileFieldsIO;
 
 public abstract class CXDLPFileTable implements MSLAFileBlock {
     @Override

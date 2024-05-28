@@ -8,21 +8,27 @@ import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class FileOptionMapper extends MSLAOptionMapper {
     private final Logger logger = Logger.getLogger(FileOptionMapper.class.getName());
+
     private final MSLAFile<?> file;
+    private final MSLAFileDefaults defaults;
     private final HashMap<String, Option> optionsMap;
 
-    public FileOptionMapper(MSLAFile<?> file) {
+    public FileOptionMapper(MSLAFile<?> file, MSLAFileDefaults defaults) throws MSLAException {
+        if (defaults != null && file.getResolution() != null && !file.getResolution().equals(defaults.getResolution())) {
+            throw new MSLAException("Defaults are not suitable for loaded file: " +
+                    file.getResolution() + " vs " + defaults.getResolution());
+        } else {
+            logger.warning("Created without defaults! Options are not editable.");
+        }
         this.file = file;
+        this.defaults = defaults;
         this.optionsMap = new HashMap<>();
-        enumerateFileOptions();
+        enumerateOptions();
     }
 
     /**
@@ -31,7 +37,7 @@ public class FileOptionMapper extends MSLAOptionMapper {
      * is considered to be MSLAFileBlock or MSLAFileBlockFields that have
      * option fields inside.
      */
-    private void enumerateFileOptions() {
+    private void enumerateOptions() {
         var fileClass = file.getClass();
         var fields = fileClass.getDeclaredFields();
         try {
@@ -47,9 +53,11 @@ public class FileOptionMapper extends MSLAOptionMapper {
                                     var optionName = f.getAnnotation(MSLAOption.class).value().isEmpty() ?
                                             f.getName() :
                                             f.getAnnotation(MSLAOption.class).value();
-                                    var location = new LinkedList<String>();
-                                    location.add(blockPropertyName);
-                                    this.optionsMap.put(optionName, new Option(f.getName(), f.getType(), location));
+                                    var location = List.of(blockPropertyName); // TODO make hierarchy
+                                    var opt = new Option(f.getName(), f.getType(), location);
+                                    if (defaults != null)
+                                        opt.setParameters(defaults.getParameters(blockPropertyName, f.getName()));
+                                    this.optionsMap.put(optionName, opt);
                                 });
                     }
                 }
@@ -63,18 +71,26 @@ public class FileOptionMapper extends MSLAOptionMapper {
     @Override
     public Class<?> getType(String option) {
         if (!this.optionsMap.containsKey(option)) return null;
-        return this.optionsMap.get(option).getOptionClass();
+        return this.optionsMap.get(option).getType();
+    }
+
+    @Override
+    public MSLADefaultsParams getParameters(String option) {
+        if (this.optionsMap.get(option) == null) return null;
+        return this.optionsMap.get(option).getParameters();
     }
 
     @Override
     public boolean hasOption(String option, Class<? extends Serializable> aClass) {
         if (!this.optionsMap.containsKey(option)) return false;
-        if (aClass != null) return this.optionsMap.get(option).getOptionClass().isAssignableFrom(aClass);
+        if (aClass != null) return this.optionsMap.get(option).getType().isAssignableFrom(aClass);
         return true;
     }
 
     @Override
     public void populateOption(String optionName, Serializable value) throws MSLAException {
+        if (!isEditable()) throw new MSLAException("Options are not editable because defaults were not specified");
+        getParameters(optionName).checkValue(value.toString());
         try {
             var option = this.optionsMap.get(optionName);
             var fileBlock = getOptionFileBlock(optionName);
@@ -82,8 +98,8 @@ public class FileOptionMapper extends MSLAOptionMapper {
                 var fields = fileBlock.getFileFields();
                 logger.info("Setting '" + option.getName() + "' of " + fields.getClass());
                 try {
-                    var setter = fields.getClass().getDeclaredMethod("set" + option.getName(), option.getOptionClass());
-                    setter.invoke(fields, option.getOptionClass().cast(value));
+                    var setter = fields.getClass().getDeclaredMethod("set" + option.getName(), option.getType());
+                    setter.invoke(fields, option.getType().cast(value));
                 } catch (NoSuchMethodException ignored) {
                     var f = fields.getClass().getDeclaredField(option.getName());
                     f.setAccessible(true);
@@ -107,20 +123,21 @@ public class FileOptionMapper extends MSLAOptionMapper {
                 logger.info("Getting '" + option.getName() + "' of " + fields.getClass());
                 try {
                     var getter = fields.getClass().getDeclaredMethod("get" + option.getName());
-                    return (Serializable) option.getOptionClass().cast(getter.invoke(fields));
+                    return (Serializable) option.getType().cast(getter.invoke(fields));
                 } catch (NoSuchMethodException ignored) {
                     var f = fields.getClass().getDeclaredField(option.getName());
                     f.setAccessible(true);
                     var value = f.get(fields);
                     f.setAccessible(false);
-                    return (Serializable) option.getOptionClass().cast(value);
+                    return (Serializable) option.getType().cast(value);
                 }
             } else throw new MSLAException("Can't fetch option, no file block fields instantiated");
-        } catch (NoSuchFieldException | InvocationTargetException | IllegalAccessException e) {
-            throw new MSLAException("Error fetching option", e);
+        } catch (NoSuchFieldException | InvocationTargetException | IllegalAccessException | ClassCastException e) {
+            throw new MSLAException("Error fetching option " + optionName, e);
         }
     }
 
+    @Override public Boolean isEditable() { return defaults != null; }
     @Override public Set<String> available() { return optionsMap.keySet(); }
 
     /**

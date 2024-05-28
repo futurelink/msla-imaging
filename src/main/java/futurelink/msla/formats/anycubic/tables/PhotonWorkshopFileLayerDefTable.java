@@ -58,16 +58,16 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         @MSLAFileField(order = 3, lengthAt = "LayerCount") private final ArrayList<PhotonWorkshopFileLayerDef> Layers = new ArrayList<>();
         private final ArrayList<byte[]> LayerData = new ArrayList<>();
 
-        public Fields(PhotonWorkshopFileTable parent) {
+        public Fields(PhotonWorkshopFileTable parent, MSLALayerDefaults layerDefaults) {
             this.parent = parent;
-            this.optionMapper = new LayerOptionMapper(this);
+            this.optionMapper = new LayerOptionMapper(this, layerDefaults);
         }
         @Override public MSLAOptionMapper options() { return optionMapper; }
     }
 
-    public PhotonWorkshopFileLayerDefTable(byte versionMajor, byte versionMinor) {
+    public PhotonWorkshopFileLayerDefTable(byte versionMajor, byte versionMinor, MSLALayerDefaults layerDefaults) {
         super(versionMajor, versionMinor);
-        this.fileFields = new Fields(this);
+        this.fileFields = new Fields(this, layerDefaults);
         this.fileFields.LayerCount = 0;
     }
 
@@ -155,7 +155,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
     }
 
     @Override
-    public long read(FileInputStream stream, long position) throws MSLAException {
+    public long read(DataInputStream stream, long position) throws MSLAException {
         var dataRead = super.read(stream, position);
         if (dataRead != TableLength) throw new MSLAException(
                 "LayerDef was not completely read out (" + dataRead + " of " + TableLength +

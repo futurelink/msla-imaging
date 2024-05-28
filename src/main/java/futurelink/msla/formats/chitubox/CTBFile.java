@@ -6,13 +6,13 @@ import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.chitubox.tables.*;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.formats.utils.FileFieldsException;
+import futurelink.msla.formats.utils.fields.FileFieldsException;
 import futurelink.msla.formats.utils.FileOptionMapper;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
 
     public CTBFile(MSLAFileDefaults defaults) throws MSLAException {
         super();
-        var Version = defaults.getOptionByte(null, "Version");
+        var Version = defaults.getFileProps().getByte("Version");
         if (Version == null || Version <= 0)
             throw new MSLAException("File defaults do not have a version number.");
 
@@ -47,7 +47,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
         MachineName = new CTBFileMachineName(defaults);
         PrintParams = new CTBFilePrintParams(Version, defaults);
         SlicerInfo = new CTBFileSlicerInfo(Version, defaults);
-        Layers = new CTBFileLayers(this);
+        Layers = new CTBFileLayers(this, defaults.getLayerDefaults());
 
         // Version 4 or later data
         if (Header.getFileFields().getVersion() >= 4) {
@@ -58,13 +58,13 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
             if (Header.getFileFields().getVersion() >= 5) ResinParams = new CTBFileResinParams(Version);
         }
 
-        options = new FileOptionMapper(this);
+        options = new FileOptionMapper(this, defaults);
     }
 
-    public CTBFile(FileInputStream stream) throws IOException, MSLAException {
+    public CTBFile(MSLAFileDefaults defaults, DataInputStream stream) throws IOException, MSLAException {
         super();
         read(stream);
-        options = new FileOptionMapper(this);
+        options = new FileOptionMapper(this, defaults);
     }
 
     @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return CTBFileCodec.class; }
@@ -95,7 +95,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
 
     /* Internal read method */
     @SuppressWarnings("unused")
-    private void read(FileInputStream stream) throws MSLAException {
+    private void read(DataInputStream stream) throws MSLAException {
         Header = new CTBFileHeader(0); // Version is going to be read from file
         Header.read(stream, 0);
         if (Header.getFileFields().getVersion() == null)
@@ -155,7 +155,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
             var pixels = PreviewSmall.readImage(stream);
         }
 
-        Layers = new CTBFileLayers(this);
+        Layers = new CTBFileLayers(this, null);
         Layers.read(stream, Header.getFileFields().getLayersDefinitionOffset());
     }
 
@@ -253,6 +253,11 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     }
 
     @Override public boolean isValid() { return (Header != null) && (SlicerInfo != null) && (PrintParams != null); }
+
+    @Override
+    public String getMachineName() {
+        return MachineName.getFileFields().getMachineName();
+    }
 
     @Override
     public void setPreview(int index, BufferedImage image) {

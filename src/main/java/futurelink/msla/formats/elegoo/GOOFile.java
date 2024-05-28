@@ -13,7 +13,7 @@ import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -22,23 +22,25 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     @Getter private final MSLAOptionMapper options;
 
     @Getter @MSLAOptionContainer private final GOOFileHeader Header;
-    @Getter private final GOOFileLayers Layers = new GOOFileLayers();
+    @Getter private final GOOFileLayers Layers;
     private final GOOFileFooter Footer = new GOOFileFooter();
 
     public GOOFile(MSLAFileDefaults defaults) throws MSLAException {
         super();
         Header = new GOOFileHeader(defaults);
-        options = new FileOptionMapper(this);
+        Layers = new GOOFileLayers(null);
+        options = new FileOptionMapper(this, defaults);
     }
 
-    public GOOFile(FileInputStream stream) throws IOException, MSLAException {
+    public GOOFile(MSLAFileDefaults defaults, DataInputStream stream) throws IOException, MSLAException {
         super();
         Header = new GOOFileHeader();
+        Layers = new GOOFileLayers(defaults.getLayerDefaults());
         readTables(stream);
-        options = new FileOptionMapper(this);
+        options = new FileOptionMapper(this, defaults);
     }
 
-    private void readTables(FileInputStream input) throws MSLAException {
+    private void readTables(DataInputStream input) throws MSLAException {
         var pos = Header.read(input, 0);
         if (pos != Header.getLayerDefAddress()) throw new MSLAException("Invalid layer definition at position " + pos);
 
@@ -63,6 +65,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
         else Header.getBigPreview().setImage(image);
     }
 
+    @Override public String getMachineName() { return Header.getMachineName(); }
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return Header.getResolution(); }
     @Override public float getPixelSizeUm() { return Header.getPixelSizeUm(); }

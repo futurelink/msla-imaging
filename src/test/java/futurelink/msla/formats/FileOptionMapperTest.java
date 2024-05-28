@@ -17,8 +17,8 @@ public class FileOptionMapperTest extends CommonTestRoutines {
         // Assert Chitubox format has 24 file options
         assertEquals(24, file.getOptions().available().size());
 
-        file.getOptions().set("Bottom layers exposure time", 12.0F);
-        assertEquals(12f, file.getOptions().get("Bottom layers exposure time"));
+        file.getOptions().set("Bottom layers exposure time", "12");
+        assertEquals(12f, Float.parseFloat(file.getOptions().get("Bottom layers exposure time")));
 
         // It's necessary to add a layer to access layer options
         var resource = resourceFile("test_data/ChituboxFileTest/ELEGOO_Saturn_Layer_0.png");
@@ -34,7 +34,16 @@ public class FileOptionMapperTest extends CommonTestRoutines {
         assertEquals(13, file.getLayers().options(0).available().size());
 
         // Try to set layer option and retrieve its value
-        file.getLayers().options(0).set("Light PWM", 128f);
-        assertEquals(128f, file.getLayers().options(0).get("Light PWM"));
+        file.getLayers().options(0).set("Light PWM", "128");
+        assertEquals(128f, Float.parseFloat(file.getLayers().options(0).get("Light PWM")));
+    }
+
+    @Test
+    void LayerOptionParamsTest() throws MSLAException {
+        var file = FileFactory.instance.create("Anycubic Photon M3 Max");
+        System.out.println(file.getOptions().getParameters("Bottom layers exposure time"));
+        System.out.println(file.getOptions().getType("Bottom layers exposure time").getName());
+
+        file.getOptions().set("Bottom layers exposure time", "120");
     }
 }

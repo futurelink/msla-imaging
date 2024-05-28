@@ -3,13 +3,10 @@ package futurelink.msla.formats.chitubox.tables;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.chitubox.CTBFile;
-import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAFileLayers;
-import futurelink.msla.formats.iface.MSLALayerEncodeReader;
-import futurelink.msla.formats.iface.MSLALayerEncoder;
-import futurelink.msla.formats.utils.FileFieldsException;
+import futurelink.msla.formats.iface.*;
+import futurelink.msla.formats.utils.fields.FileFieldsException;
 
-import java.io.FileInputStream;
+import java.io.DataInputStream;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -18,10 +15,12 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
     private final CTBFile parent;
     private final Logger logger = Logger.getLogger(CTBFileLayers.class.getName());
     private final ArrayList<CTBFileLayerDef> LayerDefinition = new ArrayList<>();
+    private final MSLALayerDefaults layerDefaults;
 
-    public CTBFileLayers(CTBFile parent) {
+    public CTBFileLayers(CTBFile parent, MSLALayerDefaults layerDefaults) {
         super(parent.getHeader().getFileFields().getVersion());
         this.parent = parent;
+        this.layerDefaults = layerDefaults;
     }
 
     @Override public MSLAOptionMapper options(int layerNumber) { return LayerDefinition.get(layerNumber).options(); }
@@ -34,7 +33,7 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
 
     @Override
     public CTBFileLayerDef.Fields allocate() throws MSLAException {
-        var layer = new CTBFileLayerDef(getVersion());
+        var layer = new CTBFileLayerDef(getVersion(), layerDefaults);
         LayerDefinition.add(layer);
         return layer.getFileFields();
     }
@@ -81,7 +80,7 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
     }
 
     @Override
-    public long read(FileInputStream stream, long position) throws MSLAException {
+    public long read(DataInputStream stream, long position) throws MSLAException {
         // Read preliminary layer definitions
         long bytesRead = 0;
         try {

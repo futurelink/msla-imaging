@@ -135,6 +135,8 @@ public class PhotonWorkshopFileDescriptor {
 
     public static PhotonWorkshopFileDescriptor read(LittleEndianDataInputStream stream)
             throws IOException, MSLAException {
+        stream.reset();
+
         byte[] markPattern = Arrays.copyOf(PhotonWorkshopFileDescriptor.Mark.getBytes(), PhotonWorkshopFileTable.MarkLength);
         byte[] mark = stream.readNBytes(PhotonWorkshopFileTable.MarkLength);
         if (!Arrays.equals(mark, markPattern))

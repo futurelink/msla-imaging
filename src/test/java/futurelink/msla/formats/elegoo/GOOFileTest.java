@@ -51,8 +51,9 @@ public class GOOFileTest extends CommonTestRoutines {
 
     @Test
     void ReadTestFile() throws InterruptedException {
+        var machineName = "ELEGOO Mars 4 Max";
         try {
-            var file = (GOOFile) FileFactory.instance.load(
+            var file = (GOOFile) FileFactory.instance.load(machineName,
                     resourceFile("test_data/ElegooFileTest/Example_GOO.goo")
             );
             System.out.println(file);

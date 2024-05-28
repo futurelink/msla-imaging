@@ -3,6 +3,7 @@ package futurelink.msla.formats.elegoo.tables;
 import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileLayer;
+import futurelink.msla.formats.iface.MSLALayerDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.utils.LayerOptionMapper;
@@ -38,9 +39,9 @@ public class GOOFileLayerDef extends GOOFileTable implements MSLAFileLayer {
         @MSLAFileField(order = 20, length = 2) public byte[] Delimiter2 = new byte[]{ 0x0d, 0x0a };
     }
 
-    public GOOFileLayerDef() {
+    public GOOFileLayerDef(MSLALayerDefaults layerDefaults) {
         super();
-        optionMapper = new LayerOptionMapper(fileFields);
+        optionMapper = new LayerOptionMapper(fileFields, layerDefaults);
     }
 
     @Override public MSLAOptionMapper options() { return optionMapper; }

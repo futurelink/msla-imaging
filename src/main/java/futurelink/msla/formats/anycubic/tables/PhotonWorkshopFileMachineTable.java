@@ -4,14 +4,14 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.FileFieldsIO;
-import futurelink.msla.formats.utils.FileFieldsReader;
+import futurelink.msla.formats.utils.fields.FileFieldsException;
+import futurelink.msla.formats.utils.fields.FileFieldsIO;
+import futurelink.msla.formats.utils.fields.FileFieldsReader;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
 
-import java.io.FileInputStream;
+import java.io.DataInputStream;
 import java.io.OutputStream;
 
 /**
@@ -111,7 +111,7 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public long read(FileInputStream stream, long position) throws MSLAException {
+    public long read(DataInputStream stream, long position) throws MSLAException {
         try {
             var reader = new FileFieldsReader(stream, FileFieldsIO.Endianness.LittleEndian);
             var dataRead = reader.read(this);

@@ -103,7 +103,7 @@ public class GOOFileHeader extends GOOFileTable {
     public GOOFileHeader(MSLAFileDefaults defaults) throws MSLAException {
         this();
         defaults.setFields("Header", fileFields);
-        fileFields.MachineName = defaults.getName();
+        fileFields.MachineName = defaults.getMachineName();
     }
 
     @Override public int getDataLength() { return HEADER_LENGTH; }

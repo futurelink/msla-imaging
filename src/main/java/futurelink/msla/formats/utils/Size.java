@@ -20,6 +20,12 @@ public class Size {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Size) return this.width == ((Size)obj).width && this.height == ((Size)obj).height;
+        return false;
+    }
+
+    @Override
     public String toString() {
         return width + " x " + height;
     }

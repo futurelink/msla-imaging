@@ -4,7 +4,7 @@ import futurelink.msla.formats.anycubic.PhotonWorkshopFile;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileHeaderTable;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileMachineTable;
 import futurelink.msla.formats.creality.CXDLPFile;
-import futurelink.msla.formats.utils.PrinterDefaults;
+import futurelink.msla.formats.utils.defaults.PrinterDefaults;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,9 +14,9 @@ public class DefaultsLoaderTest extends CommonTestRoutines {
     void testDefaultsLoader() throws MSLAException {
         var defaults = PrinterDefaults.instance.getPrinter("Anycubic Photon M3 Max");
         assertEquals("Anycubic Photon M3 Max", defaults.getMachineFullName());
-        assertEquals("6480x3600", defaults.getOptionsBlock("Header").get("Resolution"));
-        assertEquals("34.399998", defaults.getOptionsBlock("Header").get("PixelSizeUm"));
-        assertEquals(2, defaults.getFileOptions().size());
+        assertEquals("6480x3600", defaults.getOptionsBlock("Header").getOption("Resolution").getDefaultValue());
+        assertEquals("34.399998", defaults.getOptionsBlock("Header").getOption("PixelSizeUm").getDefaultValue());
+        assertEquals(2, defaults.getFileProps().size());
         assertEquals(8, defaults.getOptionsBlock("Machine").size());
 
         // Check for header options

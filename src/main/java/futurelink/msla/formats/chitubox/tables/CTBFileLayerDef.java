@@ -2,13 +2,12 @@ package futurelink.msla.formats.chitubox.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAOptionMapper;
-import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAFileLayer;
+import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.FileFieldsIO;
+import futurelink.msla.formats.utils.fields.FileFieldsException;
+import futurelink.msla.formats.utils.fields.FileFieldsIO;
 import futurelink.msla.formats.utils.LayerOptionMapper;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,7 +56,7 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
         }
     }
 
-    public CTBFileLayerDef(int version) throws MSLAException {
+    public CTBFileLayerDef(int version, MSLALayerDefaults layerDefaults) throws MSLAException {
         super(version);
         if (version <= 0) throw new MSLAException("Can't allocate a layer, version is not set");
         fileFields = new Fields(this);
@@ -66,7 +65,7 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
             fileFields.Extra = new CTBFileLayerDefExtra();
             fileFields.TableSize += CTBFileLayerDefExtra.TABLE_SIZE;
         }
-        optionMapper = new LayerOptionMapper(this.fileFields);
+        optionMapper = new LayerOptionMapper(this.fileFields, layerDefaults);
     }
 
     @Override public MSLAOptionMapper options() { return optionMapper; }

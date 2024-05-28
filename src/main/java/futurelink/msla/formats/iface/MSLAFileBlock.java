@@ -1,10 +1,10 @@
 package futurelink.msla.formats.iface;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.FileFieldsIO;
-import futurelink.msla.formats.utils.FileFieldsReader;
-import futurelink.msla.formats.utils.FileFieldsWriter;
+import futurelink.msla.formats.utils.fields.FileFieldsException;
+import futurelink.msla.formats.utils.fields.FileFieldsIO;
+import futurelink.msla.formats.utils.fields.FileFieldsReader;
+import futurelink.msla.formats.utils.fields.FileFieldsWriter;
 
 import java.io.*;
 
@@ -30,17 +30,6 @@ public interface MSLAFileBlock {
             input.reset();
             input.skipBytes((int) position);
             var reader = new FileFieldsReader(input, getEndianness());
-            return reader.read(this);
-        } catch (IOException | FileFieldsException e) {
-            throw new MSLAException("Error reading " + this.getClass().getName() + " table", e);
-        }
-    }
-
-    default long read(FileInputStream stream, long position) throws MSLAException {
-        try {
-            var fc = stream.getChannel();
-            fc.position(position);
-            var reader = new FileFieldsReader(stream, getEndianness());
             return reader.read(this);
         } catch (IOException | FileFieldsException e) {
             throw new MSLAException("Error reading " + this.getClass().getName() + " table", e);

@@ -4,7 +4,7 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
-import futurelink.msla.formats.utils.PrinterDefaults;
+import futurelink.msla.formats.utils.defaults.PrinterDefaults;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -20,28 +20,31 @@ public class CXDLPFileFactory implements MSLAFileFactory {
         return new CXDLPFile(def);
     }
 
-    @Override public MSLAFile<?> load(String fileName) throws MSLAException {
+    @Override public MSLAFile<?> load(String machineName, String fileName) throws MSLAException {
         try {
-            return new CXDLPFile(new FileInputStream(fileName));
+            return new CXDLPFile(defaults(machineName), new DataInputStream(new FileInputStream(fileName)));
         } catch (IOException e) {
             throw new MSLAException("Could not open file " + fileName, e);
         }
     }
 
-    @Override public boolean checkType(FileInputStream stream) throws MSLAException {
+    @Override public MSLAFile<?> load(String machineName, DataInputStream stream) throws MSLAException {
+        return new CXDLPFile(defaults(machineName), stream);
+    }
+
+    @Override public boolean checkType(DataInputStream stream) throws MSLAException {
         try {
-            var fc = stream.getChannel();
-            fc.position(0);
-            var dis = new DataInputStream(stream);
-            var markLength = dis.readInt();
+            stream.reset();
+            var markLength = stream.readInt();
             if (markLength > 9) return false;
-            return new String(dis.readNBytes(markLength)).trim().startsWith("CXSW3D");
+            return new String(stream.readNBytes(markLength)).trim().startsWith("CXSW3D");
         } catch (IOException e) {
             throw new MSLAException("Could not read stream", e);
         }
     }
 
     @Override public MSLAFileDefaults defaults(String machineName) {
+        if (machineName == null) return null;
         return PrinterDefaults.instance.getPrinter(machineName);
     }
 

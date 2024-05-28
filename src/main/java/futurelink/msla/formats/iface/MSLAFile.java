@@ -29,6 +29,11 @@ public interface MSLAFile<T> {
     MSLALayerDecoder<T> getDecodersPool() throws MSLAException;
 
     /**
+     * Returns a name of a machine that file is made for.
+     */
+    String getMachineName();
+
+    /**
      * Returns {@code MSLAPreview} object.
      */
     MSLAPreview getPreview(int index) throws MSLAException;

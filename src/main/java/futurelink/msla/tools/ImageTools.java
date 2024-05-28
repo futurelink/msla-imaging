@@ -17,7 +17,7 @@ public class ImageTools {
     public static void exportLayers(String fileName, String destinationDir, String format)
             throws MSLAException, InterruptedException
     {
-        var wsFile = FileFactory.instance.load(fileName);
+        var wsFile = FileFactory.instance.load(null, fileName);
         if (wsFile != null) {
             if (wsFile.isValid()) {
                 for (int i = 0; i < wsFile.getLayers().count(); i++)
@@ -64,7 +64,7 @@ public class ImageTools {
         var wsFile = FileFactory.instance.create(machineName);
         if (wsFile != null) {
             if (!wsFile.isValid()) throw new MSLAException("File header has no resolution info");
-            wsFile.getOptions().set("BottomExposureTime", 12);
+            wsFile.getOptions().set("BottomExposureTime", "12");
             wsFile.addLayer(new ImageReader(wsFile, image), null);
         }
     }

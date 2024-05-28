@@ -3,8 +3,8 @@ package futurelink.msla.formats.chitubox.tables;
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.FileFieldsIO;
+import futurelink.msla.formats.utils.fields.FileFieldsException;
+import futurelink.msla.formats.utils.fields.FileFieldsIO;
 import lombok.Getter;
 
 @Getter

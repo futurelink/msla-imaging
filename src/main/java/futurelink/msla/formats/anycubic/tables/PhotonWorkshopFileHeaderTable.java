@@ -4,15 +4,15 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.FileFieldsIO;
-import futurelink.msla.formats.utils.FileFieldsReader;
+import futurelink.msla.formats.utils.fields.FileFieldsException;
+import futurelink.msla.formats.utils.fields.FileFieldsIO;
+import futurelink.msla.formats.utils.fields.FileFieldsReader;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
 
-import java.io.FileInputStream;
+import java.io.DataInputStream;
 import java.io.OutputStream;
 
 /**
@@ -43,7 +43,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         @MSLAFileField(order = 4) @MSLAOption(MSLAOption.ExposureTime) private Float ExposureTime;
         @MSLAFileField(order = 5) @MSLAOption(MSLAOption.WaitBeforeCure) private Float WaitTimeBeforeCure1;
         @MSLAFileField(order = 6) @MSLAOption(MSLAOption.BottomExposureTime) private Float BottomExposureTime;
-        @MSLAFileField(order = 7) @MSLAOption(MSLAOption.BottomLayersCount) private Integer BottomLayersCount;
+        @MSLAFileField(order = 7) @MSLAOption(MSLAOption.BottomLayersCount) private Float BottomLayersCount;
         @MSLAFileField(order = 8) @MSLAOption(MSLAOption.LiftHeight) private Float LiftHeight = DefaultLiftHeight;
         @MSLAFileField(order = 9) @MSLAOption(MSLAOption.LiftSpeed) private Float LiftSpeed;// = SpeedConverter.Convert(DefaultLiftSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
         @MSLAFileField(order = 10) @MSLAOption(MSLAOption.RetractSpeed) private Float RetractSpeed;// = SpeedConverter.Convert(DefaultRetractSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
@@ -71,7 +71,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
 
         /* Version 2.6 fields */
         // boolean, when true, normal exposure time will be auto set, use false for traditional way
-        @MSLAFileField(order = 26) @MSLAOption("Intelligent mode") private int IntelligentMode = 0;
+        @MSLAFileField(order = 26) @MSLAOption("Intelligent mode") private Integer IntelligentMode = 0;
 
         public Fields(PhotonWorkshopFileHeaderTable parent) { this.parent = parent; }
 
@@ -108,7 +108,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public long read(FileInputStream stream, long position) throws MSLAException {
+    public long read(DataInputStream stream, long position) throws MSLAException {
         try {
             var reader = new FileFieldsReader(stream, FileFieldsIO.Endianness.LittleEndian);
             var dataRead = reader.read(this);

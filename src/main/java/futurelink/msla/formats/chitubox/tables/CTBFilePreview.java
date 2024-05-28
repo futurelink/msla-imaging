@@ -5,14 +5,14 @@ import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAPreview;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.FileFieldsIO;
+import futurelink.msla.formats.utils.fields.FileFieldsException;
+import futurelink.msla.formats.utils.fields.FileFieldsIO;
 import futurelink.msla.formats.utils.Size;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -65,9 +65,9 @@ public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
         Decode(fileFields.ImageData);
     }
 
-    public final long readImage(FileInputStream stream) throws MSLAException {
+    public final long readImage(DataInputStream stream) throws MSLAException {
         try {
-            var fc = stream.getChannel(); fc.position(fileFields.ImageOffset);
+            stream.reset(); stream.skipBytes(fileFields.ImageOffset);
             byte[] readData = stream.readNBytes(fileFields.getImageLength());
             Byte[] imageData = new Byte[readData.length];
             Arrays.setAll(imageData, i -> readData[i]);

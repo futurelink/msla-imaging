@@ -27,11 +27,9 @@ public class CXDLPFilePreview implements MSLAFileBlockFields, MSLAPreview {
     void setImageData(Short[] imageData) {
         var length = getImageDataLength();
         for (int i = 0; i < length; i++) {
-            // Assume we've got RBG555 format
-            var r = (imageData[i] >> 10) & 0x1f;
-            var b = (imageData[i] >> 5) & 0x1f;
-            var g = imageData[i] & 0x1f;
-            Image.getRaster().getDataBuffer().setElem(i, (r << 10) | (g << 5) | b);
+            // We've got RGB565 format. If one can see a file created by Chitubox has
+            // wrong colors that's because it creates it incorrectly.
+            Image.getRaster().getDataBuffer().setElem(i, (imageData[i] & 0xff00) >> 8 | (imageData[i] & 0xff) << 8);
         }
     }
 
@@ -46,7 +44,7 @@ public class CXDLPFilePreview implements MSLAFileBlockFields, MSLAPreview {
         Image = new BufferedImage(
                 resolution.getWidth(),
                 resolution.getHeight(),
-                BufferedImage.TYPE_USHORT_555_RGB);
+                BufferedImage.TYPE_USHORT_565_RGB);
         if (image != null) Image.getGraphics().drawImage(image, 0, 0, null);
     }
 

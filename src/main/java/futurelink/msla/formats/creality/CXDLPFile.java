@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     private static final Logger logger = Logger.getLogger(CXDLPFile.class.getName());
-    private final FileInputStream iStream;
+    private final DataInputStream iStream;
     @Getter private final MSLAOptionMapper options;
 
     @Getter @MSLAOptionContainer private final CXDLPFileHeader Header;
@@ -29,30 +29,36 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
         Header = new CXDLPFileHeader(defaults);
         SliceInfo = new CXDLPFileSliceInfo(defaults);
         SliceInfoV3 = new CXDLPFileSliceInfoV3(defaults);
-        options = new FileOptionMapper(this);
+        options = new FileOptionMapper(this, defaults);
     }
 
-    public CXDLPFile(FileInputStream stream) throws MSLAException {
+    public CXDLPFile(MSLAFileDefaults defaults, DataInputStream stream) throws MSLAException {
         var position = 0;
-        iStream = stream;
-        Header = new CXDLPFileHeader();
-        SliceInfo = new CXDLPFileSliceInfo();
-        SliceInfoV3 = new CXDLPFileSliceInfoV3();
-        options = new FileOptionMapper(this);
-        Header.read(iStream, position); position += Header.getDataLength();
-        Previews.read(iStream, position); position += Previews.getDataLength();
-        SliceInfo.read(iStream, position); position += SliceInfo.getDataLength();
+        try {
+            stream.reset();
+            iStream = stream;
+            Header = new CXDLPFileHeader();
+            SliceInfo = new CXDLPFileSliceInfo();
+            SliceInfoV3 = new CXDLPFileSliceInfoV3();
+            Header.read(iStream, position); position += Header.getDataLength();
+            Previews.read(iStream, position); position += Previews.getDataLength();
+            SliceInfo.read(iStream, position); position += SliceInfo.getDataLength();
 
-        // Skip layer areas (don't know what's their purpose)
-        try { iStream.skipNBytes(Header.getLayerCount() * 4 + 2); }
-        catch (IOException e) { throw new MSLAException("Can't read file", e); }
-        position += Header.getLayerCount() * 4 + 2;
-        if (Header.getVersion() >= 3) SliceInfoV3.read(iStream, position); position += SliceInfoV3.getDataLength();
+            options = new FileOptionMapper(this, defaults);
 
-        // Scan layer data and get layer data lengths and offsets
-        // ------------------------------------------------------
-        for (int i = 0; i < Header.getLayerCount(); i++) Layers.allocate();
-        Layers.read(iStream, position);
+            // Skip layer areas (don't know what's their purpose)
+            try { iStream.skipNBytes(Header.getLayerCount() * 4 + 2); }
+            catch (IOException e) { throw new MSLAException("Can't read file", e); }
+            position += Header.getLayerCount() * 4 + 2;
+            if (Header.getVersion() >= 3) SliceInfoV3.read(iStream, position); position += SliceInfoV3.getDataLength();
+
+            // Scan layer data and get layer data lengths and offsets
+            // ------------------------------------------------------
+            for (int i = 0; i < Header.getLayerCount(); i++) Layers.allocate();
+            Layers.read(iStream, position);
+        } catch (IOException e) {
+            throw new MSLAException("Can't read CXDLP data", e);
+        }
     }
 
     @Override
@@ -60,6 +66,7 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
         return CXDLPLayerCodec.class;
     }
 
+    @Override public String getMachineName() { return getHeader().getPrinterModel(); }
     @Override public MSLAPreview getPreview(int index) throws MSLAException { return Previews.getPreview(index); }
     @Override public void setPreview(int index, BufferedImage image) throws MSLAException {
         Previews.getPreview(index).setImage(image);

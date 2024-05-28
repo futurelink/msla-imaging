@@ -2,8 +2,7 @@ package futurelink.msla.formats.utils;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAOptionMapper;
-import futurelink.msla.formats.iface.MSLAFileBlock;
-import futurelink.msla.formats.iface.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 
@@ -16,12 +15,15 @@ import java.util.logging.Logger;
 
 public class LayerOptionMapper extends MSLAOptionMapper {
     private final Logger logger = Logger.getLogger(FileOptionMapper.class.getName());
+
     private final MSLAFileBlockFields layer;
+    private final MSLALayerDefaults defaults;
     private final HashMap<String, Option> optionsMap;
 
-    public LayerOptionMapper(MSLAFileBlockFields layer) {
+    public LayerOptionMapper(MSLAFileBlockFields layer, MSLALayerDefaults defaults) {
         this.layer = layer;
         this.optionsMap = new HashMap<>();
+        this.defaults = defaults;
         this.enumerateOptions(layer, new LinkedList<>());
     }
 
@@ -36,13 +38,13 @@ public class LayerOptionMapper extends MSLAOptionMapper {
      * @param path path to a block (used as recursion accumulator)
      */
     private void enumerateOptions(MSLAFileBlockFields fields, List<String> path) {
-        logger.info("Getting options from " + fields.getClass());
+        logger.fine("Getting options from " + fields.getClass().getName());
         for (var f : fields.getClass().getDeclaredFields()) {
             // Field is options container
             if (MSLAFileBlock.class.isAssignableFrom(f.getType()) || MSLAFileBlockFields.class.isAssignableFrom(f.getType())) {
                 if (f.getAnnotation(MSLAOptionContainer.class) != null) {
                     try {
-                        logger.info("Getting options for container '" + f.getName() + "'");
+                        logger.fine("Getting options for container '" + f.getName() + "'");
                         MSLAFileBlockFields fieldsInternal;
                         f.setAccessible(true);
                         if (MSLAFileBlock.class.isAssignableFrom(f.getType())) {
@@ -65,7 +67,12 @@ public class LayerOptionMapper extends MSLAOptionMapper {
             else if (f.getAnnotation(MSLAOption.class) != null) {
                 var optionName = f.getAnnotation(MSLAOption.class).value();
                 var optionTitle = optionName.isEmpty() ? f.getName() : optionName;
-                optionsMap.put(optionTitle, new Option(f.getName(), f.getType(), path));
+                var opt = new Option(f.getName(), f.getType(), path);
+                if (defaults != null) {
+                    var blockName = path.isEmpty() ? null : path.get(path.size()-1);
+                    opt.setParameters(defaults.getParameters(blockName, f.getName()));
+                }
+                optionsMap.put(optionTitle, opt);
             }
         }
     }
@@ -73,20 +80,28 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     @Override
     public Class<?> getType(String optionName) {
         if (!this.optionsMap.containsKey(optionName)) return null;
-        return this.optionsMap.get(optionName).getOptionClass();
+        return this.optionsMap.get(optionName).getType();
+    }
+
+    @Override
+    public MSLADefaultsParams getParameters(String option) {
+        if (this.optionsMap.get(option) == null) return null;
+        return this.optionsMap.get(option).getParameters();
     }
 
     @Override
     public boolean hasOption(String optionName, Class<? extends Serializable> aClass) {
         if (!this.optionsMap.containsKey(optionName)) return false;
-        if (aClass != null) return this.optionsMap.get(optionName).getOptionClass().isAssignableFrom(aClass);
+        if (aClass != null) return this.optionsMap.get(optionName).getType().isAssignableFrom(aClass);
         return true;
     }
 
+    @Override public Boolean isEditable() { return defaults != null; }
     @Override public Set<String> available() { return optionsMap.keySet(); }
 
     @Override
     protected void populateOption(String optionName, Serializable value) throws MSLAException {
+        if (!isEditable()) throw new MSLAException("Options are not editable because defaults were not specified");
         var option = optionsMap.get(optionName);
         try {
             if ("".equals(option.getLocation().get(0))) {
@@ -104,7 +119,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
                         optionContainer = ((MSLAFileBlock) optionContainer).getFileFields();
                     var optionField = optionContainer.getClass().getDeclaredField(option.getName());
                     optionField.setAccessible(true);
-                    optionField.set(optionContainer, option.getOptionClass().cast(value));
+                    optionField.set(optionContainer, option.getType().cast(value));
                     optionField.setAccessible(false);
                 } else {
                     throw new MSLAException("Option can't be set");
@@ -126,7 +141,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
                 var value = optionField.get(layer);
                 optionField.setAccessible(false);
                 return (Serializable) value;
-            } else{
+            } else {
                 // Option is inside another container
                 logger.info("Option is inside '" + option.getLocation() + "'");
                 var optionContainer = getOptionContainer(layer, option.getLocation());

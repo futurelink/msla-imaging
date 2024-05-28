@@ -18,6 +18,7 @@ public interface MSLALayerDecodeWriter {
 
     /**
      * Must be implemented to write sequence of pixels of the same color into some sort of output image.
+     * @param layerNumber layer number
      * @param color pixel color
      * @param position position in a sequence of pixels
      * @param length number of pixels of the same color
@@ -41,6 +42,7 @@ public interface MSLALayerDecodeWriter {
     /**
      * Method is being called when decoding process encounters an error.
      * @param layerNumber layer number that had been being decoded
+     * @param error describes a reason why error happened
      */
     void onError(int layerNumber, String error) throws MSLAException;
 }

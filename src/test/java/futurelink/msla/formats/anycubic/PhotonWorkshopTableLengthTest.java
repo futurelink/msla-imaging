@@ -2,8 +2,8 @@ package futurelink.msla.formats.anycubic;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.anycubic.tables.*;
-import futurelink.msla.formats.utils.FileFieldsException;
-import futurelink.msla.formats.utils.FileFieldsIO;
+import futurelink.msla.formats.utils.fields.FileFieldsException;
+import futurelink.msla.formats.utils.fields.FileFieldsIO;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +35,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
 
     @Test
     void PreviewTableTest() throws FileFieldsException {
-        var block = new PhotonWorkshopFilePreviewTable((byte) 2, (byte) 0);
+        var block = new PhotonWorkshopFilePreview1Table((byte) 2, (byte) 0);
         var length = FileFieldsIO.getBlockLength(block);
 
         // Add 16 bytes of shades of gray table that should not be counted
@@ -54,7 +54,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
     @Test
     void LayerDefTableTest() throws FileFieldsException {
         // Test empty layer definition table
-        var block = new PhotonWorkshopFileLayerDefTable((byte) 2, (byte) 0);
+        var block = new PhotonWorkshopFileLayerDefTable((byte) 2, (byte) 0, null);
         block.allocate();
         var length = FileFieldsIO.getBlockLength(block);
         assertEquals(52, length);

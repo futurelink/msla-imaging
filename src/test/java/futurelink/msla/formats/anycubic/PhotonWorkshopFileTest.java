@@ -7,6 +7,8 @@ import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
 import org.junit.jupiter.api.Test;
 
+import javax.imageio.ImageIO;
+import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +19,7 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
     @Test
     void TestFileRead() {
         try {
-            var file = FileFactory.instance.load(
+            var file = FileFactory.instance.load("Anycubic Photon Mono 4K",
                     resourceFile("test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma")
             );
             assertTrue(file.isValid());
@@ -32,9 +34,13 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
             delete_file(temp_dir + "1.png");  // Clean up files just in case
             delete_file(temp_dir + "10.png");
 
-            var file = (PhotonWorkshopFile) FileFactory.instance.load(
+            var file = (PhotonWorkshopFile) FileFactory.instance.load("Anycubic Photon Mono 4K",
                     resourceFile("test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma")
             );
+
+            // Extract preview
+            ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "photon_preview.png"));
+            assertFileExactSize(temp_dir + "photon_preview.png", 3535);
 
             // Asynchronously extract image files
             var layerPixels = new int[2];
@@ -56,7 +62,7 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
 
             // Save previews
             file.getPreview((short) 0).getImage();
-        } catch (MSLAException e) {
+        } catch (MSLAException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -68,7 +74,7 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
         delete_file(outFile); // Clean up files just in case
 
         var file = (PhotonWorkshopFile) FileFactory.instance.create("Anycubic Photon Mono X 6K");
-        file.getOptions().set("Bottom layers exposure time", 12.0F);
+        file.getOptions().set("Bottom layers exposure time", "12");
 
         var pngFileLayers = new String[]{
                 resourceFile("test_data/PhotonFileTest/Layer_1.png"),

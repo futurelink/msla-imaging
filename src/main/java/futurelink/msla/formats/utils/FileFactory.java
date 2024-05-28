@@ -9,7 +9,7 @@ import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
 
-import java.io.FileInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -67,28 +67,40 @@ public final class FileFactory {
     }
 
     /**
-     * Loads a mSLA data file.
+     * Loads a mSLA data.
      *
-     * @param fileName data file to load
+     * @param stream data to load
      * @return MSLAFile
      * @throws MSLAException on mSLA format related errors
      */
-    public MSLAFile load(String fileName) throws MSLAException {
-        try (var stream = new FileInputStream(fileName)) {
-            var factory = supportedFiles.stream().filter((t) -> {
-                try {
-                    if (t.checkType(stream)) {
-                        logger.info("Found file of type " + t.getClass());
-                        return true;
-                    }
-                    return false;
-                } catch (MSLAException e) { return false; }
-            }).findFirst().orElse(null);
-            if (factory != null) {
-                return factory.load(fileName);
-            } else throw new MSLAException("File is not supported");
+    public MSLAFile load(String machineName, DataInputStream stream) throws MSLAException {
+        if (!stream.markSupported()) throw new MSLAException("Can't use " + stream.getClass() + ". Mark/reset is not supported");
+        var factory = supportedFiles.stream().filter((t) -> {
+            try {
+                if (t.checkType(stream)) {
+                    logger.info("Found file of type " + t.getClass());
+                    return true;
+                }
+                return false;
+            } catch (MSLAException e) { return false; }
+        }).findFirst().orElse(null);
+        if (factory != null) {
+            return factory.load(machineName, stream);
+        } else throw new MSLAException("File is not supported");
+    }
+
+    /**
+     * Loads a mSLA data file.
+     *
+     * @param fileName file name to load
+     * @return MSLAFile
+     * @throws MSLAException on mSLA format related errors
+     */
+    public MSLAFile load(String machineName, String fileName) throws MSLAException {
+        try {
+            return load(machineName, new DataInputStream(new MarkedFileInputStream(fileName)));
         } catch (IOException e) {
-            throw new MSLAException("File error", e);
+            throw new MSLAException("Can't load file " + fileName, e);
         }
     }
 

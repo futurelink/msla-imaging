@@ -8,19 +8,19 @@
         <options name="Header">
             <option name="Resolution" value="6480x3600"/>
             <option name="PixelSizeUm" value="34.399998"/>
-            <option name="PriceCurrencySymbol" value="36"/>
-            <option name="LayerHeight" value="0.05"/>
-            <option name="ExposureTime" value="3.0"/>
-            <option name="WaitTimeBeforeCure1" value="2.0"/>
-            <option name="BottomExposureTime" value="30.0"/>
-            <option name="BottomLayersCount" value="6"/>
-            <option name="LiftHeight" value="10.0"/>
-            <option name="LiftSpeed" value="4.0"/>
-            <option name="RetractSpeed" value="4.0"/>
-            <option name="AntiAliasing" value="1"/>
-            <option name="TransitionLayerCount" value="10"/>
-            <option name="TransitionLayerType" value="0"/>
-            <option name="AdvancedMode" value="0"/>
+            <option name="PriceCurrencySymbol" type="char" value="$"/>
+            <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option name="ExposureTime" type="float" value="3.0" minValue="0.5" maxValue="30.0"/>
+            <option name="WaitTimeBeforeCure1" type="float" value="2.0" minValue="0.0" maxValue="120.0"/>
+            <option name="BottomExposureTime" type="float" value="30.0" minValue="0.5" maxValue="120.0"/>
+            <option name="BottomLayersCount" type="int" value="6" minValue="0" maxValue="99999"/>
+            <option name="LiftHeight" type="float" value="10.0" minValue="1.0" maxValue="50.0"/>
+            <option name="LiftSpeed" type="float" value="4.0" minValue="0.1" maxValue="10.0"/>
+            <option name="RetractSpeed" type="float" value="4.0" minValue="0.1" maxValue="10.0"/>
+            <option name="AntiAliasing" type="float" value="1" minValue="0" maxValue="16"/>
+            <option name="TransitionLayerCount" type="int" value="10" minValue="0" maxValue="99999"/>
+            <option name="TransitionLayerType" type="int" value="0" minValue="0" maxValue="1"/>
+            <option name="AdvancedMode" type="boolean" value="0"/>
         </options>
         <options name="Machine">
             <option name="LayerImageFormat" value="pw0Img"/>
@@ -32,6 +32,7 @@
             <option name="MaxFileVersion" value="516"/>
             <option name="MachineBackground" value="6506241"/>
         </options>
+        <options name="Extra"/>
     </printer>
 
     <printer manufacturer="Anycubic" name="Photon Mono X 6K" extension="pwmb" file="PhotonWorkshopFile">
@@ -66,6 +67,7 @@
             <option name="MaxFileVersion" value="516"/>
             <option name="MachineBackground" value="6506241"/>
         </options>
+        <options name="Extra"/>
     </printer>
 
     <printer manufacturer="Anycubic" name="Photon Mono 4K" extension="pwma" file="PhotonWorkshopFile">
@@ -100,6 +102,7 @@
             <option name="MaxFileVersion" value="516"/>
             <option name="MachineBackground" value="6506241"/>
         </options>
+        <options name="Extra"/>
     </printer>
 
     <printer manufacturer="Anycubic" name="Photon Mono X" extension="pwmx" file="PhotonWorkshopFile">
@@ -134,6 +137,7 @@
             <option name="MaxFileVersion" value="516"/>
             <option name="MachineBackground" value="6506241"/>
         </options>
+        <options name="Extra"/>
     </printer>
 
     <printer manufacturer="Anycubic" name="Photon M3" extension="pm3" file="PhotonWorkshopFile">
@@ -168,6 +172,7 @@
             <option name="MaxFileVersion" value="516"/>
             <option name="MachineBackground" value="6506241"/>
         </options>
+        <options name="Extra"/>
     </printer>
 
     <printer manufacturer="CREALITY" name="HALOT-ONE PLUS" extension="cxdlp" file="CXDLPFile">
@@ -309,6 +314,9 @@
         <file_options>
             <option name="Version" value="4"/>
         </file_options>
+        <layer_options>
+            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+        </layer_options>
         <options name="Header">
             <option name="Resolution" value="3840x2400"/>
             <option name="PixelSizeUm" value="35.0f"/>

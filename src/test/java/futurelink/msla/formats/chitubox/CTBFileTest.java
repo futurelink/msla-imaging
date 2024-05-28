@@ -3,7 +3,6 @@ package futurelink.msla.formats.chitubox;
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.utils.FileFactory;
-import futurelink.msla.formats.utils.FileOptionMapper;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ public class CTBFileTest extends CommonTestRoutines {
     void ReadTestFile() throws IOException, InterruptedException {
         logger.info("Temporary dir: " + temp_dir);
         try {
-            var file = (CTBFile) FileFactory.instance.load(
+            var file = (CTBFile) FileFactory.instance.load("Elegoo Saturn",
                     resourceFile("test_data/ChituboxFileTest/Example_ELEGOO_SATURN.ctb")
             );
             assertTrue(file.isValid());
@@ -96,7 +95,7 @@ public class CTBFileTest extends CommonTestRoutines {
         writeMSLAFile(outFile, file);
 
         // Read exported file and do checks
-        file = (CTBFile) FileFactory.instance.load(outFile);
+        file = (CTBFile) FileFactory.instance.load("ELEGOO Saturn", outFile);
         assertTrue(file.isValid());
 
         // Asynchronously extract image files
@@ -130,11 +129,10 @@ public class CTBFileTest extends CommonTestRoutines {
         var file = (CTBFile) FileFactory.instance.create("ELEGOO Saturn");
         assertTrue(file.isValid());
 
-        var mapper = new FileOptionMapper(file);
-        assertEquals(70.0f, mapper.fetchOption("Normal layers lift speed"));
-        assertEquals(0.0f, mapper.fetchOption("Bottom layers light off delay"));
+        assertEquals(70.0, Float.parseFloat(file.getOptions().get("Normal layers lift speed")));
+        assertEquals(0.0, Float.parseFloat(file.getOptions().get("Bottom layers light off delay")));
 
-        mapper.populateOption("Bottom layers light off delay", 1.0f);
-        assertEquals(1.0f, mapper.fetchOption("Bottom layers light off delay"));
+        file.getOptions().set("Bottom layers light off delay", "1.0");
+        assertEquals(1.0, Float.parseFloat(file.getOptions().get("Bottom layers light off delay")));
     }
 }

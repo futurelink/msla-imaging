@@ -15,13 +15,13 @@ public class CXDLPFileLayerDef extends CXDLPFileTable implements MSLAFileLayers<
     private final ArrayList<CXDLPFileLayer> Layers = new ArrayList<>();
 
     @Override
-    public final long read(FileInputStream iStream, long layerDataPosition) throws MSLAException {
+    public final long read(DataInputStream iStream, long layerDataPosition) throws MSLAException {
         var dis = new DataInputStream(iStream);
         var currentPosition = layerDataPosition;
         try {
             for (var layer : Layers) {
-                var fc = iStream.getChannel();
-                fc.position(currentPosition);
+                iStream.reset();
+                iStream.skipNBytes(currentPosition);
                 layer.LayerArea = dis.readInt();
                 var lineCount = dis.readInt();
                 // Some integer (4 bytes) + number of lines (4 bytes) + 6 bytes per line + 0x0D0A at the end
@@ -37,9 +37,9 @@ public class CXDLPFileLayerDef extends CXDLPFileTable implements MSLAFileLayers<
             for (var layer : Layers) {
                 var encodedDataLength = layer.DataLength;
                 var decodedDataLength = layer.DataLength;
-                var fc = iStream.getChannel();
                 var pos = layer.getDataOffset();
-                fc.position(pos);
+                iStream.reset();
+                iStream.skipNBytes(pos);
 
                 var bytesRead = 0;
                 dis.readInt(); // Skip integer

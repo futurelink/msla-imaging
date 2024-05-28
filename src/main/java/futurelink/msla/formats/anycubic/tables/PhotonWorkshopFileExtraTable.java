@@ -20,7 +20,7 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
 
     @SuppressWarnings("unused")
     @Getter
-    static class Fields implements MSLAFileBlockFields {
+    public static class Fields implements MSLAFileBlockFields {
         private final PhotonWorkshopFileTable parent;
 
         @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return "EXTRA"; }
