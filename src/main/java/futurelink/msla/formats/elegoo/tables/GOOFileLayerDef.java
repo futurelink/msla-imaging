@@ -38,10 +38,8 @@ public class GOOFileLayerDef extends GOOFileTable implements MSLAFileLayer {
         @MSLAFileField(order = 20, length = 2) public byte[] Delimiter2 = new byte[]{ 0x0d, 0x0a };
     }
 
-    public GOOFileLayerDef(MSLALayerDefaults layerDefaults) { super(); }
-
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
-        layerDefaults.setFields(null, fileFields);
+        if (layerDefaults != null) layerDefaults.setFields(null, fileFields);
     }
 
     @Override public String getName() { return null; }

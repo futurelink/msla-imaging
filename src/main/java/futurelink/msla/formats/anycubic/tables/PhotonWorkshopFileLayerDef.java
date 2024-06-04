@@ -29,6 +29,6 @@ public class PhotonWorkshopFileLayerDef implements MSLAFileBlockFields, MSLAFile
 
     @Override
     public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
-
+        if (layerDefaults != null) layerDefaults.setFields(null, this);
     }
 }

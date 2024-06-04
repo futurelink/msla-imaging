@@ -30,7 +30,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     @Getter @MSLAOptionContainer private PhotonWorkshopFileExtraTable Extra;
     @Getter @MSLAOptionContainer private PhotonWorkshopFileMachineTable Machine;
 
-    public PhotonWorkshopFile(byte versionMajor, byte versionMinor) throws MSLAException {
+    public PhotonWorkshopFile(byte versionMajor, byte versionMinor) {
         super();
         Descriptor = new PhotonWorkshopFileDescriptor(versionMajor, versionMinor);
         Header = new PhotonWorkshopFileHeaderTable(versionMajor, versionMinor);

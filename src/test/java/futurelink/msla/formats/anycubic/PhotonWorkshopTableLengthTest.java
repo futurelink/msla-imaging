@@ -1,6 +1,7 @@
 package futurelink.msla.formats.anycubic;
 
 import futurelink.msla.formats.CommonTestRoutines;
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.anycubic.tables.*;
 import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.formats.io.FileFieldsIO;
@@ -52,7 +53,7 @@ public class PhotonWorkshopTableLengthTest extends CommonTestRoutines {
     }
 
     @Test
-    void LayerDefTableTest() throws FileFieldsException {
+    void LayerDefTableTest() throws FileFieldsException, MSLAException {
         // Test empty layer definition table
         var block = new PhotonWorkshopFileLayerDefTable((byte) 2, (byte) 0);
         block.allocate();

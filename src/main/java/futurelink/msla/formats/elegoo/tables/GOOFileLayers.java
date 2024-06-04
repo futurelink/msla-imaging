@@ -23,8 +23,9 @@ public class GOOFileLayers implements MSLAFileLayers<GOOFileLayerDef, byte[]> {
     @Override public boolean hasOptions() { return true; }
     @Override public int count() { return Layers.size(); }
     @Override public GOOFileLayerDef get(int index) { return Layers.get(index); }
-    @Override public GOOFileLayerDef allocate() {
-        var layer = new GOOFileLayerDef(layerDefaults);
+    @Override public GOOFileLayerDef allocate() throws MSLAException {
+        var layer = new GOOFileLayerDef();
+        layer.setDefaults(layerDefaults);
         Layers.add(layer);
         return layer;
     }
@@ -34,8 +35,9 @@ public class GOOFileLayers implements MSLAFileLayers<GOOFileLayerDef, byte[]> {
                               Map<String, Object> params,
                               MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
     {
-        var layer = new GOOFileLayerDef(layerDefaults);
+        var layer = new GOOFileLayerDef();
         var layerNumber = count();
+        layer.setDefaults(layerDefaults);
         Layers.add(layer);
         encoder.encode(layerNumber, reader, params, callback);
     }

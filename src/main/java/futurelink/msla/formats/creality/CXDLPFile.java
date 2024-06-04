@@ -22,7 +22,7 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     private final CXDLPFilePreviews Previews = new CXDLPFilePreviews();
     @Getter private final CXDLPFileLayerDef Layers = new CXDLPFileLayerDef();
 
-    public CXDLPFile() throws MSLAException {
+    public CXDLPFile() {
         super();
         iStream = null;
         Header = new CXDLPFileHeader();

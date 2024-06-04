@@ -1,6 +1,5 @@
 package futurelink.msla.formats;
 
-import futurelink.msla.formats.iface.MSLAFileLayer;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.utils.FileOptionMapper;

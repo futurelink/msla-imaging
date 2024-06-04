@@ -21,7 +21,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     @Getter private final GOOFileLayers Layers;
     private final GOOFileFooter Footer = new GOOFileFooter();
 
-    public GOOFile() throws MSLAException {
+    public GOOFile() {
         super();
         Header = new GOOFileHeader();
         Layers = new GOOFileLayers();
@@ -53,7 +53,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
         else return Header.getBigPreview();
     }
 
-    @Override public MSLAPreview getLargePreview() throws MSLAException { return Header.getBigPreview(); }
+    @Override public MSLAPreview getLargePreview() { return Header.getBigPreview(); }
     @Override public void setPreview(int index, BufferedImage image) {
         if (index == 0) Header.getSmallPreview().setImage(image);
         else Header.getBigPreview().setImage(image);

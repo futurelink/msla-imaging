@@ -66,11 +66,9 @@ public class ImageTools {
         var defaults = PrinterDefaults.instance.getPrinter(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var wsFile = FileFactory.instance.create(machineName);
-        if (wsFile != null) {
-            if (!wsFile.isValid()) throw new MSLAException("File header has no resolution info");
-            var options = new FileOptionMapper(wsFile, defaults);
-            options.set("BottomExposureTime", "12");
-            wsFile.addLayer(new ImageReader(wsFile, image), null);
-        }
+        if (!wsFile.isValid()) throw new MSLAException("File header has no resolution info");
+        var options = new FileOptionMapper(wsFile, defaults);
+        options.set("BottomExposureTime", "12");
+        wsFile.addLayer(new ImageReader(wsFile, image), null);
     }
 }

@@ -53,7 +53,7 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
         }
     }
 
-    public CTBFileLayerDef(int version, MSLALayerDefaults layerDefaults) throws MSLAException {
+    public CTBFileLayerDef(int version) throws MSLAException {
         super(version);
         if (version <= 0) throw new MSLAException("Can't allocate a layer, version is not set");
         fileFields = new Fields(this);
@@ -65,7 +65,7 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
     }
 
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
-        layerDefaults.setFields(null, fileFields);
+        if (layerDefaults != null) layerDefaults.setFields(null, fileFields);
     }
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
 

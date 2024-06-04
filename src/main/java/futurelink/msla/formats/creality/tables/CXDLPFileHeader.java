@@ -37,10 +37,6 @@ public class CXDLPFileHeader extends CXDLPFileTable {
     }
 
     public CXDLPFileHeader() { fileFields = new Fields(); }
-    public CXDLPFileHeader(MSLAFileDefaults defaults) throws MSLAException {
-        this();
-        defaults.setFields("Header", fileFields);
-    }
 
     @Override public String getName() { return "Header"; }
     public void setLayerCount(short count) {

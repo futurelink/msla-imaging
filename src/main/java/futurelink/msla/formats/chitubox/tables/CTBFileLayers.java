@@ -40,7 +40,8 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
 
     @Override
     public CTBFileLayerDef allocate() throws MSLAException {
-        var layer = new CTBFileLayerDef(getVersion(), layerDefaults);
+        var layer = new CTBFileLayerDef(getVersion());
+        layer.setDefaults(layerDefaults);
         LayerDefinition.add(layer);
         return layer;
     }

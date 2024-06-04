@@ -71,11 +71,9 @@ public class PCBCalibration {
     {
         var defaults = PrinterDefaults.instance.getPrinter(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
-
         var wsFile = FileFactory.instance.create(machineName);
-        if (wsFile == null) throw new MSLAException("File was not initialized properly!");
-
         var options = new FileOptionMapper(wsFile, defaults);
+
         filePath = filePath.endsWith(defaults.getFileExtension()) ?
                 filePath :
                 filePath + "." + defaults.getFileExtension();

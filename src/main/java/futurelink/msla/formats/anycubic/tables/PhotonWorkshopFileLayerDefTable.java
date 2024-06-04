@@ -5,6 +5,7 @@ import futurelink.msla.formats.anycubic.PhotonWorkshopCodec;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         implements MSLAFileLayers<PhotonWorkshopFileLayerDef, byte[]>
 {
+    @Setter private MSLALayerDefaults layerDefaults;
     private final Fields fileFields;
 
     @SuppressWarnings("unused")
@@ -46,11 +48,6 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         super(versionMajor, versionMinor);
         this.fileFields = new Fields(this);
         this.fileFields.LayerCount = 0;
-    }
-
-    @Override
-    public void setDefaults(MSLALayerDefaults layerDefaults) {
-        //this.getFileFields().setDefaults(layerDefaults);
     }
 
     public final byte[] getLayerData(int i) {
@@ -83,6 +80,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         }
     }
 
+    @Override public void setDefaults(MSLALayerDefaults layerDefaults) { this.layerDefaults = layerDefaults; }
     @Override public int count() {
         return fileFields.getLayerCount();
     }
@@ -91,8 +89,9 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
     }
 
     @Override
-    public PhotonWorkshopFileLayerDef allocate() {
+    public PhotonWorkshopFileLayerDef allocate() throws MSLAException {
         var layer = new PhotonWorkshopFileLayerDef();
+        layer.setDefaults(layerDefaults);
         fileFields.Layers.add(layer);
         fileFields.LayerData.add(null);
         fileFields.LayerCount = fileFields.Layers.size();
