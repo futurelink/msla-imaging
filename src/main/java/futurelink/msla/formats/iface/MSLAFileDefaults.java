@@ -1,6 +1,6 @@
 package futurelink.msla.formats.iface;
 
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 
 import java.util.HashMap;

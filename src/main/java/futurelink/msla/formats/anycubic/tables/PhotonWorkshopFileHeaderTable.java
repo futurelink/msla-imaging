@@ -4,10 +4,10 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.fields.FileFieldsIO;
-import futurelink.msla.formats.utils.fields.FileFieldsReader;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
+import futurelink.msla.formats.io.FileFieldsReader;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
@@ -20,8 +20,6 @@ import java.io.OutputStream;
  */
 @Getter
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
-    private static final String OPTIONS_SECTION_NAME = "Header";
-
     @Delegate private final Fields fileFields;
 
     @Getter @Setter
@@ -95,16 +93,8 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
 
     public PhotonWorkshopFileHeaderTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
+        this.Name = "Header";
         this.fileFields = new Fields(this);
-    }
-
-    public PhotonWorkshopFileHeaderTable(
-            MSLAFileDefaults defaults,
-            byte versionMajor,
-            byte versionMinor) throws MSLAException
-    {
-        this(versionMajor, versionMinor);
-        defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
     }
 
     @Override

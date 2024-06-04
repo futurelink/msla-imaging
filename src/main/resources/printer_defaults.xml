@@ -184,26 +184,32 @@
         <options name="SliceInfo">
             <option name="DisplayWidth" value="172.8"/>
             <option name="DisplayHeight" value="102.4"/>
-            <option name="LayerHeight" value="0.05"/>
-            <option name="ExposureTime" value="30"/>
-            <option name="WaitTimeBeforeCure" value="4"/>
-            <option name="BottomExposureTime" value="40"/>
-            <option name="BottomLayersCount" value="2"/>
-            <option name="BottomLiftHeight" value="6"/>
-            <option name="BottomLiftSpeed" value="1"/>
-            <option name="LiftHeight" value="6"/>
-            <option name="LiftSpeed" value="1"/>
-            <option name="RetractSpeed" value="1"/>
+            <option group="General" name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
+            <option group="General" name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="General" name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option group="Normal layers" name="ExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
+            <option group="Normal layers" name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option group="Normal layers" name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="Normal layers" name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option group="Bottom layers" name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
+            <option group="Bottom layers" name="BottomExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
+            <option group="Bottom layers" name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option group="Bottom layers" name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="Bottom layers" name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
         </options>
         <options name="SliceInfoV3">
-            <option name="DistortionCompensationEnabled" value="0"/>
-            <option name="DistortionCompensationThickness" value="0"/>
-            <option name="DistortionCompensationFocalLength" value="0"/>
-            <option name="XYAxisProfileCompensationEnabled" value="0"/>
-            <option name="XYAxisProfileCompensationValue" value="0"/>
-            <option name="ZPenetrationCompensationEnabled" value="0"/>
-            <option name="ZPenetrationCompensationLevel" value="0"/>
-            <option name="AntiAliasEnabled" value="0"/>
+            <option group="Advanced" name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="XYAxisProfileCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="ZPenetrationCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="AntiAliasEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="AntiAliasGreyMinValue" type="int" value="1" minValue="1" maxValue="255"/>
+            <option group="Advanced" name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
+            <option group="Advanced" name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
         </options>
     </printer>
 
@@ -214,28 +220,34 @@
             <option name="PrinterModel" value="CL-70"/>
         </options>
         <options name="SliceInfo">
-            <option name="DisplayWidth" value="130.56"/>
-            <option name="DisplayHeight" value="122.4"/>
-            <option name="LayerHeight" value="0.05"/>
-            <option name="ExposureTime" value="30"/>
-            <option name="WaitTimeBeforeCure" value="4"/>
-            <option name="BottomExposureTime" value="40"/>
-            <option name="BottomLayersCount" value="2"/>
-            <option name="BottomLiftHeight" value="6"/>
-            <option name="BottomLiftSpeed" value="1"/>
-            <option name="LiftHeight" value="6"/>
-            <option name="LiftSpeed" value="1"/>
-            <option name="RetractSpeed" value="1"/>
+            <option name="DisplayWidth" value="172.8"/>
+            <option name="DisplayHeight" value="102.4"/>
+            <option group="General" name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
+            <option group="General" name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="General" name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option group="Normal layers" name="ExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
+            <option group="Normal layers" name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option group="Normal layers" name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="Normal layers" name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option group="Bottom layers" name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
+            <option group="Bottom layers" name="BottomExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
+            <option group="Bottom layers" name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option group="Bottom layers" name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="Bottom layers" name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
         </options>
         <options name="SliceInfoV3">
-            <option name="DistortionCompensationEnabled" value="0"/>
-            <option name="DistortionCompensationThickness" value="0"/>
-            <option name="DistortionCompensationFocalLength" value="0"/>
-            <option name="XYAxisProfileCompensationEnabled" value="0"/>
-            <option name="XYAxisProfileCompensationValue" value="0"/>
-            <option name="ZPenetrationCompensationEnabled" value="0"/>
-            <option name="ZPenetrationCompensationLevel" value="0"/>
-            <option name="AntiAliasEnabled" value="0"/>
+            <option group="Advanced" name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="XYAxisProfileCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="ZPenetrationCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="AntiAliasEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="AntiAliasGreyMinValue" type="int" value="1" minValue="1" maxValue="255"/>
+            <option group="Advanced" name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
+            <option group="Advanced" name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
         </options>
     </printer>
 
@@ -246,28 +258,34 @@
             <option name="PrinterModel" value="CL-60"/>
         </options>
         <options name="SliceInfo">
-            <option name="DisplayWidth" value="81.0"/>
-            <option name="DisplayHeight" value="128.0"/>
-            <option name="LayerHeight" value="0.05"/>
-            <option name="ExposureTime" value="30"/>
-            <option name="WaitTimeBeforeCure" value="4"/>
-            <option name="BottomExposureTime" value="40"/>
-            <option name="BottomLayersCount" value="2"/>
-            <option name="BottomLiftHeight" value="6"/>
-            <option name="BottomLiftSpeed" value="1"/>
-            <option name="LiftHeight" value="6"/>
-            <option name="LiftSpeed" value="1"/>
-            <option name="RetractSpeed" value="1"/>
+            <option name="DisplayWidth" value="172.8"/>
+            <option name="DisplayHeight" value="102.4"/>
+            <option group="General" name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
+            <option group="General" name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="General" name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option group="Normal layers" name="ExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
+            <option group="Normal layers" name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option group="Normal layers" name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="Normal layers" name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option group="Bottom layers" name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
+            <option group="Bottom layers" name="BottomExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
+            <option group="Bottom layers" name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option group="Bottom layers" name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="Bottom layers" name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
         </options>
         <options name="SliceInfoV3">
-            <option name="DistortionCompensationEnabled" value="0"/>
-            <option name="DistortionCompensationThickness" value="0"/>
-            <option name="DistortionCompensationFocalLength" value="0"/>
-            <option name="XYAxisProfileCompensationEnabled" value="0"/>
-            <option name="XYAxisProfileCompensationValue" value="0"/>
-            <option name="ZPenetrationCompensationEnabled" value="0"/>
-            <option name="ZPenetrationCompensationLevel" value="0"/>
-            <option name="AntiAliasEnabled" value="0"/>
+            <option group="Advanced" name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="XYAxisProfileCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="ZPenetrationCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="AntiAliasEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="AntiAliasGreyMinValue" type="int" value="1" minValue="1" maxValue="255"/>
+            <option group="Advanced" name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
+            <option group="Advanced" name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
         </options>
     </printer>
 
@@ -278,28 +296,34 @@
             <option name="PrinterModel" value="CL925"/>
         </options>
         <options name="SliceInfo">
-            <option name="DisplayWidth" value="198.14"/>
-            <option name="DisplayHeight" value="123.838"/>
-            <option name="LayerHeight" value="0.05"/>
-            <option name="ExposureTime" value="30"/>
-            <option name="WaitTimeBeforeCure" value="4"/>
-            <option name="BottomExposureTime" value="40"/>
-            <option name="BottomLayersCount" value="2"/>
-            <option name="BottomLiftHeight" value="6"/>
-            <option name="BottomLiftSpeed" value="1"/>
-            <option name="LiftHeight" value="6"/>
-            <option name="LiftSpeed" value="1"/>
-            <option name="RetractSpeed" value="1"/>
+            <option name="DisplayWidth" value="172.8"/>
+            <option name="DisplayHeight" value="102.4"/>
+            <option group="General" name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
+            <option group="General" name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="General" name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option group="Normal layers" name="ExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
+            <option group="Normal layers" name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option group="Normal layers" name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="Normal layers" name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option group="Bottom layers" name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
+            <option group="Bottom layers" name="BottomExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
+            <option group="Bottom layers" name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option group="Bottom layers" name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option group="Bottom layers" name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
         </options>
         <options name="SliceInfoV3">
-            <option name="DistortionCompensationEnabled" value="0"/>
-            <option name="DistortionCompensationThickness" value="0"/>
-            <option name="DistortionCompensationFocalLength" value="0"/>
-            <option name="XYAxisProfileCompensationEnabled" value="0"/>
-            <option name="XYAxisProfileCompensationValue" value="0"/>
-            <option name="ZPenetrationCompensationEnabled" value="0"/>
-            <option name="ZPenetrationCompensationLevel" value="0"/>
-            <option name="AntiAliasEnabled" value="0"/>
+            <option group="Advanced" name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="XYAxisProfileCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="ZPenetrationCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option group="Advanced" name="AntiAliasEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="AntiAliasGreyMinValue" type="int" value="1" minValue="1" maxValue="255"/>
+            <option group="Advanced" name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
+            <option group="Advanced" name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option group="Advanced" name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
         </options>
     </printer>
 
@@ -310,7 +334,7 @@
         </options>
     </printer>
 
-    <printer manufacturer="ELEGOO" name="Saturn" extension="ctb" file="CTBFile">
+    <printer manufacturer="ELEGOO" name="SATURN" extension="ctb" file="CTBFile">
         <file_options>
             <option name="Version" value="4"/>
         </file_options>
@@ -323,50 +347,51 @@
             <option name="BedSizeX" value="192.0"/>
             <option name="BedSizeY" value="120.0"/>
             <option name="BedSizeZ" value="200.0"/>
-            <option name="BottomLayersCount" value="5"/>
-            <option name="LightOffDelay" value="0"/>
-            <option name="AntiAliasLevel" value="1"/>
-            <option name="LightPWM" value="255"/>
-            <option name="BottomLightPWM" value="255"/>
-            <option name="LayerHeightMillimeter" value="0.05"/>
-            <option name="LayerExposureSeconds" value="2.5"/>
-            <option name="BottomExposureSeconds" value="30"/>
+            <option group="General" name="LightOffDelay" value="0"/>
+            <option group="General" name="AntiAliasLevel" value="1"/>
+            <option group="General" name="LightPWM" value="255"/>
+            <option group="General" name="LayerHeightMillimeter" value="0.05"/>
+            <option group="Normal layers" name="LayerExposureSeconds" value="2.5"/>
+            <option group="Bottom layers" name="BottomLayersCount" value="5"/>
+            <option group="Bottom layers" name="BottomLightPWM" value="255"/>
+            <option group="Bottom layers" name="BottomExposureSeconds" value="30"/>
         </options>
         <options name="SlicerInfo">
-            <option name="BottomLiftHeight2" value="0.0"/>
-            <option name="BottomLiftSpeed2" value="0.0"/>
-            <option name="LiftHeight2" value="0.0"/>
-            <option name="LiftSpeed2" value="0.0"/>
-            <option name="RetractHeight2" value="0.0"/>
-            <option name="RetractSpeed2" value="0.0"/>
-            <option name="RestTimeAfterLift" value="0.0"/>
-            <option name="AntiAliasFlag" value="15"/>
-            <option name="PerLayerSettings" value="0"/>
-            <option name="AntiAliasLevel" value="4"/>
-            <option name="RestTimeAfterRetract" value="0.5"/>
-            <option name="RestTimeAfterLift2" value="0.0"/>
-            <option name="TransitionLayerCount" value="10"/>
+            <option group="General" name="PerLayerSettings" value="0"/>
+            <option group="General" name="AntiAliasFlag" value="15"/>
+            <option group="General" name="AntiAliasLevel" value="4"/>
+            <option group="General" name="TransitionLayerCount" value="10"/>
+            <option group="Normal layers" name="LiftHeight2" value="0.0"/>
+            <option group="Normal layers" name="LiftSpeed2" value="0.0"/>
+            <option group="Normal layers" name="RetractHeight2" value="0.0"/>
+            <option group="Normal layers" name="RetractSpeed2" value="0.0"/>
+            <option group="Normal layers" name="RestTimeAfterLift" value="0.0"/>
+            <option group="Normal layers" name="RestTimeAfterRetract" value="0.5"/>
+            <option group="Normal layers" name="RestTimeAfterLift2" value="0.0"/>
+            <option group="Bottom layers" name="BottomLiftHeight2" value="0.0"/>
+            <option group="Bottom layers" name="BottomLiftSpeed2" value="0.0"/>
         </options>
         <options name="MachineName">
+            <!-- Must be the same as "manufacturer" + ' ' + "name" attributes in printer header -->
             <option name="MachineName" value="ELEGOO SATURN"/>
         </options>
         <options name="PrintParams">
-            <option name="BottomLiftHeight" value="7"/>
-            <option name="BottomLiftSpeed" value="70"/>
-            <option name="LiftHeight" value="7"/>
-            <option name="LiftSpeed" value="70"/>
-            <option name="RetractSpeed" value="180"/>
-            <option name="BottomLightOffDelay" value="0"/>
-            <option name="LightOffDelay" value="0"/>
-            <option name="BottomLayerCount" value="5"/>
+            <option group="Normal layers" name="LightOffDelay" value="0"/>
+            <option group="Normal layers" name="LiftHeight" value="7"/>
+            <option group="Normal layers" name="LiftSpeed" value="70"/>
+            <option group="Normal layers" name="RetractSpeed" value="180"/>
+            <option group="Bottom layers" name="BottomLiftHeight" value="7"/>
+            <option group="Bottom layers" name="BottomLiftSpeed" value="70"/>
+            <option group="Bottom layers" name="BottomLightOffDelay" value="0"/>
+            <option group="Bottom layers" name="BottomLayerCount" value="5"/>
         </options>
         <options name="PrintParamsV4">
-            <option name="BottomRetractSpeed" value="180"/>
-            <option name="BottomRetractSpeed2" value="0"/>
-            <option name="RestTimeAfterRetract" value="0.5"/>
-            <option name="RestTimeAfterLift" value="0"/>
-            <option name="RestTimeBeforeLift" value="0"/>
-            <option name="BottomRetractHeight2" value="0"/>
+            <option group="Bottom layers" name="BottomRetractSpeed" value="180"/>
+            <option group="Bottom layers" name="BottomRetractSpeed2" value="0"/>
+            <option group="Normal layers" name="RestTimeAfterRetract" value="0.5"/>
+            <option group="Normal layers" name="RestTimeAfterLift" value="0"/>
+            <option group="Normal layers" name="RestTimeBeforeLift" value="0"/>
+            <option group="Bottom layers" name="BottomRetractHeight2" value="0"/>
         </options>
     </printer>
 </printers>

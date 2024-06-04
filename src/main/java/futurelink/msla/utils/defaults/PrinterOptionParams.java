@@ -1,8 +1,8 @@
-package futurelink.msla.formats.utils.defaults;
+package futurelink.msla.utils.defaults;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLADefaultsParams;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 import org.dom4j.Element;
 
@@ -24,8 +24,12 @@ public class PrinterOptionParams {
 
     @Getter
     public static class Param implements MSLADefaultsParams {
+        private final String group;
         private final String defaultValue;
-        public Param(String value) { this.defaultValue = value; }
+        public Param(String group, String value) {
+            this.group = group;
+            this.defaultValue = value;
+        }
         public String getType() { return "generic"; }
         public Integer getInt() { return Integer.parseInt(defaultValue); }
         public Byte getByte() { return Byte.parseByte(defaultValue); }
@@ -54,13 +58,18 @@ public class PrinterOptionParams {
     @Getter public static class ParamFloat extends Param {
         private final Float minValue;
         private final Float maxValue;
-        public ParamFloat(String value, Float minValue, Float maxValue) {
-            super(value);
+        public ParamFloat(String group, String value, Float minValue, Float maxValue) {
+            super(group, value);
             this.minValue = minValue;
             this.maxValue = maxValue;
         }
 
         @Override public String getType() { return "float"; }
+        @Override public Byte getByte() { return null; }
+        @Override public Short getShort() { return null; }
+        @Override public Integer getInt() { return null; }
+        @Override public Long getLong() { return null; }
+        @Override public String getString() { return String.valueOf(getDefaultValue()); }
 
         @Override
         public void checkValue(String value) throws MSLAException {
@@ -82,13 +91,14 @@ public class PrinterOptionParams {
     @Getter public static class ParamInt extends Param {
         private final Integer minValue;
         private final Integer maxValue;
-        public ParamInt(String value, Integer minValue, Integer maxValue) {
-            super(value);
+        public ParamInt(String group, String value, Integer minValue, Integer maxValue) {
+            super(group, value);
             this.minValue = minValue;
             this.maxValue = maxValue;
         }
 
         @Override public String getType() { return "integer"; }
+        @Override public String getString() { return String.valueOf(getDefaultValue()); }
 
         @Override
         public void checkValue(String value) throws MSLAException {
@@ -108,7 +118,7 @@ public class PrinterOptionParams {
     }
 
     @Getter public static class ParamChar extends Param {
-        public ParamChar(String value) { super(!value.isEmpty() ? value.substring(0,1) : ""); }
+        public ParamChar(String group, String value) { super(group, !value.isEmpty() ? value.substring(0,1) : ""); }
         @Override public String getType() { return "character"; }
         @Override public Integer getInt() { return getDefaultValue().isEmpty() ? null : (int) getDefaultValue().getBytes()[0]; }
         @Override public Byte getByte() { return getDefaultValue().isEmpty() ? null : getDefaultValue().getBytes()[0]; }
@@ -119,7 +129,7 @@ public class PrinterOptionParams {
     @Getter public static class ParamBoolean extends Param {
         private Integer trueValue;
         private Integer falseValue;
-        public ParamBoolean(String value) { super(value); }
+        public ParamBoolean(String group, String value) { super(group, value); }
         @Override public String getType() { return "boolean"; }
         @Override public String toString() {
             return "Boolean option [ default = " + getDefaultValue() + ", true = " + trueValue + ", false = " + falseValue + " ]"; }
@@ -137,6 +147,7 @@ public class PrinterOptionParams {
      * @throws MSLAException is thrown if XML element is incorrect or missing required attributes
      */
     public void addFromXMLElement(Element option) throws MSLAException {
+        var group = option.attributeValue("group");
         var name = option.attributeValue("name");
         var value = option.attributeValue("value");
         var type = option.attributeValue("type"); // Option type in XML description, to properly display option
@@ -149,13 +160,13 @@ public class PrinterOptionParams {
             if (minValue == null) throw new MSLAException("Attribute 'minValue' is required in option '" + name + "'");
             if (maxValue == null) throw new MSLAException("Attribute 'maxValue' is required in option '" + name + "'");
             if ("int".equals(type)) {
-                opt = new ParamInt(value, Integer.parseInt(minValue), Integer.parseInt(maxValue));
+                opt = new ParamInt(group, value, Integer.parseInt(minValue), Integer.parseInt(maxValue));
             } else {
-                opt = new ParamFloat(value, Float.parseFloat(minValue), Float.parseFloat(maxValue));
+                opt = new ParamFloat(group,value, Float.parseFloat(minValue), Float.parseFloat(maxValue));
             }
-        } else if ("char".equals(type)) opt = new ParamChar(value);
-        else if ("boolean".equals(type)) opt = new ParamBoolean(value);
-        else if ("".equals(type) || type == null) opt = new Param(value);
+        } else if ("char".equals(type)) opt = new ParamChar(group, value);
+        else if ("boolean".equals(type)) opt = new ParamBoolean(group, value);
+        else if ("".equals(type) || type == null) opt = new Param(group, value);
         else throw new MSLAException("Option type " + type + " is unknown");
         options.put(name, opt);
     }

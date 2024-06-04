@@ -3,7 +3,7 @@ package futurelink.msla.formats.elegoo.tables;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.MSLAPreview;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 
 import java.awt.image.BufferedImage;
 

@@ -2,13 +2,11 @@ package futurelink.msla.formats.chitubox;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAFileGeneric;
-import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.chitubox.tables.*;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.FileOptionMapper;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 
 import java.awt.image.BufferedImage;
@@ -20,7 +18,6 @@ import java.util.logging.Logger;
 
 public class CTBFile extends MSLAFileGeneric<byte[]> {
     private final Logger logger = Logger.getLogger(CTBFile.class.getName());
-    @Getter private final MSLAOptionMapper options;
 
     /* File sections */
     @Getter @MSLAOptionContainer private CTBFileHeader Header = null;
@@ -34,37 +31,33 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     private final CTBFilePreview PreviewLarge = new CTBFilePreview(CTBFilePreview.Type.Large);
     @Getter private CTBFileLayers Layers = null;
 
-    public CTBFile(MSLAFileDefaults defaults) throws MSLAException {
+    public CTBFile(Byte Version) throws MSLAException {
         super();
-        var Version = defaults.getFileProps().getByte("Version");
         if (Version == null || Version <= 0)
             throw new MSLAException("File defaults do not have a version number.");
 
-        Header = new CTBFileHeader(Version, defaults);
+        Header = new CTBFileHeader(Version);
         if (Header.getFileFields().getVersion() <= 0)
             throw new MSLAException("The MSLA file does not have a version number.");
 
-        MachineName = new CTBFileMachineName(defaults);
-        PrintParams = new CTBFilePrintParams(Version, defaults);
-        SlicerInfo = new CTBFileSlicerInfo(Version, defaults);
-        Layers = new CTBFileLayers(this, defaults.getLayerDefaults());
+        MachineName = new CTBFileMachineName();
+        PrintParams = new CTBFilePrintParams(Version);
+        SlicerInfo = new CTBFileSlicerInfo(Version);
+        Layers = new CTBFileLayers(this);
 
         // Version 4 or later data
         if (Header.getFileFields().getVersion() >= 4) {
-            PrintParamsV4 = new CTBFilePrintParamsV4(Version, defaults);
+            PrintParamsV4 = new CTBFilePrintParamsV4(Version);
             Disclaimer = new CTBFileDisclaimer();
 
             // Version 5 or later data
             if (Header.getFileFields().getVersion() >= 5) ResinParams = new CTBFileResinParams(Version);
         }
-
-        options = new FileOptionMapper(this, defaults);
     }
 
-    public CTBFile(MSLAFileDefaults defaults, DataInputStream stream) throws IOException, MSLAException {
+    public CTBFile(DataInputStream stream) throws IOException, MSLAException {
         super();
         read(stream);
-        options = new FileOptionMapper(this, defaults);
     }
 
     @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return CTBFileCodec.class; }
@@ -72,6 +65,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
         if (index == 0) return PreviewLarge;
         else return PreviewSmall;
     }
+    @Override public MSLAPreview getLargePreview() throws MSLAException { return PreviewLarge; }
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return Header.getFileFields().getResolution(); }
     @Override public float getPixelSizeUm() { return 0; }
@@ -87,7 +81,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     }
 
     @Override public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        var layerData = new CTBFileCodec.Input(Layers.get(layer).getData());
+        var layerData = new CTBFileCodec.Input(Layers.get(layer).getFileFields().getData());
         var params = new HashMap<String, Object>();
         params.put("EncryptionKey", Header.getFileFields().getEncryptionKey());
         return getDecodersPool().decode(layer, writer, layerData, params);
@@ -155,7 +149,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
             var pixels = PreviewSmall.readImage(stream);
         }
 
-        Layers = new CTBFileLayers(this, null);
+        Layers = new CTBFileLayers(this);
         Layers.read(stream, Header.getFileFields().getLayersDefinitionOffset());
     }
 
@@ -225,7 +219,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
             // Write brief layer definitions
             var wholeBriefLayerDefSize = Layers.count() * CTBFileLayerDef.BRIEF_TABLE_SIZE;
             for (var i = 0; i < Layers.count(); i++) {
-                var def = Layers.get(i);
+                var def = Layers.get(i).getFileFields();
                 def.setDataAddress(wholeBriefLayerDefSize +
                         offset + CTBFileLayerDef.BRIEF_TABLE_SIZE +
                         ((def.getExtra() != null) ? CTBFileLayerDefExtra.TABLE_SIZE : 0)
@@ -243,7 +237,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
 
             // Write whole layer definitions
             for (var i = 0; i < Layers.count(); i++) {
-                var def = Layers.get(i);
+                var def = Layers.get(i).getFileFields();
                 def.getParent().setBriefMode(false);
                 def.getParent().write(stream);
             }
@@ -263,6 +257,16 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     public void setPreview(int index, BufferedImage image) {
         if (index == 0) PreviewLarge.setImage(image);
         else PreviewSmall.setImage(image);
+    }
+
+    @Override
+    public void reset(MSLAFileDefaults defaults) throws MSLAException {
+        defaults.setFields(Header.getName(), Header.getFileFields());
+        defaults.setFields(SlicerInfo.getName(), SlicerInfo.getFileFields());
+        defaults.setFields(MachineName.getName(), MachineName.getFileFields());
+        defaults.setFields(PrintParams.getName(), PrintParams.getFileFields());
+        defaults.setFields(PrintParamsV4.getName(), PrintParamsV4.getFileFields());
+        getLayers().setDefaults(defaults.getLayerDefaults());
     }
 
     @Override

@@ -2,7 +2,6 @@ package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import lombok.Getter;
@@ -15,7 +14,6 @@ import java.io.OutputStream;
  */
 @Getter @Setter
 public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
-    private static final String OPTIONS_SECTION_NAME = "Extra";
     private final Fields fileFields;
 
     @SuppressWarnings("unused")
@@ -52,14 +50,9 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
 
     public PhotonWorkshopFileExtraTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
+        Name = "Extra";
         TableLength = 24; // Constant that doesn't mean anything...
         fileFields = new Fields(this);
-    }
-
-    public PhotonWorkshopFileExtraTable(MSLAFileDefaults defaults, byte versionMajor, byte versionMinor)
-            throws MSLAException {
-        this(versionMajor, versionMinor);
-        defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
     }
 
     @Override

@@ -2,9 +2,11 @@ package futurelink.msla.formats.anycubic;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.utils.FileFactory;
+import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
+import futurelink.msla.utils.FileOptionMapper;
+import futurelink.msla.utils.defaults.PrinterDefaults;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -29,42 +31,38 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
     }
 
     @Test
-    void TestFileExtract() throws InterruptedException {
-        try {
-            delete_file(temp_dir + "1.png");  // Clean up files just in case
-            delete_file(temp_dir + "10.png");
+    void TestFileExtract() throws InterruptedException, MSLAException, IOException {
+        delete_file(temp_dir + "1.png");  // Clean up files just in case
+        delete_file(temp_dir + "10.png");
 
-            var file = (PhotonWorkshopFile) FileFactory.instance.load("Anycubic Photon Mono 4K",
-                    resourceFile("test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma")
-            );
+        var file = (PhotonWorkshopFile) FileFactory.instance.load("Anycubic Photon Mono 4K",
+                resourceFile("test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma")
+        );
 
-            // Extract preview
-            ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "photon_preview.png"));
-            assertFileExactSize(temp_dir + "photon_preview.png", 3535);
+        // Extract preview
+        ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "photon_preview.png"));
+        assertFileExactSize(temp_dir + "photon_preview.png", 3535);
 
-            // Asynchronously extract image files
-            var layerPixels = new int[2];
-            var layerFiles = new String[2];
-            var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
-                layerPixels[layerNumber] = pixels;
-                layerFiles[layerNumber] = fileName;
-            });
-            file.readLayer(writer, 0);
-            file.readLayer(writer, 1);
-            while (file.getDecodersPool().isDecoding()) { Thread.sleep(100); } // Wait while decoding-writing is done
-            logger.info("Done");
+        // Asynchronously extract image files
+        var layerPixels = new int[2];
+        var layerFiles = new String[2];
+        var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
+            layerPixels[layerNumber] = pixels;
+            layerFiles[layerNumber] = fileName;
+        });
+        file.readLayer(writer, 0);
+        file.readLayer(writer, 1);
+        while (file.getDecodersPool().isDecoding()) { Thread.sleep(100); } // Wait while decoding-writing is done
+        logger.info("Done");
 
-            assertEquals(166587, layerPixels[0]);
-            assertEquals(169644, layerPixels[1]);
+        assertEquals(166587, layerPixels[0]);
+        assertEquals(169644, layerPixels[1]);
 
-            assertFileMinSize(layerFiles[0], 11000);
-            assertFileMinSize(layerFiles[1], 11000);
+        assertFileMinSize(layerFiles[0], 11000);
+        assertFileMinSize(layerFiles[1], 11000);
 
-            // Save previews
-            file.getPreview((short) 0).getImage();
-        } catch (MSLAException | IOException e) {
-            throw new RuntimeException(e);
-        }
+        // Save previews
+        file.getPreview((short) 0).getImage();
     }
 
     @Test
@@ -73,8 +71,12 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
         logger.info("Temporary file: " + outFile);
         delete_file(outFile); // Clean up files just in case
 
-        var file = (PhotonWorkshopFile) FileFactory.instance.create("Anycubic Photon Mono X 6K");
-        file.getOptions().set("Bottom layers exposure time", "12");
+        var machine = "Anycubic Photon Mono X 6K";
+        var defaults = PrinterDefaults.instance.getPrinter(machine)
+                .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
+        var file = (PhotonWorkshopFile) FileFactory.instance.create(machine);
+        var options = new FileOptionMapper(file, defaults);
+        options.set("Bottom layers exposure time", "12");
 
         var pngFileLayers = new String[]{
                 resourceFile("test_data/PhotonFileTest/Layer_1.png"),

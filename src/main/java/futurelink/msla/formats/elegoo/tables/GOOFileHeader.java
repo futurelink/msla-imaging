@@ -1,11 +1,10 @@
 package futurelink.msla.formats.elegoo.tables;
 
-import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.utils.About;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.About;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 
@@ -100,12 +99,8 @@ public class GOOFileHeader extends GOOFileTable {
     }
 
     public GOOFileHeader() { fileFields = new Fields(); }
-    public GOOFileHeader(MSLAFileDefaults defaults) throws MSLAException {
-        this();
-        defaults.setFields("Header", fileFields);
-        fileFields.MachineName = defaults.getMachineName();
-    }
 
+    @Override public String getName() { return "Header"; }
     @Override public int getDataLength() { return HEADER_LENGTH; }
     @Override public String toString() { return "-- Header --\n" + fileFields.fieldsAsString(" = ", "\n"); }
 

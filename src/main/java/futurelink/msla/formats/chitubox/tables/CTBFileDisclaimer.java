@@ -3,8 +3,8 @@ package futurelink.msla.formats.chitubox.tables;
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.fields.FileFieldsIO;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
 import lombok.Getter;
 
 @Getter
@@ -15,6 +15,8 @@ public class CTBFileDisclaimer implements MSLAFileBlock {
             "or sublicense the said programs or codes.";
 
     private final Fields fileFields = new Fields();
+
+    @Override public String getName() { return null; }
 
     @Override
     public int getDataLength() throws FileFieldsException {

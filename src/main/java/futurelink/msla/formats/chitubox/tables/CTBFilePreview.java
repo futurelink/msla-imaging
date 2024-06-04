@@ -5,9 +5,9 @@ import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAPreview;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.fields.FileFieldsIO;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -142,6 +142,7 @@ public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
         return rawData.toArray(Byte[]::new);
     }
 
+    @Override public String getName() { return null; }
     @Override public Size getResolution() { return fileFields.Resolution; }
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }

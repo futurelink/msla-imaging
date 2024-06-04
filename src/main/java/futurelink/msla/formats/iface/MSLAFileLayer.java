@@ -1,7 +1,8 @@
 package futurelink.msla.formats.iface;
 
-import futurelink.msla.formats.MSLAOptionMapper;
+import futurelink.msla.formats.MSLAException;
 
 public interface MSLAFileLayer {
-    MSLAOptionMapper options();
+    MSLAFileBlockFields getFileFields();
+    void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException;
 }

@@ -1,4 +1,4 @@
-package futurelink.msla.formats.utils.fields;
+package futurelink.msla.formats.io;
 
 import com.google.common.io.LittleEndianDataOutputStream;
 import futurelink.msla.formats.MSLAException;

@@ -2,9 +2,11 @@ package futurelink.msla.formats.creality;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.utils.FileFactory;
+import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
+import futurelink.msla.utils.FileOptionMapper;
+import futurelink.msla.utils.defaults.PrinterDefaults;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -19,8 +21,13 @@ public class CXDLPFileTest extends CommonTestRoutines {
         logger.info("Temporary file: " + outFile);
         delete_file(outFile); // Clean up files just in case
 
-        var file = (CXDLPFile) FileFactory.instance.create("CREALITY HALOT-ONE PLUS");
-        file.getOptions().set("Bottom layers exposure time", "12");
+        var machine = "CREALITY HALOT-ONE PLUS";
+        var defaults = PrinterDefaults.instance.getPrinter(machine)
+                .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
+        var file = (CXDLPFile) FileFactory.instance.create(machine);
+        var options = new FileOptionMapper(file, defaults);
+        options.set("Bottom layers exposure time", "12");
+        options.set("Layer height", "0.1");
 
         var pngFileLayers = new String[]{
                 resourceFile("test_data/CXDLPFileTest/Layer_1.png"),
@@ -46,6 +53,18 @@ public class CXDLPFileTest extends CommonTestRoutines {
     }
 
     @Test
+    void TestFileWithDefaultParams() throws MSLAException {
+        var machine = "CREALITY HALOT-RAY";
+        var defaults = PrinterDefaults.instance.getPrinter(machine)
+                .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
+        var file = (CXDLPFile) FileFactory.instance.create(machine);
+        var options = new FileOptionMapper(file, defaults);
+        options.set("Bottom layers exposure time", "12");
+        options.set("Layer height", "0.1");
+        System.out.println(options.getParameters("Layer height"));
+    }
+
+    @Test
     void TestFileCreateAndExtract() throws MSLAException, InterruptedException, IOException {
         var machineName = "CREALITY HALOT ONE PLUS";
         var outFile = temp_dir + "test_create_and_extract.cxdlp";
@@ -57,8 +76,8 @@ public class CXDLPFileTest extends CommonTestRoutines {
                 resourceFile("test_data/CXDLPFileTest/Example_HALOT_ONE_PLUS.cxdlp")
         );
 
-        ImageIO.write(file.getPreview((short) 0).getImage(), "png", new File(temp_dir + "cxdlp_preview.png"));
-        assertFileExactSize(temp_dir + "cxdlp_preview.png", 1871);
+        ImageIO.write(file.getLargePreview().getImage(), "png", new File(temp_dir + "cxdlp_preview.png"));
+        assertFileExactSize(temp_dir + "cxdlp_preview.png", 5468);
 
         // Asynchronously extract image files
         var writer = new ImageWriter(file, temp_dir, "extracted_", "png");

@@ -1,14 +1,12 @@
 package futurelink.msla.formats.chitubox.tables;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.fields.FileFieldsIO;
-import futurelink.msla.formats.utils.LayerOptionMapper;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +14,6 @@ import lombok.Setter;
 public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
     public static final int BRIEF_TABLE_SIZE = 36;
     @Getter private final Fields fileFields;
-    private final MSLAOptionMapper optionMapper;
 
     /**
      * Brief mode, which means a layer definition excludes
@@ -65,13 +62,16 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
             fileFields.Extra = new CTBFileLayerDefExtra();
             fileFields.TableSize += CTBFileLayerDefExtra.TABLE_SIZE;
         }
-        optionMapper = new LayerOptionMapper(this.fileFields, layerDefaults);
     }
 
-    @Override public MSLAOptionMapper options() { return optionMapper; }
+    @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
+        layerDefaults.setFields(null, fileFields);
+    }
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
+
+    @Override public String getName() { return null; }
     @Override public int getDataLength() throws FileFieldsException {
-        return (isBriefMode) ? BRIEF_TABLE_SIZE : FileFieldsIO.getBlockLength(this);
+        return (isBriefMode) ? BRIEF_TABLE_SIZE : FileFieldsIO.getBlockLength(this.fileFields);
     }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {

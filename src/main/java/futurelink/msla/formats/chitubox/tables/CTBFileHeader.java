@@ -3,12 +3,11 @@ package futurelink.msla.formats.chitubox.tables;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.fields.FileFieldsIO;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -95,11 +94,7 @@ public class CTBFileHeader implements MSLAFileBlock {
         fileFields.EncryptionKey = r.nextInt(Integer.MAX_VALUE);
     }
 
-    public CTBFileHeader(int version, MSLAFileDefaults defaults) throws MSLAException {
-        this(version);
-        defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
-    }
-
+    @Override public String getName() { return OPTIONS_SECTION_NAME; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {

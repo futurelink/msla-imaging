@@ -1,7 +1,9 @@
 package futurelink.msla.tools;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.utils.FileFactory;
+import futurelink.msla.utils.FileFactory;
+import futurelink.msla.utils.FileOptionMapper;
+import futurelink.msla.utils.defaults.PrinterDefaults;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -30,8 +32,8 @@ public class ImageTools {
 
     public static void createFromSVG(String machineName, String svgFileName, String outputFileName)
             throws IOException, MSLAException {
-        var defaults = FileFactory.instance.defaults(machineName);
-        if (defaults == null) throw new IOException("Machine name '" + machineName + "' is incorrect");
+        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+                .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         try (var stream = new FileInputStream(svgFileName)) {
             var reader = new BufferedReader(new InputStreamReader(stream));
             var svgImage = new TranscoderInput(reader);
@@ -61,10 +63,13 @@ public class ImageTools {
     @SuppressWarnings("unchecked")
     public static void createFromBufferedImage(String machineName, BufferedImage image, String outputFileName)
             throws MSLAException  {
+        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+                .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var wsFile = FileFactory.instance.create(machineName);
         if (wsFile != null) {
             if (!wsFile.isValid()) throw new MSLAException("File header has no resolution info");
-            wsFile.getOptions().set("BottomExposureTime", "12");
+            var options = new FileOptionMapper(wsFile, defaults);
+            options.set("BottomExposureTime", "12");
             wsFile.addLayer(new ImageReader(wsFile, image), null);
         }
     }

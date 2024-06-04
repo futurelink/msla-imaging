@@ -16,6 +16,6 @@ public class GOOFileFooter extends GOOFileTable {
         @MSLAFileField(order = 3, length = 8) byte[] Magic = {0x07, 0x00, 0x00, 0x00, 0x44, 0x4C, 0x50, 0x00}; // 8 bytes;
     }
 
-    @Override
-    public int getDataLength() { return 0; }
+    @Override public String getName() { return null; }
+    @Override public int getDataLength() { return 0; }
 }

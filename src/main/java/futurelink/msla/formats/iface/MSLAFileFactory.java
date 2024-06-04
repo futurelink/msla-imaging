@@ -7,11 +7,10 @@ import java.util.Set;
 
 public interface MSLAFileFactory {
     String getName();
-    MSLAFile<?> create(String machineName) throws MSLAException;
-    MSLAFile<?> load(String machineName, String fileName) throws MSLAException;
-    MSLAFile<?> load(String machineName, DataInputStream stream) throws MSLAException;
+    MSLAFile<?> create(MSLAFileDefaults.FileProps initialProps) throws MSLAException;
+    MSLAFile<?> load(String fileName) throws MSLAException;
+    MSLAFile<?> load(DataInputStream stream) throws MSLAException;
     boolean checkType(DataInputStream stream) throws MSLAException;
-    MSLAFileDefaults defaults(String machineName);
     boolean checkDefaults(String machineName);
     Set<String> getSupportedMachines();
 }

@@ -1,6 +1,6 @@
 package futurelink.msla.formats.iface;
 
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 
 import java.awt.image.BufferedImage;
 

@@ -1,4 +1,4 @@
-package futurelink.msla.formats.utils.fields;
+package futurelink.msla.formats.io;
 
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;

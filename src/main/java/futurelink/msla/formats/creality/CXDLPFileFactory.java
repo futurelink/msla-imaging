@@ -4,7 +4,7 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
-import futurelink.msla.formats.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.PrinterDefaults;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -14,22 +14,20 @@ import java.util.Set;
 public class CXDLPFileFactory implements MSLAFileFactory {
     @Override public String getName() { return "ChituBox"; }
 
-    @Override public MSLAFile<?> create(String machineName) throws MSLAException {
-        var def = defaults(machineName);
-        if (def == null) throw new MSLAException("No defaults found for " + machineName);
-        return new CXDLPFile(def);
+    @Override public MSLAFile<?> create(MSLAFileDefaults.FileProps initialProps) throws MSLAException {
+        return new CXDLPFile();
     }
 
-    @Override public MSLAFile<?> load(String machineName, String fileName) throws MSLAException {
+    @Override public MSLAFile<?> load(String fileName) throws MSLAException {
         try {
-            return new CXDLPFile(defaults(machineName), new DataInputStream(new FileInputStream(fileName)));
+            return new CXDLPFile(new DataInputStream(new FileInputStream(fileName)));
         } catch (IOException e) {
             throw new MSLAException("Could not open file " + fileName, e);
         }
     }
 
-    @Override public MSLAFile<?> load(String machineName, DataInputStream stream) throws MSLAException {
-        return new CXDLPFile(defaults(machineName), stream);
+    @Override public MSLAFile<?> load(DataInputStream stream) throws MSLAException {
+        return new CXDLPFile(stream);
     }
 
     @Override public boolean checkType(DataInputStream stream) throws MSLAException {
@@ -41,11 +39,6 @@ public class CXDLPFileFactory implements MSLAFileFactory {
         } catch (IOException e) {
             throw new MSLAException("Could not read stream", e);
         }
-    }
-
-    @Override public MSLAFileDefaults defaults(String machineName) {
-        if (machineName == null) return null;
-        return PrinterDefaults.instance.getPrinter(machineName);
     }
 
     @Override public boolean checkDefaults(String machineName) {

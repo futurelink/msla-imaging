@@ -1,10 +1,11 @@
-package futurelink.msla.formats.utils;
+package futurelink.msla.utils;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -14,21 +15,22 @@ import java.util.logging.Logger;
 public class FileOptionMapper extends MSLAOptionMapper {
     private final Logger logger = Logger.getLogger(FileOptionMapper.class.getName());
 
-    private final MSLAFile<?> file;
-    private final MSLAFileDefaults defaults;
+    private final MSLAFile file;
+    @Getter private MSLAFileDefaults defaults;
     private final HashMap<String, Option> optionsMap;
 
-    public FileOptionMapper(MSLAFile<?> file, MSLAFileDefaults defaults) throws MSLAException {
-        if (defaults != null && file.getResolution() != null && !file.getResolution().equals(defaults.getResolution())) {
-            throw new MSLAException("Defaults are not suitable for loaded file: " +
-                    file.getResolution() + " vs " + defaults.getResolution());
-        } else {
-            logger.warning("Created without defaults! Options are not editable.");
-        }
+    public FileOptionMapper(MSLAFile file, MSLAFileDefaults defaults) throws MSLAException {
         this.file = file;
         this.defaults = defaults;
         this.optionsMap = new HashMap<>();
         enumerateOptions();
+    }
+
+    @Override
+    public void setDefaults(MSLADefaults defaults) {
+        if (defaults instanceof MSLALayerDefaults)
+            this.defaults = (MSLAFileDefaults) defaults;
+        else throw new ClassCastException("Can't set defaults other than " + MSLAFileDefaults.class.getName());
     }
 
     /**
@@ -37,9 +39,10 @@ public class FileOptionMapper extends MSLAOptionMapper {
      * is considered to be MSLAFileBlock or MSLAFileBlockFields that have
      * option fields inside.
      */
-    private void enumerateOptions() {
+    public void enumerateOptions() {
         var fileClass = file.getClass();
         var fields = fileClass.getDeclaredFields();
+        this.optionsMap.clear();
         try {
             for (var field : fields) {
                 if (MSLAFileBlock.class.isAssignableFrom(field.getType())) {

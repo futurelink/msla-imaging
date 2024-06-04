@@ -2,7 +2,7 @@ package futurelink.msla.formats.elegoo;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.utils.FileFactory;
+import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
 import org.junit.jupiter.api.Test;

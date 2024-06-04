@@ -4,7 +4,7 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 
@@ -21,7 +21,7 @@ public class CXDLPFileHeader extends CXDLPFileTable {
         @Getter private Size Resolution = new Size(0, 0);
         @Getter private Float PixelSizeUm;
 
-        @MSLAFileField() @Getter private Integer HeaderSize = 9;
+        @MSLAFileField @Getter private Integer HeaderSize = 9;
         @MSLAFileField(order = 1, lengthAt = "HeaderSize") @Getter private String HeaderValue = HEADER_VALUE;
         @MSLAFileField(order = 2) @Getter private Short Version = DEFAULT_VERSION;
         @MSLAFileField(order = 3) @Getter private Integer PrinterModelSize = 6;
@@ -42,6 +42,7 @@ public class CXDLPFileHeader extends CXDLPFileTable {
         defaults.setFields("Header", fileFields);
     }
 
+    @Override public String getName() { return "Header"; }
     public void setLayerCount(short count) {
         fileFields.LayerCount = count;
     }

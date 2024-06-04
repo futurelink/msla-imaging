@@ -1,7 +1,6 @@
 package futurelink.msla.formats.creality.tables;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.iface.*;
 
 import java.io.*;
@@ -75,10 +74,12 @@ public class CXDLPFileLayerDef extends CXDLPFileTable implements MSLAFileLayers<
         }
     }
 
+    @Override public String getName() { return null; }
     @Override public final int getDataLength() { return 0; }
     @Override public MSLAFileBlockFields getFileFields() { return null; }
     @Override public final int count() { return Layers.size(); }
     @Override public final CXDLPFileLayer get(int index) { return Layers.get(index); }
+    @Override public boolean hasOptions() { return false; }
 
     @Override
     public void add(MSLALayerEncoder<List<CXDLPFileLayerLine>> encoder,
@@ -98,8 +99,7 @@ public class CXDLPFileLayerDef extends CXDLPFileTable implements MSLAFileLayers<
         });
     }
 
-    /* Creality does not support layer options */
-    @Override public MSLAOptionMapper options(int layerNumber) { return null; }
+    @Override public void setDefaults(MSLALayerDefaults layerDefaults) {}
 
     @Override
     public final CXDLPFileLayer allocate() {

@@ -4,8 +4,10 @@ import futurelink.msla.formats.*;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLALayerEncodeOutput;
 import futurelink.msla.formats.iface.MSLALayerEncodeReader;
-import futurelink.msla.formats.utils.FileFactory;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.FileFactory;
+import futurelink.msla.utils.FileOptionMapper;
+import futurelink.msla.utils.Size;
+import futurelink.msla.utils.defaults.PrinterDefaults;
 import lombok.Setter;
 
 import java.awt.*;
@@ -67,21 +69,22 @@ public class PCBCalibration {
             int interval,
             int repetitions) throws MSLAException
     {
-        var defaults = FileFactory.instance.defaults(machineName);
-        if (defaults == null) throw new MSLAException("Unknown machine name: '" + machineName + "'");
+        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+                .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
 
         var wsFile = FileFactory.instance.create(machineName);
         if (wsFile == null) throw new MSLAException("File was not initialized properly!");
 
+        var options = new FileOptionMapper(wsFile, defaults);
         filePath = filePath.endsWith(defaults.getFileExtension()) ?
                 filePath :
                 filePath + "." + defaults.getFileExtension();
         try (var fos = new FileOutputStream(filePath)) {
             // Set options
-            wsFile.getOptions().set("Bottom layers count", "1");
-            wsFile.getOptions().set("Bottom layers exposure time", String.valueOf(startTime));
-            wsFile.getOptions().set("Normal layers exposure time", String.valueOf(interval));
-            wsFile.getOptions().set("Normal layers lift height", "1");
+            options.set("Bottom layers count", "1");
+            options.set("Bottom layers exposure time", String.valueOf(startTime));
+            options.set("Normal layers exposure time", String.valueOf(interval));
+            options.set("Normal layers lift height", "1");
 
             //wsFile.setOption("PerLayerOverride", 0);
             //wsFile.setOption("TransitionLayerCount", 0);

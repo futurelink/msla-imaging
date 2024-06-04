@@ -4,7 +4,7 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.MSLAPreview;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 
 @Getter
@@ -27,13 +27,11 @@ public class CXDLPFilePreviews extends CXDLPFileTable {
         };
     }
 
-    @Override
-    public int getDataLength() {
+    @Override public String getName() { return null; }
+    @Override public int getDataLength() {
         return (fileFields.Preview1.getResolution().length() +
                 fileFields.Preview2.getResolution().length() +
                 fileFields.Preview3.getResolution().length()) * 2 + 6;
     }
-
-    @Override
-    public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
 }

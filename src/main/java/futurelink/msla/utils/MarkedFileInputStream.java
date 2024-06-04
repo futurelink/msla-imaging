@@ -1,4 +1,4 @@
-package futurelink.msla.formats.utils;
+package futurelink.msla.utils;
 
 import java.io.File;
 import java.io.FileInputStream;

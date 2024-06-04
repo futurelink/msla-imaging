@@ -3,7 +3,7 @@ package futurelink.msla.formats.creality;
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.creality.tables.CXDLPFileLayerLine;
-import futurelink.msla.formats.utils.FileFactory;
+import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import org.junit.jupiter.api.Test;
 

@@ -2,7 +2,7 @@ package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.utils.About;
+import futurelink.msla.utils.About;
 import lombok.Getter;
 
 /**

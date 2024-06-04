@@ -1,18 +1,17 @@
 package futurelink.msla.formats.elegoo.tables;
 
-import futurelink.msla.formats.MSLAOptionMapper;
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileLayer;
 import futurelink.msla.formats.iface.MSLALayerDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.utils.LayerOptionMapper;
 import lombok.Getter;
 
 
+@Getter
 public class GOOFileLayerDef extends GOOFileTable implements MSLAFileLayer {
-    private final MSLAOptionMapper optionMapper;
-    @Getter private final Fields fileFields = new Fields();
+    private final Fields fileFields = new Fields();
 
     @SuppressWarnings("unused")
     static public class Fields implements MSLAFileBlockFields {
@@ -39,12 +38,13 @@ public class GOOFileLayerDef extends GOOFileTable implements MSLAFileLayer {
         @MSLAFileField(order = 20, length = 2) public byte[] Delimiter2 = new byte[]{ 0x0d, 0x0a };
     }
 
-    public GOOFileLayerDef(MSLALayerDefaults layerDefaults) {
-        super();
-        optionMapper = new LayerOptionMapper(fileFields, layerDefaults);
+    public GOOFileLayerDef(MSLALayerDefaults layerDefaults) { super(); }
+
+    @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
+        layerDefaults.setFields(null, fileFields);
     }
 
-    @Override public MSLAOptionMapper options() { return optionMapper; }
+    @Override public String getName() { return null; }
     @Override public int getDataLength() { return 72 + fileFields.DataLength; }
     @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
 

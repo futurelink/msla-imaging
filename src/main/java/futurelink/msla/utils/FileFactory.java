@@ -1,4 +1,4 @@
-package futurelink.msla.formats.utils;
+package futurelink.msla.utils;
 
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.PhotonWorkshopFileFactory;
@@ -6,8 +6,8 @@ import futurelink.msla.formats.chitubox.CTBFileFactory;
 import futurelink.msla.formats.creality.CXDLPFileFactory;
 import futurelink.msla.formats.elegoo.GOOFileFactory;
 import futurelink.msla.formats.iface.MSLAFile;
-import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
+import futurelink.msla.utils.defaults.PrinterDefaults;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -34,19 +34,7 @@ public final class FileFactory {
         supportedFiles.add(factory);
     }
 
-    /**
-     * Returns an object containing default values suitable for a specified machine.
-     *
-     * @param machineName machine name (can be obtained with getSupportedMachines)
-     * @return MSLAFileDefaults
-     */
-    public MSLAFileDefaults defaults(String machineName) {
-        return getMachine(machineName)
-                .map(f -> f.defaults(machineName))
-                .orElse(null);
-    }
-
-    private Optional<MSLAFileFactory> getMachine(String machineName) {
+    private Optional<MSLAFileFactory> getMachineFactory(String machineName) {
         return supportedFiles.stream().filter((f) -> f.checkDefaults(machineName)).findFirst();
     }
 
@@ -57,13 +45,14 @@ public final class FileFactory {
      * @return MSLAFile
      */
     public MSLAFile create(String machineName) throws MSLAException {
-        var machine = getMachine(machineName);
-        if (machine.isPresent()) {
-            logger.info("Creating file for " + machineName + " using " + machine.get().getClass().getName());
-            return machine.get().create(machineName);
-        } else {
-            throw new MSLAException("Machine '" + machineName + "' is not supported");
-        }
+        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+                .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
+        var machineFactory = getMachineFactory(machineName).orElseThrow(
+                () -> new MSLAException("Machine '" + machineName + "' is not supported"));
+        logger.info("Creating file for " + machineName + " using " + machineFactory.getClass().getName());
+        var file = machineFactory.create(defaults.getFileProps());
+        file.reset(defaults);
+        return file;
     }
 
     /**
@@ -85,7 +74,7 @@ public final class FileFactory {
             } catch (MSLAException e) { return false; }
         }).findFirst().orElse(null);
         if (factory != null) {
-            return factory.load(machineName, stream);
+            return factory.load(stream);
         } else throw new MSLAException("File is not supported");
     }
 

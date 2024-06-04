@@ -1,6 +1,6 @@
 package futurelink.msla.tools;
 
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 import lombok.Setter;
 
 import java.awt.*;

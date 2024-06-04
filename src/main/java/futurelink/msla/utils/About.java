@@ -1,4 +1,4 @@
-package futurelink.msla.formats.utils;
+package futurelink.msla.utils;
 
 public class About {
     public static final String Name = "mSLA-imaging";

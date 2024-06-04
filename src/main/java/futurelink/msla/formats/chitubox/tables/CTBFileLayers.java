@@ -1,41 +1,48 @@
 package futurelink.msla.formats.chitubox.tables;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.chitubox.CTBFile;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsException;
+import lombok.Setter;
 
 import java.io.DataInputStream;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFileLayerDef.Fields, byte[]> {
+public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFileLayerDef, byte[]> {
     private final CTBFile parent;
     private final Logger logger = Logger.getLogger(CTBFileLayers.class.getName());
     private final ArrayList<CTBFileLayerDef> LayerDefinition = new ArrayList<>();
-    private final MSLALayerDefaults layerDefaults;
+    @Setter private MSLALayerDefaults layerDefaults;
 
-    public CTBFileLayers(CTBFile parent, MSLALayerDefaults layerDefaults) {
+    public CTBFileLayers(CTBFile parent) {
         super(parent.getHeader().getFileFields().getVersion());
         this.parent = parent;
-        this.layerDefaults = layerDefaults;
-    }
-
-    @Override public MSLAOptionMapper options(int layerNumber) { return LayerDefinition.get(layerNumber).options(); }
-    @Override public int count() {
-        return LayerDefinition.size();
-    }
-    @Override public CTBFileLayerDef.Fields get(int index) {
-        return LayerDefinition.get(index).getFileFields();
     }
 
     @Override
-    public CTBFileLayerDef.Fields allocate() throws MSLAException {
+    public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
+        this.layerDefaults = layerDefaults;
+        for (CTBFileLayerDef def : LayerDefinition) {
+            def.setDefaults(layerDefaults);
+        }
+    }
+
+    @Override public boolean hasOptions() { return true; }
+    @Override public int count() {
+        return LayerDefinition.size();
+    }
+    @Override public CTBFileLayerDef get(int index) {
+        return LayerDefinition.get(index);
+    }
+
+    @Override
+    public CTBFileLayerDef allocate() throws MSLAException {
         var layer = new CTBFileLayerDef(getVersion(), layerDefaults);
         LayerDefinition.add(layer);
-        return layer.getFileFields();
+        return layer;
     }
 
     @Override
@@ -45,7 +52,8 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
                     MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
     {
         var layerNumber = count();
-        var layer = allocate();
+        var layerDef = allocate();
+        var layer = layerDef.getFileFields();
         layer.setPositionZ((layerNumber + 1) * parent.getHeader().getFileFields().getLayerHeightMillimeter());
         layer.setExposureTime(parent.getHeader().getFileFields().getLayerExposureSeconds());
         layer.setLightOffSeconds(parent.getHeader().getFileFields().getLightOffDelay());
@@ -87,11 +95,11 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
             logger.info("Reading preliminary layer definitions");
             for (int i = 0; i < parent.getHeader().getFileFields().getLayerCount(); i++) {
                 var layerDef = allocate();
-                layerDef.getParent().setBriefMode(true);
-                var len = layerDef.getParent().read(stream, position);
-                if (len != layerDef.getParent().getDataLength())
+                layerDef.getFileFields().getParent().setBriefMode(true);
+                var len = layerDef.getFileFields().getParent().read(stream, position);
+                if (len != layerDef.getFileFields().getParent().getDataLength())
                     throw new MSLAException("Error reading brief layer definition for layer " + i + ": data size mismatch");
-                position += layerDef.getParent().getDataLength();
+                position += layerDef.getFileFields().getParent().getDataLength();
                 bytesRead += len;
             }
         } catch (FileFieldsException e) {
@@ -113,18 +121,10 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
         return bytesRead;
     }
 
-    @Override
-    public int getDataLength() throws FileFieldsException {
-        return 0;
-    }
-
-    @Override
-    public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return 0;
-    }
-
-    @Override
-    public MSLAFileBlockFields getFileFields() {
+    @Override public String getName() { return null; }
+    @Override public int getDataLength() throws FileFieldsException { return 0; }
+    @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException { return 0; }
+    @Override public MSLAFileBlockFields getFileFields() {
         return null;
     }
 }

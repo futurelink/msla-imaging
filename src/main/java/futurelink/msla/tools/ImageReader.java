@@ -2,7 +2,7 @@ package futurelink.msla.tools;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 import lombok.Setter;
 
 import javax.imageio.ImageIO;

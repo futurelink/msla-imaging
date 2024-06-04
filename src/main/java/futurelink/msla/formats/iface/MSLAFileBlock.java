@@ -1,14 +1,19 @@
 package futurelink.msla.formats.iface;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.fields.FileFieldsIO;
-import futurelink.msla.formats.utils.fields.FileFieldsReader;
-import futurelink.msla.formats.utils.fields.FileFieldsWriter;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
+import futurelink.msla.formats.io.FileFieldsReader;
+import futurelink.msla.formats.io.FileFieldsWriter;
 
 import java.io.*;
 
 public interface MSLAFileBlock {
+
+    /**
+     * Returns block name.
+     */
+    String getName();
 
     /**
      * Calculates and returns block length in bytes.

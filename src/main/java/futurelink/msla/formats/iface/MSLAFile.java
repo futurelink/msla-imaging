@@ -1,8 +1,7 @@
 package futurelink.msla.formats.iface;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.MSLAOptionMapper;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
@@ -39,11 +38,26 @@ public interface MSLAFile<T> {
     MSLAPreview getPreview(int index) throws MSLAException;
 
     /**
+     * Returns {@code MSLAPreview} object.
+     * Some of the formats have more than one preview and one of them is larger
+     * than the others. This method returns the largest one.
+     */
+    MSLAPreview getLargePreview() throws MSLAException;
+
+    /**
      * Sets preview.
      * @param index preview number
      * @param image a {@link BufferedImage} containing preview data
      */
     void setPreview(int index, BufferedImage image) throws MSLAException;
+
+    /**
+     * Sets defaults to a file.
+     * The implementation must check if defaults passed to this method is valid and suitable
+     * to a file i.e. parameters like screen resolution and other machine-dependent options are correct.
+     * @param defaults defaults object
+     */
+    void reset(MSLAFileDefaults defaults) throws MSLAException;
 
     /**
      * Gets file UUID
@@ -68,7 +82,7 @@ public interface MSLAFile<T> {
     /**
      * Returns layers object.
      */
-    MSLAFileLayers<?, ?> getLayers();
+    MSLAFileLayers<? extends MSLAFileLayer, ?> getLayers();
 
     /**
      * Adds new layer to a file.
@@ -96,9 +110,4 @@ public interface MSLAFile<T> {
      * Checks if a file is valid.
      */
     boolean isValid();
-
-    /**
-     * Returns file- and printer-specific option mapper.
-     */
-    MSLAOptionMapper getOptions();
 }

@@ -1,4 +1,4 @@
-package futurelink.msla.formats.utils.fields;
+package futurelink.msla.formats.io;
 
 public class FileFieldsException extends Exception {
     public FileFieldsException(String message, Throwable cause) {

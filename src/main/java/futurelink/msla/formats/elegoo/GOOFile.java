@@ -2,14 +2,12 @@ package futurelink.msla.formats.elegoo;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAFileGeneric;
-import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.elegoo.tables.GOOFileFooter;
 import futurelink.msla.formats.elegoo.tables.GOOFileHeader;
 import futurelink.msla.formats.elegoo.tables.GOOFileLayers;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.formats.utils.FileOptionMapper;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 
 import java.awt.image.BufferedImage;
@@ -19,25 +17,19 @@ import java.io.OutputStream;
 import java.util.HashMap;
 
 public class GOOFile extends MSLAFileGeneric<byte[]> {
-    @Getter private final MSLAOptionMapper options;
-
     @Getter @MSLAOptionContainer private final GOOFileHeader Header;
     @Getter private final GOOFileLayers Layers;
     private final GOOFileFooter Footer = new GOOFileFooter();
 
-    public GOOFile(MSLAFileDefaults defaults) throws MSLAException {
-        super();
-        Header = new GOOFileHeader(defaults);
-        Layers = new GOOFileLayers(null);
-        options = new FileOptionMapper(this, defaults);
-    }
-
-    public GOOFile(MSLAFileDefaults defaults, DataInputStream stream) throws IOException, MSLAException {
+    public GOOFile() throws MSLAException {
         super();
         Header = new GOOFileHeader();
-        Layers = new GOOFileLayers(defaults.getLayerDefaults());
+        Layers = new GOOFileLayers();
+    }
+
+    public GOOFile(DataInputStream stream) throws IOException, MSLAException {
+        this();
         readTables(stream);
-        options = new FileOptionMapper(this, defaults);
     }
 
     private void readTables(DataInputStream input) throws MSLAException {
@@ -60,9 +52,17 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
         if (index == 0) return Header.getSmallPreview();
         else return Header.getBigPreview();
     }
+
+    @Override public MSLAPreview getLargePreview() throws MSLAException { return Header.getBigPreview(); }
     @Override public void setPreview(int index, BufferedImage image) {
         if (index == 0) Header.getSmallPreview().setImage(image);
         else Header.getBigPreview().setImage(image);
+    }
+
+    @Override
+    public void reset(MSLAFileDefaults defaults) throws MSLAException {
+        defaults.setFields(Header.getName(), Header.getFileFields());
+        getLayers().setDefaults(defaults.getLayerDefaults());
     }
 
     @Override public String getMachineName() { return Header.getMachineName(); }

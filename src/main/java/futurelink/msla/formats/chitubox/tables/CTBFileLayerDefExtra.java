@@ -4,8 +4,8 @@ import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.fields.FileFieldsIO;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,6 +33,8 @@ public class CTBFileLayerDefExtra implements MSLAFileBlock {
     }
 
     @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
+
+    @Override public String getName() { return null; }
     @Override public int getDataLength() { return TABLE_SIZE; }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {

@@ -8,7 +8,11 @@ public abstract class MSLAFileGeneric<T> implements MSLAFile<T> {
     private final java.util.UUID UUID;
 
     protected MSLAFileGeneric() {
-        UUID = java.util.UUID.randomUUID();
+        this.UUID = java.util.UUID.randomUUID();
+    }
+
+    public void reset(MSLAFileDefaults defaults) throws MSLAException {
+        //this.options.setDefaults(defaults);
     }
 
     @Override

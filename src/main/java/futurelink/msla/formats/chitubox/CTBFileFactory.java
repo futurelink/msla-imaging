@@ -5,7 +5,7 @@ import futurelink.msla.formats.chitubox.tables.CTBFileHeader;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
-import futurelink.msla.formats.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.PrinterDefaults;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -17,21 +17,22 @@ public class CTBFileFactory implements MSLAFileFactory {
     public String getName() { return "Chitubox"; }
 
     @Override
-    public MSLAFile<?> create(String machineName) throws MSLAException {
-        return new CTBFile(defaults(machineName));
+    public MSLAFile<?> create(MSLAFileDefaults.FileProps initialProps) throws MSLAException {
+        var Version = initialProps.getByte("Version");
+        return new CTBFile(Version);
     }
 
-    @Override public MSLAFile<?> load(String machineName, String fileName) throws MSLAException {
+    @Override public MSLAFile<?> load(String fileName) throws MSLAException {
         try {
-            return new CTBFile(defaults(machineName), new DataInputStream(new FileInputStream(fileName)));
+            return new CTBFile(new DataInputStream(new FileInputStream(fileName)));
         } catch (IOException e) {
             throw new MSLAException("Can't load a file " + fileName, e);
         }
     }
 
-    @Override public MSLAFile<?> load(String machineName, DataInputStream stream) throws MSLAException {
+    @Override public MSLAFile<?> load(DataInputStream stream) throws MSLAException {
         try {
-            return new CTBFile(defaults(machineName), stream);
+            return new CTBFile(stream);
         } catch (IOException e) {
             throw new MSLAException("Can't load data", e);
         }
@@ -44,11 +45,6 @@ public class CTBFileFactory implements MSLAFileFactory {
         } catch (IOException e) {
             throw new MSLAException("Can't read stream", e);
         }
-    }
-
-    @Override public MSLAFileDefaults defaults(String machineName) {
-        if (machineName == null) return null;
-        return PrinterDefaults.instance.getPrinter(machineName);
     }
 
     @Override public boolean checkDefaults(String machineName) {

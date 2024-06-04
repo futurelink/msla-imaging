@@ -1,8 +1,8 @@
-package futurelink.msla.formats.utils.defaults;
+package futurelink.msla.utils.defaults;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -69,11 +70,11 @@ public class PrinterDefaults {
                     try { setter = fields.getClass().getDeclaredMethod("set" + option, type); }
                     catch (NoSuchMethodException ignored) {}
                     if (setter != null) {
-                        logger.info("Calling setter for default '" + defaultOption.getDefaultValue() + "' " + option + " of type " + type.getSimpleName());
+                        logger.fine("Calling setter for default '" + defaultOption.getDefaultValue() + "' " + option + " of type " + type.getSimpleName());
                         setter.invoke(fields, defaultOption.getAsType(type.getSimpleName()));
                     } else {
                         field.setAccessible(true);
-                        logger.info("Setting default " + option + " of type " + type.getSimpleName());
+                        logger.fine("Setting default '" + defaultOption.getDefaultValue() + "' " + option + " of type " + type.getSimpleName());
                         field.set(fields, defaultOption.getAsType(type.getSimpleName()));
                         field.setAccessible(false);
                    }
@@ -124,7 +125,7 @@ public class PrinterDefaults {
         }
     }
 
-    public final Defaults getPrinter(String name) { return printers.get(name); }
+    public final Optional<Defaults> getPrinter(String name) { return Optional.ofNullable(printers.get(name)); }
     public final Set<String> getSupportedPrinters(Class<? extends MSLAFile<?>> cls) {
         return printers.keySet().stream().filter(printerName ->
                 cls.getSimpleName().equals(printers.get(printerName).fileHandler)

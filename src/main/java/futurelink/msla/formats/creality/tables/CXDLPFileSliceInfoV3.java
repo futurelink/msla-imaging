@@ -1,6 +1,5 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
@@ -58,14 +57,8 @@ public class CXDLPFileSliceInfoV3 extends CXDLPFileTable {
         fileFields.setSoftwareName("v1.9.4");
         fileFields.setMaterialName("normal");
     }
-    public CXDLPFileSliceInfoV3(MSLAFileDefaults defaults) throws MSLAException {
-        this();
-        defaults.setFields("SliceInfoV3", fileFields);
-    }
 
-    @Override
-    public int getDataLength() { return fileFields.getDataLength() + 2; }
-
-    @Override
-    public String toString() { return fieldsAsString(" = ", "\n"); }
+    @Override public String getName() { return "SliceInfoV3"; }
+    @Override public int getDataLength() { return fileFields.getDataLength() + 2; }
+    @Override public String toString() { return fieldsAsString(" = ", "\n"); }
 }

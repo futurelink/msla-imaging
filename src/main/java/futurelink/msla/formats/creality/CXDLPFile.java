@@ -4,8 +4,7 @@ import futurelink.msla.formats.*;
 import futurelink.msla.formats.creality.tables.*;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.formats.utils.FileOptionMapper;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 
 import java.awt.image.BufferedImage;
@@ -16,7 +15,6 @@ import java.util.logging.Logger;
 public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     private static final Logger logger = Logger.getLogger(CXDLPFile.class.getName());
     private final DataInputStream iStream;
-    @Getter private final MSLAOptionMapper options;
 
     @Getter @MSLAOptionContainer private final CXDLPFileHeader Header;
     @Getter @MSLAOptionContainer private final CXDLPFileSliceInfo SliceInfo;
@@ -24,15 +22,16 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     private final CXDLPFilePreviews Previews = new CXDLPFilePreviews();
     @Getter private final CXDLPFileLayerDef Layers = new CXDLPFileLayerDef();
 
-    public CXDLPFile(MSLAFileDefaults defaults) throws MSLAException {
+    public CXDLPFile() throws MSLAException {
+        super();
         iStream = null;
-        Header = new CXDLPFileHeader(defaults);
-        SliceInfo = new CXDLPFileSliceInfo(defaults);
-        SliceInfoV3 = new CXDLPFileSliceInfoV3(defaults);
-        options = new FileOptionMapper(this, defaults);
+        Header = new CXDLPFileHeader();
+        SliceInfo = new CXDLPFileSliceInfo();
+        SliceInfoV3 = new CXDLPFileSliceInfoV3();
     }
 
-    public CXDLPFile(MSLAFileDefaults defaults, DataInputStream stream) throws MSLAException {
+    public CXDLPFile(DataInputStream stream) throws MSLAException {
+        super();
         var position = 0;
         try {
             stream.reset();
@@ -43,8 +42,6 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
             Header.read(iStream, position); position += Header.getDataLength();
             Previews.read(iStream, position); position += Previews.getDataLength();
             SliceInfo.read(iStream, position); position += SliceInfo.getDataLength();
-
-            options = new FileOptionMapper(this, defaults);
 
             // Skip layer areas (don't know what's their purpose)
             try { iStream.skipNBytes(Header.getLayerCount() * 4 + 2); }
@@ -66,10 +63,28 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
         return CXDLPLayerCodec.class;
     }
 
-    @Override public String getMachineName() { return getHeader().getPrinterModel(); }
+    @Override public String getMachineName() {
+        return switch (getHeader().getPrinterModel()) {
+            case "CL-60" -> "CREALITY HALOT-ONE";
+            case "CL-70" -> "CREALITY HALOT-ONE PRO";
+            case "CL-79" -> "CREALITY HALOT-ONE PLUS";
+            case "CL925" -> "CREALITY HALOT-RAY";
+            default -> null;
+        };
+    }
     @Override public MSLAPreview getPreview(int index) throws MSLAException { return Previews.getPreview(index); }
+    @Override public MSLAPreview getLargePreview() throws MSLAException { return getPreview(1); }
+
     @Override public void setPreview(int index, BufferedImage image) throws MSLAException {
         Previews.getPreview(index).setImage(image);
+    }
+
+    @Override
+    public void reset(MSLAFileDefaults defaults) throws MSLAException {
+        defaults.setFields(Header.getName(), Header.getFileFields());
+        defaults.setFields(SliceInfo.getName(), SliceInfo.getFileFields());
+        defaults.setFields(SliceInfoV3.getName(), SliceInfoV3.getFileFields());
+        getLayers().setDefaults(defaults.getLayerDefaults());
     }
 
     @Override public float getDPI() { return 0; }

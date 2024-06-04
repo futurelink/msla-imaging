@@ -10,9 +10,8 @@ import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.tables.*;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.FileOptionMapper;
-import futurelink.msla.formats.utils.Size;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.utils.Size;
 import lombok.Getter;
 
 /**
@@ -22,7 +21,6 @@ import lombok.Getter;
 public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     @Getter private Class<? extends PhotonWorkshopCodec> codec;
     private DataInputStream iStream;
-    @Getter private final MSLAOptionMapper options;
 
     private PhotonWorkshopFileDescriptor Descriptor;
     @Getter @MSLAOptionContainer private PhotonWorkshopFileHeaderTable Header;
@@ -32,29 +30,31 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     @Getter @MSLAOptionContainer private PhotonWorkshopFileExtraTable Extra;
     @Getter @MSLAOptionContainer private PhotonWorkshopFileMachineTable Machine;
 
-    public PhotonWorkshopFile(MSLAFileDefaults defaults) throws MSLAException {
+    public PhotonWorkshopFile(byte versionMajor, byte versionMinor) throws MSLAException {
         super();
-        var VersionMajor = defaults.getFileProps().getByte("VersionMajor");
-        var VersionMinor = defaults.getFileProps().getByte("VersionMinor");
-        Descriptor = new PhotonWorkshopFileDescriptor(VersionMajor, VersionMinor);
-        Header = new PhotonWorkshopFileHeaderTable(defaults, VersionMajor, VersionMinor);
-        Machine = new PhotonWorkshopFileMachineTable(defaults, VersionMajor, VersionMinor);
-        Preview = new PhotonWorkshopFilePreview1Table(VersionMajor, VersionMinor);
-        Software = new PhotonWorkshopFileSoftwareTable(VersionMajor, VersionMinor);
-        Layers = new PhotonWorkshopFileLayerDefTable(VersionMajor, VersionMinor, defaults.getLayerDefaults());
-        if ((VersionMajor >= 2) && (VersionMinor >= 4)) {
-            Extra = new PhotonWorkshopFileExtraTable(defaults, VersionMajor, VersionMinor);
+        Descriptor = new PhotonWorkshopFileDescriptor(versionMajor, versionMinor);
+        Header = new PhotonWorkshopFileHeaderTable(versionMajor, versionMinor);
+        Machine = new PhotonWorkshopFileMachineTable(versionMajor, versionMinor);
+        Preview = new PhotonWorkshopFilePreview1Table(versionMajor, versionMinor);
+        Software = new PhotonWorkshopFileSoftwareTable(versionMajor, versionMinor);
+        Layers = new PhotonWorkshopFileLayerDefTable(versionMajor, versionMinor);
+        if ((versionMajor >= 2) && (versionMinor >= 4)) {
+            Extra = new PhotonWorkshopFileExtraTable(versionMajor, versionMinor);
         }
-        options = new FileOptionMapper(this, defaults);
-        initCodec();
     }
 
-    public PhotonWorkshopFile(MSLAFileDefaults defaults, DataInputStream stream) throws IOException, MSLAException {
+    public PhotonWorkshopFile(DataInputStream stream) throws IOException, MSLAException {
         super();
         iStream = stream;
-        readTables(defaults, iStream);
-        options = new FileOptionMapper(this, defaults);
-        initCodec();
+        readTables(iStream);
+
+        // Get layers definition table. This requires defaults to be read out if available.
+        if (Descriptor.getFields().getLayerDefinitionAddress() > 0) {
+            Layers = new PhotonWorkshopFileLayerDefTable(
+                    Descriptor.getVersionMajor(),
+                    Descriptor.getVersionMinor());
+            Layers.read(stream, Descriptor.getFields().getLayerDefinitionAddress());
+        } else throw new MSLAException("No layer definition section found!");
     }
 
     @Override public String getMachineName() { return Header.getName(); }
@@ -74,17 +74,17 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
 
     private void initCodec() throws MSLAException {
         if (Machine == null) throw new MSLAException("Machine section was not initialized properly");
-        var format = Machine.getLayerImageFormat();
-        if (format.equals("pw0Img")) {
+        var imageFormat = Machine.getLayerImageFormat();
+        if ("pw0Img".equals(imageFormat)) {
             codec = PhotonWorkshopCodecPW0.class;
-        } else if (format.equals("pwsImg")) {
+        } else if ("pwsImg".equals(imageFormat)) {
             codec = PhotonWorkshopCodecPWS.class;
         } else {
-            throw new MSLAException("Codec not implemented for '" + format + "'");
+            throw new MSLAException("Codec not implemented for image format '" + imageFormat + "'");
         }
     }
 
-    private void readTables(MSLAFileDefaults defaults, DataInputStream stream) throws IOException, MSLAException {
+    private void readTables(DataInputStream stream) throws IOException, MSLAException {
         Descriptor = PhotonWorkshopFileDescriptor.read(new LittleEndianDataInputStream(iStream));
 
         if (Descriptor.getFields().getHeaderAddress() > 0) {
@@ -102,14 +102,6 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
             Preview.read(stream, Descriptor.getFields().getPreviewAddress());
         }
 
-        if (Descriptor.getFields().getLayerDefinitionAddress() > 0) {
-            Layers = new PhotonWorkshopFileLayerDefTable(
-                    Descriptor.getVersionMajor(),
-                    Descriptor.getVersionMinor(),
-                    defaults != null ? defaults.getLayerDefaults() : null);
-            Layers.read(stream, Descriptor.getFields().getLayerDefinitionAddress());
-        } else throw new MSLAException("No layer definition section found!");
-
         if (Descriptor.getFields().getExtraAddress() > 0) {
             Extra = new PhotonWorkshopFileExtraTable(Descriptor.getVersionMajor(), Descriptor.getVersionMinor());
             Extra.read(stream, Descriptor.getFields().getExtraAddress());
@@ -119,6 +111,8 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
             Machine = new PhotonWorkshopFileMachineTable(Descriptor.getVersionMajor(), Descriptor.getVersionMinor());
             Machine.read(stream, Descriptor.getFields().getMachineAddress());
         }
+
+        initCodec(); // Codec must be configured after tables were read out
     }
 
     @Override
@@ -147,6 +141,17 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
 
     @Override public MSLAPreview getPreview(int index) { return Preview; }
     @Override public void setPreview(int index, BufferedImage image) { Preview.setImage(image); }
+
+    @Override
+    public void reset(MSLAFileDefaults defaults) throws MSLAException {
+        super.reset(defaults);
+        defaults.setFields(Header.getName(), Header.getFileFields());
+        defaults.setFields(Machine.getName(), Machine.getFileFields());
+        getLayers().setDefaults(defaults.getLayerDefaults());
+        initCodec(); // Codec must be configured after setting defaults
+    }
+
+    @Override public MSLAPreview getLargePreview() { return Preview; }
 
     @Override
     public final void addLayer(

@@ -1,5 +1,6 @@
 package futurelink.msla.formats;
 
+import futurelink.msla.formats.iface.MSLADefaults;
 import futurelink.msla.formats.iface.MSLADefaultsParams;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,6 +42,13 @@ public abstract class MSLAOptionMapper {
      * @param option option name
      */
     abstract public Class<?> getType(String option);
+
+    /**
+     * Gets defaults object.
+     */
+    abstract public MSLADefaults getDefaults();
+
+    abstract public void setDefaults(MSLADefaults defaults);
 
     /**
      * Gets option default parameters.

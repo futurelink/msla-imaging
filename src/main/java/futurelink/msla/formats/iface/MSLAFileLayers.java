@@ -1,7 +1,6 @@
 package futurelink.msla.formats.iface;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.MSLAOptionMapper;
 
 import java.util.Map;
 
@@ -33,5 +32,7 @@ public interface MSLAFileLayers<T, L> {
              MSLALayerEncoder.Callback<L> callback)
             throws MSLAException;
 
-    MSLAOptionMapper options(int layerNumber);
+    boolean hasOptions();
+
+    void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException;
 }

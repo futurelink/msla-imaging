@@ -1,10 +1,11 @@
-package futurelink.msla.formats.utils;
+package futurelink.msla.utils;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -16,15 +17,26 @@ import java.util.logging.Logger;
 public class LayerOptionMapper extends MSLAOptionMapper {
     private final Logger logger = Logger.getLogger(FileOptionMapper.class.getName());
 
-    private final MSLAFileBlockFields layer;
-    private final MSLALayerDefaults defaults;
+    private final MSLAFile file;
+    private Integer layerNumber;
+    @Getter private MSLALayerDefaults defaults;
     private final HashMap<String, Option> optionsMap;
 
-    public LayerOptionMapper(MSLAFileBlockFields layer, MSLALayerDefaults defaults) {
-        this.layer = layer;
-        this.optionsMap = new HashMap<>();
+    public LayerOptionMapper(MSLAFile file, MSLALayerDefaults defaults) throws MSLAException {
+        if (file == null) throw new MSLAException("File is mandatory for option mapper");
+        if (!file.getLayers().hasOptions()) throw new MSLAException("Layer options are not supported in this file format");
+        this.file = file;
         this.defaults = defaults;
-        this.enumerateOptions(layer, new LinkedList<>());
+        this.optionsMap = new HashMap<>();
+        setLayerNumber(0);
+    }
+
+    public void setLayerNumber(Integer layerNumber) throws MSLAException {
+        if (layerNumber == null) throw new MSLAException("Layer number can't be null");
+        if (layerNumber < 0) throw new MSLAException("Layer number can't be negative");
+        if (layerNumber >= file.getLayers().count()) throw new MSLAException("Layer number is too large");
+        this.layerNumber = layerNumber;
+        this.enumerateOptions(((MSLAFileLayer)file.getLayers().get(layerNumber)).getFileFields(), new LinkedList<>());
     }
 
     /**
@@ -84,6 +96,13 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
+    public void setDefaults(MSLADefaults defaults) {
+        if (defaults instanceof MSLALayerDefaults)
+            this.defaults = (MSLALayerDefaults) defaults;
+        else throw new ClassCastException("Can't set defaults other than " + MSLALayerDefaults.class.getName());
+    }
+
+    @Override
     public MSLADefaultsParams getParameters(String option) {
         if (this.optionsMap.get(option) == null) return null;
         return this.optionsMap.get(option).getParameters();
@@ -103,6 +122,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     protected void populateOption(String optionName, Serializable value) throws MSLAException {
         if (!isEditable()) throw new MSLAException("Options are not editable because defaults were not specified");
         var option = optionsMap.get(optionName);
+        var layer = (MSLAFileLayer) file.getLayers().get(layerNumber);
         try {
             if ("".equals(option.getLocation().get(0))) {
                 // Option is in root layer definition object
@@ -112,8 +132,8 @@ public class LayerOptionMapper extends MSLAOptionMapper {
                 optionField.setAccessible(false);
             } else{
                 // Option is inside another container
-                logger.info("Option is inside '" + option.getLocation() + "'");
-                var optionContainer = getOptionContainer(layer, option.getLocation());
+                logger.info("Option '" + optionName + "' is inside '" + option.getLocation() + "'");
+                var optionContainer = getOptionContainer(layer.getFileFields(), option.getLocation());
                 if (optionContainer != null) {
                     if (optionContainer instanceof MSLAFileBlock)
                         optionContainer = ((MSLAFileBlock) optionContainer).getFileFields();
@@ -133,6 +153,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     @Override
     protected Serializable fetchOption(String optionName) throws MSLAException {
         var option = optionsMap.get(optionName);
+        var layer = (MSLAFileLayer) file.getLayers().get(layerNumber);
         try {
             if ("".equals(option.getLocation().get(0))) {
                 // Option is in root layer definition object
@@ -144,7 +165,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
             } else {
                 // Option is inside another container
                 logger.info("Option is inside '" + option.getLocation() + "'");
-                var optionContainer = getOptionContainer(layer, option.getLocation());
+                var optionContainer = getOptionContainer(layer.getFileFields(), option.getLocation());
                 if (optionContainer != null) {
                     if (optionContainer instanceof MSLAFileBlock)
                         optionContainer = ((MSLAFileBlock) optionContainer).getFileFields();
@@ -167,6 +188,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     {
         if (container == null) throw new MSLAException("Container can't be null");
         var containerName = location.get(location.size() - 1);
+        var layer = ((MSLAFileLayer) file.getLayers().get(layerNumber)).getFileFields();
         try {
             var optionContainerField = layer.getClass().getDeclaredField(containerName);
             optionContainerField.setAccessible(true);
@@ -180,7 +202,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
                 return null;
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new MSLAException("Can't get internal container '" + containerName + "'");
+            throw new MSLAException("Can't get internal container '" + containerName + "'", e);
         }
     }
 }

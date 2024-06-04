@@ -1,12 +1,10 @@
 package futurelink.msla.formats.chitubox.tables;
 
-import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.fields.FileFieldsIO;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,11 +37,7 @@ public class CTBFileMachineName implements MSLAFileBlock {
 
     public CTBFileMachineName() {}
 
-    public CTBFileMachineName(MSLAFileDefaults defaults) throws MSLAException {
-        this();
-        defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
-    }
-
+    @Override public String getName() { return OPTIONS_SECTION_NAME; }
     @Override
     public String toString() {
         return fileFields.fieldsAsString(" = ", "\n");

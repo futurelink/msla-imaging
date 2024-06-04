@@ -2,11 +2,10 @@ package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.utils.fields.FileFieldsException;
-import futurelink.msla.formats.utils.fields.FileFieldsIO;
-import futurelink.msla.formats.utils.fields.FileFieldsReader;
+import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
+import futurelink.msla.formats.io.FileFieldsReader;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
@@ -19,7 +18,6 @@ import java.io.OutputStream;
  */
 @Getter
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
-    private static final String OPTIONS_SECTION_NAME = "Machine";
     @Delegate private final Fields fileFields;
 
     @Getter @Setter
@@ -36,7 +34,7 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
         @MSLAFileField(order = 1) private Integer TableLength() { return parent.calculateTableLength(); }
         private void setTableLength(Integer length) { parent.TableLength = length; }
         @MSLAFileField(order = 2, length = 96) private String MachineName = "";
-        @MSLAFileField(order = 3, length = 16) private String LayerImageFormat = "pw0img";
+        @MSLAFileField(order = 3, length = 16) private String LayerImageFormat;
         @MSLAFileField(order = 4) private Integer MaxAntialiasingLevel = 16;
         @MSLAFileField(order = 5) private Integer PropertyFields = 7;
         @MSLAFileField(order = 6) private Float DisplayWidth;
@@ -94,15 +92,8 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
 
     public PhotonWorkshopFileMachineTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
+        Name = "Machine";
         fileFields = new Fields(this);
-    }
-    public PhotonWorkshopFileMachineTable(
-            MSLAFileDefaults defaults,
-            byte versionMajor,
-            byte versionMinor) throws MSLAException
-    {
-        this(versionMajor, versionMinor);
-        defaults.setFields(OPTIONS_SECTION_NAME, fileFields);
     }
 
     @Override

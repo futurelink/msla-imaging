@@ -1,5 +1,9 @@
 package futurelink.msla.formats.creality.tables;
 
+import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.MSLAFileBlockFields;
+import futurelink.msla.formats.iface.MSLAFileLayer;
+import futurelink.msla.formats.iface.MSLALayerDefaults;
 import lombok.Getter;
 
 import java.io.*;
@@ -8,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Getter
-public class CXDLPFileLayer {
+public class CXDLPFileLayer implements MSLAFileLayer {
 
     // Used to position in a file when read
     Long DataOffset = 0L;
@@ -24,6 +28,12 @@ public class CXDLPFileLayer {
     protected CXDLPFileLayer(List<CXDLPFileLayerLine> data) {
         for (var line : data) addLine(line);
     }
+
+    /* CXDLP does not support layer settings */
+    @Override public MSLAFileBlockFields getFileFields() { return null; }
+
+    /* CXDLP does not support layer settings */
+    @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {}
 
     public final void addLine(CXDLPFileLayerLine line) {
         Lines.add(line);
