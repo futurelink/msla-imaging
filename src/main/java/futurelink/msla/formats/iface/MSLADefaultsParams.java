@@ -5,6 +5,7 @@ import futurelink.msla.formats.MSLAException;
 
 public interface MSLADefaultsParams {
     String getType();
+    @JsonIgnore Boolean getBoolean();
     @JsonIgnore Short getShort();
     @JsonIgnore Integer getInt();
     @JsonIgnore Long getLong();

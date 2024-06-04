@@ -44,7 +44,7 @@ public final class FileFactory {
      * @param machineName machine name (can be obtained with getSupportedMachines)
      * @return MSLAFile
      */
-    public MSLAFile create(String machineName) throws MSLAException {
+    public MSLAFile<?> create(String machineName) throws MSLAException {
         var defaults = PrinterDefaults.instance.getPrinter(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var machineFactory = getMachineFactory(machineName).orElseThrow(
@@ -62,7 +62,7 @@ public final class FileFactory {
      * @return MSLAFile
      * @throws MSLAException on mSLA format related errors
      */
-    public MSLAFile load(DataInputStream stream) throws MSLAException {
+    public MSLAFile<?> load(DataInputStream stream) throws MSLAException {
         if (!stream.markSupported()) throw new MSLAException("Can't use " + stream.getClass() + ". Mark/reset is not supported");
         var factory = supportedFiles.stream().filter((t) -> {
             try {
@@ -73,10 +73,8 @@ public final class FileFactory {
                 return false;
             } catch (MSLAException e) { return false; }
         }).findFirst().orElse(null);
-        if (factory != null) {
-            var file = factory.load(stream);
-            return file;
-        } else throw new MSLAException("File is not supported");
+        if (factory != null) return factory.load(stream);
+        else throw new MSLAException("File is not supported");
     }
 
     /**
@@ -86,7 +84,7 @@ public final class FileFactory {
      * @return MSLAFile
      * @throws MSLAException on mSLA format related errors
      */
-    public MSLAFile load(String fileName) throws MSLAException {
+    public MSLAFile<?> load(String fileName) throws MSLAException {
         try {
             return load(new DataInputStream(new MarkedFileInputStream(fileName)));
         } catch (IOException e) {

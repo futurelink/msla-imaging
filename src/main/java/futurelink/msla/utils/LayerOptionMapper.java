@@ -109,10 +109,8 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    public boolean hasOption(String optionName, Class<? extends Serializable> aClass) {
-        if (!this.optionsMap.containsKey(optionName)) return false;
-        if (aClass != null) return this.optionsMap.get(optionName).getType().isAssignableFrom(aClass);
-        return true;
+    public boolean hasOption(String optionName) {
+        return this.optionsMap.containsKey(optionName);
     }
 
     @Override public Boolean isEditable() { return defaults != null; }

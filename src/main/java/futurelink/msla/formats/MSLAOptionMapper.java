@@ -70,10 +70,9 @@ public abstract class MSLAOptionMapper {
     /**
      * Returns true if mapper has option with specified name.
      * @param option option name
-     * @param aClass option type
      * @return true if option was mapped, otherwise false
      */
-    abstract protected boolean hasOption(String option, Class<? extends Serializable> aClass);
+    abstract protected boolean hasOption(String option);
 
     /**
      * Must be implemented in order to be able to populate option value.
@@ -106,7 +105,7 @@ public abstract class MSLAOptionMapper {
      */
     public final void set(String option, String value) throws MSLAException {
         if (!isEditable()) throw new MSLAException("Options are not editable in this mapper");
-        if (!hasOption(option, null)) throw new MSLAException("Option '" + option +  "' does not exist!");
+        if (!hasOption(option)) throw new MSLAException("Option '" + option +  "' does not exist!");
 
         // Check if provided value is correct
         if (getParameters(option) == null) throw new MSLAException("No parameters set for '" + option + "' although option exists");
@@ -131,7 +130,7 @@ public abstract class MSLAOptionMapper {
      * @return option value
      */
     public final String get(String option) throws MSLAException {
-        if (!hasOption(option, null)) throw new MSLAException("Option '" + option + "' is not available");
+        if (!hasOption(option)) throw new MSLAException("Option '" + option + "' is not available");
         return fetchOption(option).toString();
     }
 }

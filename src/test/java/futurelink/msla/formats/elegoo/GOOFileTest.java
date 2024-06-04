@@ -5,6 +5,8 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
+import futurelink.msla.utils.FileOptionMapper;
+import futurelink.msla.utils.defaults.PrinterDefaults;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -16,7 +18,7 @@ public class GOOFileTest extends CommonTestRoutines {
     @Test
     void CreateFileTest() throws MSLAException, InterruptedException {
         var outFile = temp_dir + "elegoo_test.goo";
-        var file = (GOOFile) FileFactory.instance.create("ELEGOO Mars 4 Max");
+        var file = FileFactory.instance.create("ELEGOO Mars 4 Max");
         assertEquals(GOOFile.class, file.getClass());
         assertEquals("5760 x 3600", file.getResolution().toString());
         assertEquals(35.0F, file.getPixelSizeUm());
@@ -51,13 +53,16 @@ public class GOOFileTest extends CommonTestRoutines {
 
     @Test
     void ReadTestFile() throws InterruptedException {
-        var machineName = "ELEGOO Mars 4 Max";
         try {
-            var file = (GOOFile) FileFactory.instance.load(
+            var defaults = PrinterDefaults.instance.getPrinter("ELEGOO Mars 4 Max")
+                    .orElseThrow(() -> new MSLAException("Machine is not supported"));
+            var file = FileFactory.instance.load(
                     resourceFile("test_data/ElegooFileTest/Example_GOO.goo")
             );
             System.out.println(file);
             assertTrue(file.isValid());
+            var options = new FileOptionMapper(file, defaults);
+            System.out.println(options.fetchOption("Normal layers lift speed"));
 
             // Asynchronously extract image files
             var layerPixels = new int[3];

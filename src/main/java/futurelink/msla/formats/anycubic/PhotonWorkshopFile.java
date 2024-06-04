@@ -57,7 +57,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         } else throw new MSLAException("No layer definition section found!");
     }
 
-    @Override public String getMachineName() { return Header.getName(); }
+    @Override public String getMachineName() { return Machine.getMachineName(); }
     @Override public Size getResolution() { return Header.getResolution(); }
     @Override public float getPixelSizeUm() {
         return Header.getPixelSizeUm();

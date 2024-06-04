@@ -66,7 +66,6 @@ public class CXDLPFileTest extends CommonTestRoutines {
 
     @Test
     void TestFileCreateAndExtract() throws MSLAException, InterruptedException, IOException {
-        var machineName = "CREALITY HALOT ONE PLUS";
         var outFile = temp_dir + "test_create_and_extract.cxdlp";
         logger.info("Temporary file: " + outFile);
         delete_file(temp_dir + "extracted_1.png"); // Clean up files just in case
@@ -118,8 +117,6 @@ public class CXDLPFileTest extends CommonTestRoutines {
 
     @Test
     void TestFileExtract() throws MSLAException, InterruptedException, IOException {
-        var machineName = "CREALITY HALOT-RAY";
-
         delete_file(temp_dir + "1.png"); // Clean up files just in case
         delete_file(temp_dir + "10.png");
 

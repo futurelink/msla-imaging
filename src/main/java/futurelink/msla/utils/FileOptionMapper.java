@@ -90,10 +90,8 @@ public class FileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    public boolean hasOption(String option, Class<? extends Serializable> aClass) {
-        if (!this.optionsMap.containsKey(option)) return false;
-        if (aClass != null) return this.optionsMap.get(option).getType().isAssignableFrom(aClass);
-        return true;
+    public boolean hasOption(String option) {
+        return this.optionsMap.containsKey(option);
     }
 
     @Override
@@ -129,20 +127,20 @@ public class FileOptionMapper extends MSLAOptionMapper {
             var fileBlock = getOptionFileBlock(optionName);
             if (fileBlock.getFileFields() != null) {
                 var fields = fileBlock.getFileFields();
-                logger.info("Getting '" + option.getName() + "' of " + fields.getClass());
+                logger.info("Getting '" + option.getName() + "' in '" + fileBlock.getClass().getSimpleName() +"' of " + option.getType());
                 try {
                     var getter = fields.getClass().getDeclaredMethod("get" + option.getName());
-                    return (Serializable) option.getType().cast(getter.invoke(fields));
+                    return (Serializable) getter.invoke(fields);
                 } catch (NoSuchMethodException ignored) {
                     var f = fields.getClass().getDeclaredField(option.getName());
                     f.setAccessible(true);
                     var value = f.get(fields);
                     f.setAccessible(false);
-                    return (Serializable) option.getType().cast(value);
+                    return (Serializable) value;
                 }
             } else throw new MSLAException("Can't fetch option, no file block fields instantiated");
         } catch (NoSuchFieldException | InvocationTargetException | IllegalAccessException | ClassCastException e) {
-            throw new MSLAException("Error fetching option " + optionName, e);
+            throw new MSLAException("Error fetching option '" + optionName + "'", e);
         }
     }
 

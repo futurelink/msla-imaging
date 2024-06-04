@@ -1,9 +1,6 @@
 package futurelink.msla.formats.iface;
 
 import futurelink.msla.utils.Size;
-import lombok.Getter;
-
-import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public interface MSLAFileDefaults extends MSLADefaults {

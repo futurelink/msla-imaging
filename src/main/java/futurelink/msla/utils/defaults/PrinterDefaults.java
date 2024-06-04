@@ -9,7 +9,6 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -72,16 +71,25 @@ public class PrinterDefaults {
                     catch (NoSuchMethodException ignored) {}
                     if (setter != null) {
                         logger.fine("Calling setter for default '" + defaultOption.getDefaultValue() + "' " + option + " of type " + type.getSimpleName());
-                        setter.invoke(fields, defaultOption.getAsType(type.getSimpleName()));
+                        try {
+                            setter.invoke(fields, defaultOption.getAsType(type.getSimpleName()));
+                        } catch (Exception e) {
+                            throw new MSLAException("Option " + blockName + ":" + option + " can't be set", e);
+                        }
                     } else {
-                        field.setAccessible(true);
                         logger.fine("Setting default '" + defaultOption.getDefaultValue() + "' " + option + " of type " + type.getSimpleName());
-                        field.set(fields, defaultOption.getAsType(type.getSimpleName()));
-                        field.setAccessible(false);
+                        try {
+                            field.setAccessible(true);
+                            field.set(fields, defaultOption.getAsType(type.getSimpleName()));
+                        } catch (Exception e) {
+                            throw new MSLAException("Option " + blockName + ":" + option + " can't be set", e);
+                        } finally {
+                            field.setAccessible(false);
+                        }
                    }
                 } catch (NoSuchFieldException e) {
                     throw new MSLAException("Option " + blockName + ":" + option + " is not supported", e);
-                } catch (SecurityException | IllegalAccessException | InvocationTargetException e) {
+                } catch (SecurityException e) {
                     throw new MSLAException("Option " + blockName + ":" + option + " can not be set", e);
                 }
             }

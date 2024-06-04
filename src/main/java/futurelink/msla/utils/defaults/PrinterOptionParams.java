@@ -38,6 +38,7 @@ public class PrinterOptionParams {
         public Float getFloat() { return Float.parseFloat(defaultValue); }
         public Double getDouble() { return Double.parseDouble(defaultValue); }
         public String getString() { return defaultValue; }
+        public Boolean getBoolean() { return Boolean.parseBoolean(defaultValue); }
 
         public final Object getAsType(String type) {
             return switch (type) {
@@ -46,7 +47,8 @@ public class PrinterOptionParams {
                 case "long", "Long" -> getLong();
                 case "float", "Float" -> getFloat();
                 case "double", "Double" -> getDouble();
-                case "byte", "Byte" ->  getByte();
+                case "byte", "Byte" -> getByte();
+                case "boolean", "Boolean" -> getBoolean();
                 case "Size" -> Size.parseSize(getDefaultValue());
                 default -> getString();
             };
