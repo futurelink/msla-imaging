@@ -21,7 +21,7 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
     @Test
     void TestFileRead() {
         try {
-            var file = FileFactory.instance.load("Anycubic Photon Mono 4K",
+            var file = FileFactory.instance.load(
                     resourceFile("test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma")
             );
             assertTrue(file.isValid());
@@ -35,7 +35,7 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
         delete_file(temp_dir + "1.png");  // Clean up files just in case
         delete_file(temp_dir + "10.png");
 
-        var file = (PhotonWorkshopFile) FileFactory.instance.load("Anycubic Photon Mono 4K",
+        var file = (PhotonWorkshopFile) FileFactory.instance.load(
                 resourceFile("test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma")
         );
 

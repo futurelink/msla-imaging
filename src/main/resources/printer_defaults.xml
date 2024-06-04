@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <printers>
-    <printer manufacturer="Anycubic" name="Photon M3 Max" extension="pm3m" file="PhotonWorkshopFile">
+    <printer manufacturer="Anycubic" name="Photon M3 Max" extension="pm3m" file="futurelink.msla.formats.anycubic.PhotonWorkshopFile">
         <file_options>
             <option name="VersionMajor" value="2"/>
             <option name="VersionMinor" value="4"/>
@@ -35,7 +35,7 @@
         <options name="Extra"/>
     </printer>
 
-    <printer manufacturer="Anycubic" name="Photon Mono X 6K" extension="pwmb" file="PhotonWorkshopFile">
+    <printer manufacturer="Anycubic" name="Photon Mono X 6K" extension="pwmb" file="futurelink.msla.formats.anycubic.PhotonWorkshopFile">
         <file_options>
             <option name="VersionMajor" value="2"/>
             <option name="VersionMinor" value="4"/>
@@ -70,7 +70,7 @@
         <options name="Extra"/>
     </printer>
 
-    <printer manufacturer="Anycubic" name="Photon Mono 4K" extension="pwma" file="PhotonWorkshopFile">
+    <printer manufacturer="Anycubic" name="Photon Mono 4K" extension="pwma" file="futurelink.msla.formats.anycubic.PhotonWorkshopFile">
         <file_options>
             <option name="VersionMajor" value="2"/>
             <option name="VersionMinor" value="4"/>
@@ -105,7 +105,7 @@
         <options name="Extra"/>
     </printer>
 
-    <printer manufacturer="Anycubic" name="Photon Mono X" extension="pwmx" file="PhotonWorkshopFile">
+    <printer manufacturer="Anycubic" name="Photon Mono X" extension="pwmx" file="futurelink.msla.formats.anycubic.PhotonWorkshopFile">
         <file_options>
             <option name="VersionMajor" value="2"/>
             <option name="VersionMinor" value="4"/>
@@ -140,7 +140,7 @@
         <options name="Extra"/>
     </printer>
 
-    <printer manufacturer="Anycubic" name="Photon M3" extension="pm3" file="PhotonWorkshopFile">
+    <printer manufacturer="Anycubic" name="Photon M3" extension="pm3" file="futurelink.msla.formats.anycubic.PhotonWorkshopFile">
         <file_options>
             <option name="VersionMajor" value="2"/>
             <option name="VersionMinor" value="4"/>
@@ -175,7 +175,7 @@
         <options name="Extra"/>
     </printer>
 
-    <printer manufacturer="CREALITY" name="HALOT-ONE PLUS" extension="cxdlp" file="CXDLPFile">
+    <printer manufacturer="CREALITY" name="HALOT-ONE PLUS" extension="cxdlp" file="futurelink.msla.formats.creality.CXDLPFile">
         <options name="Header">
             <option name="Resolution" value="4320x2560"/>
             <option name="PixelSizeUm" value="40.0f"/>
@@ -213,7 +213,7 @@
         </options>
     </printer>
 
-    <printer manufacturer="CREALITY" name="HALOT-ONE PRO" extension="cxdlp" file="CXDLPFile">
+    <printer manufacturer="CREALITY" name="HALOT-ONE PRO" extension="cxdlp" file="futurelink.msla.formats.creality.CXDLPFile">
         <options name="Header">
             <option name="Resolution" value="2560x2400"/>
             <option name="PixelSizeUm" value="40.0f"/>
@@ -251,7 +251,7 @@
         </options>
     </printer>
 
-    <printer manufacturer="CREALITY" name="HALOT-ONE" extension="cxdlp" file="CXDLPFile">
+    <printer manufacturer="CREALITY" name="HALOT-ONE" extension="cxdlp" file="futurelink.msla.formats.creality.CXDLPFile">
         <options name="Header">
             <option name="Resolution" value="1620x2560"/>
             <option name="PixelSizeUm" value="50.0f"/>
@@ -289,7 +289,7 @@
         </options>
     </printer>
 
-    <printer manufacturer="CREALITY" name="HALOT-RAY" extension="cxdlp" file="CXDLPFile">
+    <printer manufacturer="CREALITY" name="HALOT-RAY" extension="cxdlp" file="futurelink.msla.formats.creality.CXDLPFile">
         <options name="Header">
             <option name="Resolution" value="5760x3600"/>
             <option name="PixelSizeUm" value="34.39f"/>
@@ -327,14 +327,14 @@
         </options>
     </printer>
 
-    <printer manufacturer="ELEGOO" name="Mars 4 Max" extension="goo" file="GOOFile">
+    <printer manufacturer="ELEGOO" name="Mars 4 Max" extension="goo" file="futurelink.msla.formats.elegoo.GOOFile">
         <options name="Header">
             <option name="Resolution" value="5760x3600"/>
             <option name="PixelSizeUm" value="35.0f"/>
         </options>
     </printer>
 
-    <printer manufacturer="ELEGOO" name="SATURN" extension="ctb" file="CTBFile">
+    <printer manufacturer="ELEGOO" name="SATURN" extension="ctb" file="futurelink.msla.formats.chitubox.CTBFile">
         <file_options>
             <option name="Version" value="4"/>
         </file_options>

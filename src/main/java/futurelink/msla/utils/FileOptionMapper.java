@@ -5,6 +5,7 @@ import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.utils.defaults.PrinterDefaults;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -15,11 +16,11 @@ import java.util.logging.Logger;
 public class FileOptionMapper extends MSLAOptionMapper {
     private final Logger logger = Logger.getLogger(FileOptionMapper.class.getName());
 
-    private final MSLAFile file;
+    private final MSLAFile<?> file;
     @Getter private MSLAFileDefaults defaults;
     private final HashMap<String, Option> optionsMap;
 
-    public FileOptionMapper(MSLAFile file, MSLAFileDefaults defaults) throws MSLAException {
+    public FileOptionMapper(MSLAFile<?> file, MSLAFileDefaults defaults) throws MSLAException {
         this.file = file;
         this.defaults = defaults;
         this.optionsMap = new HashMap<>();
@@ -31,6 +32,11 @@ public class FileOptionMapper extends MSLAOptionMapper {
         if (defaults instanceof MSLALayerDefaults)
             this.defaults = (MSLAFileDefaults) defaults;
         else throw new ClassCastException("Can't set defaults other than " + MSLAFileDefaults.class.getName());
+    }
+
+    @SuppressWarnings("uncheked")
+    public List<MSLAFileDefaults> getMatchingDefaults() {
+        return PrinterDefaults.instance.getSuitableDefaults(file);
     }
 
     /**

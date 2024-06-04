@@ -2,8 +2,8 @@ package futurelink.msla.formats.elegoo;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFile;
-import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
+import futurelink.msla.formats.iface.MSLAFileProps;
 import futurelink.msla.utils.defaults.PrinterDefaults;
 
 import java.io.DataInputStream;
@@ -16,7 +16,7 @@ public class GOOFileFactory implements MSLAFileFactory {
     public String getName() { return "ELEGOO"; }
 
     @Override
-    public MSLAFile<?> create(MSLAFileDefaults.FileProps initialProps) throws MSLAException {
+    public MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException {
         return new GOOFile();
     }
 

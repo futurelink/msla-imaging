@@ -3,8 +3,8 @@ package futurelink.msla.formats.chitubox;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.chitubox.tables.CTBFileHeader;
 import futurelink.msla.formats.iface.MSLAFile;
-import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
+import futurelink.msla.formats.iface.MSLAFileProps;
 import futurelink.msla.utils.defaults.PrinterDefaults;
 
 import java.io.DataInputStream;
@@ -17,7 +17,7 @@ public class CTBFileFactory implements MSLAFileFactory {
     public String getName() { return "Chitubox"; }
 
     @Override
-    public MSLAFile<?> create(MSLAFileDefaults.FileProps initialProps) throws MSLAException {
+    public MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException {
         var Version = initialProps.getByte("Version");
         return new CTBFile(Version);
     }

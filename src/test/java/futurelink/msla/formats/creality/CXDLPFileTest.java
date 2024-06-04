@@ -72,7 +72,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
         delete_file(temp_dir + "extracted_1.png"); // Clean up files just in case
         delete_file(temp_dir + "extracted_10.png");
 
-        var file = (CXDLPFile) FileFactory.instance.load(machineName,
+        var file = (CXDLPFile) FileFactory.instance.load(
                 resourceFile("test_data/CXDLPFileTest/Example_HALOT_ONE_PLUS.cxdlp")
         );
 
@@ -106,7 +106,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
         delete_file(temp_dir + "final_1.png");
 
         // Extract images from newly created file
-        file = (CXDLPFile) FileFactory.instance.load(machineName, outFile);
+        file = (CXDLPFile) FileFactory.instance.load(outFile);
         writer = new ImageWriter(file, temp_dir, "final_", "png");
         file.readLayer(writer, 0);
         file.readLayer(writer, 1);
@@ -123,7 +123,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
         delete_file(temp_dir + "1.png"); // Clean up files just in case
         delete_file(temp_dir + "10.png");
 
-        var file = (CXDLPFile) FileFactory.instance.load(machineName,
+        var file = (CXDLPFile) FileFactory.instance.load(
                 resourceFile("test_data/CXDLPFileTest/HALOT_RAY_Original_Slicer.cxdlp")
         );
 

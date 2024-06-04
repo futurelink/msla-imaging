@@ -26,7 +26,7 @@ public class GOOFileHeader extends GOOFileTable {
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
         private float PixelSizeUm;
-        private Size Resolution = new Size(0, 0);
+        private Size Resolution = null;
         @MSLAFileField(length = 4) private final String Version = "V3.0";
         @MSLAFileField(length = 8, order = 1) byte[] Magic = { 0x07, 0x00, 0x00, 0x00, 0x44, 0x4C, 0x50, 0x00 };
         @MSLAFileField(length = 32, order = 2) String SoftwareName = About.Name;
@@ -41,10 +41,10 @@ public class GOOFileHeader extends GOOFileTable {
         @MSLAFileField(order = 11) GOOFilePreview SmallPreview = new GOOFilePreview(new Size(116, 116));
         @MSLAFileField(order = 11) GOOFilePreview BigPreview = new GOOFilePreview(new Size(290, 290));
         @MSLAFileField(order = 12) int LayerCount;
-        @MSLAFileField(order = 13) short ResolutionX() { return (short) Resolution.getWidth(); }
-        private void setResolutionX(short width) { Resolution = new Size(width, Resolution.getHeight()); }
-        @MSLAFileField(order = 14) short ResolutionY() { return (short) Resolution.getHeight(); }
-        private void setResolutionY(short height) { Resolution = new Size(Resolution.getWidth(), height); }
+        @MSLAFileField(order = 13) short ResolutionX() { return Resolution != null ? (short) Resolution.getWidth() : 0; }
+        private void setResolutionX(short width) { Resolution = new Size(width, ResolutionY()); }
+        @MSLAFileField(order = 14) short ResolutionY() { return Resolution != null ? (short) Resolution.getHeight() : 0; }
+        private void setResolutionY(short height) { Resolution = new Size(ResolutionX(), height); }
         @MSLAFileField(order = 15) @MSLAOption("Mirror X") boolean MirrorX;
         @MSLAFileField(order = 16) @MSLAOption("Mirror Y") boolean MirrorY;
         @MSLAFileField(order = 17) float DisplayWidth;

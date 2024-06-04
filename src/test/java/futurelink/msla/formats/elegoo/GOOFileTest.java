@@ -53,7 +53,7 @@ public class GOOFileTest extends CommonTestRoutines {
     void ReadTestFile() throws InterruptedException {
         var machineName = "ELEGOO Mars 4 Max";
         try {
-            var file = (GOOFile) FileFactory.instance.load(machineName,
+            var file = (GOOFile) FileFactory.instance.load(
                     resourceFile("test_data/ElegooFileTest/Example_GOO.goo")
             );
             System.out.println(file);

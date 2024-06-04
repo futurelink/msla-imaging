@@ -81,14 +81,23 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
 
     @Override
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
-        defaults.setFields(Header.getName(), Header.getFileFields());
-        defaults.setFields(SliceInfo.getName(), SliceInfo.getFileFields());
-        defaults.setFields(SliceInfoV3.getName(), SliceInfoV3.getFileFields());
-        getLayers().setDefaults(defaults.getLayerDefaults());
+        super.reset(defaults);
+        if (isMachineValid(defaults)) {
+            defaults.setFields(Header.getName(), Header.getFileFields());
+            defaults.setFields(SliceInfo.getName(), SliceInfo.getFileFields());
+            defaults.setFields(SliceInfoV3.getName(), SliceInfoV3.getFileFields());
+            getLayers().setDefaults(defaults.getLayerDefaults());
+        } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
     }
 
     @Override public float getDPI() { return 0; }
     @Override public float getPixelSizeUm() { return Header.getPixelSizeUm(); }
+
+    @Override
+    public boolean isMachineValid(MSLAFileDefaults defaults) {
+        return defaults.getFileClass().equals(this.getClass()) &&
+                ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+    }
 
     @Override
     public void addLayer(MSLALayerEncodeReader reader,

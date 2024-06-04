@@ -113,7 +113,7 @@ public class FileFieldsIO {
                 value = m.invoke(fields);
                 m.setAccessible(false);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e2) {
-                throw new FileFieldsException("No such field or method " + fieldOrMethodName);
+                throw new FileFieldsException("No such field or method '" + fieldOrMethodName + "'");
             }
         }
 

@@ -21,7 +21,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
 
         var defaults = PrinterDefaults.instance.getPrinter(machineName)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machineName));
-        var file = FileFactory.instance.load(machineName, filePath);
+        var file = FileFactory.instance.load(filePath);
         var options = new FileOptionMapper(file, defaults);
         logger.info(file.toString());
 
@@ -45,7 +45,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
 
         var defaults = PrinterDefaults.instance.getPrinter(machineName)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machineName));
-        var file = FileFactory.instance.load(machineName, filePath);
+        var file = FileFactory.instance.load(filePath);
         var options = new FileOptionMapper(file, defaults);
         logger.info(file.toString());
 

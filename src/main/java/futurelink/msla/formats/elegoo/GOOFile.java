@@ -60,9 +60,18 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     }
 
     @Override
+    public boolean isMachineValid(MSLAFileDefaults defaults) {
+        return defaults.getFileClass().equals(this.getClass()) &&
+                (getResolution() == null) || defaults.getResolution().equals(getResolution());
+    }
+
+    @Override
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
-        defaults.setFields(Header.getName(), Header.getFileFields());
-        getLayers().setDefaults(defaults.getLayerDefaults());
+        super.reset(defaults);
+        if (isMachineValid(defaults)) {
+            defaults.setFields(Header.getName(), Header.getFileFields());
+            getLayers().setDefaults(defaults.getLayerDefaults());
+        } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
     }
 
     @Override public String getMachineName() { return Header.getMachineName(); }

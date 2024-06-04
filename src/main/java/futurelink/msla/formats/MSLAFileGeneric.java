@@ -12,7 +12,7 @@ public abstract class MSLAFileGeneric<T> implements MSLAFile<T> {
     }
 
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
-        //this.options.setDefaults(defaults);
+        if (defaults == null) throw new MSLAException("Defaults can't be null");
     }
 
     @Override

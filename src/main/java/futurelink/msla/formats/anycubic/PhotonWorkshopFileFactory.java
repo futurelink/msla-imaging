@@ -2,8 +2,8 @@ package futurelink.msla.formats.anycubic;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFile;
-import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
+import futurelink.msla.formats.iface.MSLAFileProps;
 import futurelink.msla.utils.defaults.PrinterDefaults;
 
 import java.io.DataInputStream;
@@ -14,7 +14,7 @@ import java.util.Set;
 public class PhotonWorkshopFileFactory implements MSLAFileFactory {
     @Override public String getName() { return "Anycubic"; }
 
-    @Override public MSLAFile<?> create(MSLAFileDefaults.FileProps initialProps) throws MSLAException {
+    @Override public MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException {
         var VersionMajor = initialProps.getByte("VersionMajor");
         var VersionMinor = initialProps.getByte("VersionMinor");
         return new PhotonWorkshopFile(VersionMajor, VersionMinor);

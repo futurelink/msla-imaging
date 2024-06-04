@@ -4,8 +4,12 @@ import futurelink.msla.formats.anycubic.PhotonWorkshopFile;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileHeaderTable;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileMachineTable;
 import futurelink.msla.formats.creality.CXDLPFile;
+import futurelink.msla.formats.iface.MSLAFileDefaults;
+import futurelink.msla.utils.FileFactory;
 import futurelink.msla.utils.defaults.PrinterDefaults;
 import org.junit.jupiter.api.Test;
+
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,5 +42,14 @@ public class DefaultsLoaderTest extends CommonTestRoutines {
 
         System.out.println(PrinterDefaults.instance.getSupportedPrinters(CXDLPFile.class));
         System.out.println(PrinterDefaults.instance.getSupportedPrinters(PhotonWorkshopFile.class));
+    }
+
+    @Test
+    void testSuitableDefaults() throws MSLAException {
+        var machine = "Anycubic Photon Mono X 6K";
+        var wsFile = FileFactory.instance.create(machine);
+        var suitableDefaults = PrinterDefaults.instance.getSuitableDefaults(wsFile);
+        assertEquals(1, suitableDefaults.size());
+        assertEquals(machine, suitableDefaults.get(0).getMachineFullName());
     }
 }

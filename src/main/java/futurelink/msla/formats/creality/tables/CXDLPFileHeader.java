@@ -1,8 +1,6 @@
 package futurelink.msla.formats.creality.tables;
 
-import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.utils.Size;
 import lombok.Getter;
@@ -18,7 +16,7 @@ public class CXDLPFileHeader extends CXDLPFileTable {
         public static final String HEADER_VALUE_GENERIC = "CXSW3D";
         public static final Short DEFAULT_VERSION = 3;
 
-        @Getter private Size Resolution = new Size(0, 0);
+        @Getter private Size Resolution = null;
         @Getter private Float PixelSizeUm;
 
         @MSLAFileField @Getter private Integer HeaderSize = 9;
@@ -27,10 +25,10 @@ public class CXDLPFileHeader extends CXDLPFileTable {
         @MSLAFileField(order = 3) @Getter private Integer PrinterModelSize = 6;
         @MSLAFileField(order = 4, lengthAt = "PrinterModelSize") @Getter private String PrinterModel = "";
         @MSLAFileField(order = 5) @Getter private Short LayerCount = 0;
-        @MSLAFileField(order = 6) private Short ResolutionX() { return (short) Resolution.getWidth(); }
-        private void setResolutionX(Short width) { Resolution = new Size(width, Resolution.getHeight()); }
-        @MSLAFileField(order = 7) private Short ResolutionY() { return (short) Resolution.getHeight(); }
-        private void setResolutionY(Short height) { Resolution = new Size(Resolution.getWidth(), height); }
+        @MSLAFileField(order = 6) private Short ResolutionX() { return Resolution != null ? (short) Resolution.getWidth() : 0; }
+        private void setResolutionX(Short width) { Resolution = new Size(width, ResolutionY()); }
+        @MSLAFileField(order = 7) private Short ResolutionY() { return Resolution != null ? (short) Resolution.getHeight() : 0; }
+        private void setResolutionY(Short height) { Resolution = new Size(ResolutionX(), height); }
         @MSLAFileField(order = 8, length = 64) byte[] Padding = new byte[64];
 
         public int getDataLength() { return HeaderSize + PrinterModelSize + 16 + 64; }

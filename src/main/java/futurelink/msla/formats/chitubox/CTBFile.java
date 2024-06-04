@@ -71,6 +71,12 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     @Override public float getPixelSizeUm() { return 0; }
 
     @Override
+    public boolean isMachineValid(MSLAFileDefaults defaults) {
+        return defaults.getFileClass().equals(this.getClass()) &&
+                ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+    }
+
+    @Override
     public void addLayer(
             MSLALayerEncodeReader reader,
             MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
@@ -261,12 +267,15 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
-        defaults.setFields(Header.getName(), Header.getFileFields());
-        defaults.setFields(SlicerInfo.getName(), SlicerInfo.getFileFields());
-        defaults.setFields(MachineName.getName(), MachineName.getFileFields());
-        defaults.setFields(PrintParams.getName(), PrintParams.getFileFields());
-        defaults.setFields(PrintParamsV4.getName(), PrintParamsV4.getFileFields());
-        getLayers().setDefaults(defaults.getLayerDefaults());
+        super.reset(defaults);
+        if (isMachineValid(defaults)) {
+            defaults.setFields(Header.getName(), Header.getFileFields());
+            defaults.setFields(SlicerInfo.getName(), SlicerInfo.getFileFields());
+            defaults.setFields(MachineName.getName(), MachineName.getFileFields());
+            defaults.setFields(PrintParams.getName(), PrintParams.getFileFields());
+            defaults.setFields(PrintParamsV4.getName(), PrintParamsV4.getFileFields());
+            getLayers().setDefaults(defaults.getLayerDefaults());
+        } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
     }
 
     @Override

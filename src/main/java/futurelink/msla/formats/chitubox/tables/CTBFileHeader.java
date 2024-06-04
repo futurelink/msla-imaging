@@ -32,7 +32,7 @@ public class CTBFileHeader implements MSLAFileBlock {
     @Getter
     @SuppressWarnings("unused")
     static public class Fields implements MSLAFileBlockFields {
-        private Size Resolution = new Size(0, 0);
+        private Size Resolution = null;
         private float PixelSizeUm;
 
         @MSLAFileField private Integer Magic;
@@ -58,10 +58,10 @@ public class CTBFileHeader implements MSLAFileBlock {
         @MSLAFileField(order = 10) @MSLAOption(MSLAOption.BottomExposureTime) private Float BottomExposureSeconds;
         @MSLAFileField(order = 11) private Float LightOffDelay;
         @MSLAFileField(order = 12) @MSLAOption(MSLAOption.BottomLayersCount) private final Integer BottomLayersCount = 1;
-        @MSLAFileField(order = 13) private Integer ResolutionX() { return Resolution.getWidth(); }
-        private void setResolutionX(Integer width) { Resolution = new Size(width, Resolution.getHeight()); }
-        @MSLAFileField(order = 14) private Integer ResolutionY() { return Resolution.getHeight(); }
-        private void setResolutionY(Integer height) { Resolution = new Size(Resolution.getWidth(), height); }
+        @MSLAFileField(order = 13) private Integer ResolutionX() { return Resolution != null ? Resolution.getWidth() : 0; }
+        private void setResolutionX(Integer width) { Resolution = new Size(width, ResolutionY()); }
+        @MSLAFileField(order = 14) private Integer ResolutionY() { return  Resolution != null ? Resolution.getHeight() : 0; }
+        private void setResolutionY(Integer height) { Resolution = new Size(ResolutionX(), height); }
         @MSLAFileField(order = 15) @Setter private Integer PreviewLargeOffset;
         @MSLAFileField(order = 16) @Setter private Integer LayersDefinitionOffset;
         @MSLAFileField(order = 17) @Setter private Integer LayerCount;

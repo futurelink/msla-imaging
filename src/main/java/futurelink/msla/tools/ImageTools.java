@@ -19,7 +19,7 @@ public class ImageTools {
     public static void exportLayers(String fileName, String destinationDir, String format)
             throws MSLAException, InterruptedException
     {
-        var wsFile = FileFactory.instance.load(null, fileName);
+        var wsFile = FileFactory.instance.load(fileName);
         if (wsFile != null) {
             if (wsFile.isValid()) {
                 for (int i = 0; i < wsFile.getLayers().count(); i++)

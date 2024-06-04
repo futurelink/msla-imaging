@@ -145,10 +145,18 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     @Override
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         super.reset(defaults);
-        defaults.setFields(Header.getName(), Header.getFileFields());
-        defaults.setFields(Machine.getName(), Machine.getFileFields());
-        getLayers().setDefaults(defaults.getLayerDefaults());
-        initCodec(); // Codec must be configured after setting defaults
+        if (isMachineValid(defaults)) {
+            defaults.setFields(Header.getName(), Header.getFileFields());
+            defaults.setFields(Machine.getName(), Machine.getFileFields());
+            getLayers().setDefaults(defaults.getLayerDefaults());
+            initCodec(); // Codec must be configured after setting defaults
+        } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
+    }
+
+    @Override
+    public boolean isMachineValid(MSLAFileDefaults defaults) {
+        return defaults.getFileClass().equals(this.getClass()) &&
+                ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
     }
 
     @Override public MSLAPreview getLargePreview() { return Preview; }

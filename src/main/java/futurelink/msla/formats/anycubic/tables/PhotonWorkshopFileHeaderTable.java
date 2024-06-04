@@ -26,7 +26,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
         private final PhotonWorkshopFileTable parent;
-        private Size Resolution = new Size(0, 0);
+        private Size Resolution = null;
 
         @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return "HEADER"; }
         // Validation setter checks for what's been read from file
@@ -47,10 +47,10 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         @MSLAFileField(order = 10) @MSLAOption(MSLAOption.RetractSpeed) private Float RetractSpeed;// = SpeedConverter.Convert(DefaultRetractSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
         @MSLAFileField(order = 11) @MSLAOption(MSLAOption.Volume) private Float VolumeMl = 0.0F;
         @MSLAFileField(order = 12) @MSLAOption(MSLAOption.Antialias) private Integer AntiAliasing = 1;
-        @MSLAFileField(order = 13) private Integer ResolutionX() { return Resolution.getWidth(); }
-        private void setResolutionX(Integer width) { Resolution = new Size(width, Resolution.getHeight()); }
-        @MSLAFileField(order = 14) private Integer ResolutionY() { return Resolution.getHeight(); }
-        private void setResolutionY(Integer height) { Resolution = new Size(Resolution.getWidth(), height); }
+        @MSLAFileField(order = 13) private Integer ResolutionX() { return Resolution != null ? Resolution.getWidth() : 0; }
+        private void setResolutionX(Integer width) { Resolution = new Size(width, ResolutionY()); }
+        @MSLAFileField(order = 14) private Integer ResolutionY() { return Resolution != null ? Resolution.getHeight() : 0; }
+        private void setResolutionY(Integer height) { Resolution = new Size(ResolutionX(), height); }
         @MSLAFileField(order = 15) @MSLAOption(MSLAOption.Weight) private Float WeightG = 0.0F;
         @MSLAFileField(order = 16) @MSLAOption(MSLAOption.Price) private Float Price = 0.0F;
         @MSLAFileField(order = 17) @MSLAOption(MSLAOption.Currency) private Integer PriceCurrencySymbol; /// 24 00 00 00 $ or ¥ C2 A5 00 00 or € = E2 82 AC 00

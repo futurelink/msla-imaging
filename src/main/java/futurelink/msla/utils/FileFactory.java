@@ -62,7 +62,7 @@ public final class FileFactory {
      * @return MSLAFile
      * @throws MSLAException on mSLA format related errors
      */
-    public MSLAFile load(String machineName, DataInputStream stream) throws MSLAException {
+    public MSLAFile load(DataInputStream stream) throws MSLAException {
         if (!stream.markSupported()) throw new MSLAException("Can't use " + stream.getClass() + ". Mark/reset is not supported");
         var factory = supportedFiles.stream().filter((t) -> {
             try {
@@ -74,7 +74,8 @@ public final class FileFactory {
             } catch (MSLAException e) { return false; }
         }).findFirst().orElse(null);
         if (factory != null) {
-            return factory.load(stream);
+            var file = factory.load(stream);
+            return file;
         } else throw new MSLAException("File is not supported");
     }
 
@@ -85,9 +86,9 @@ public final class FileFactory {
      * @return MSLAFile
      * @throws MSLAException on mSLA format related errors
      */
-    public MSLAFile load(String machineName, String fileName) throws MSLAException {
+    public MSLAFile load(String fileName) throws MSLAException {
         try {
-            return load(machineName, new DataInputStream(new MarkedFileInputStream(fileName)));
+            return load(new DataInputStream(new MarkedFileInputStream(fileName)));
         } catch (IOException e) {
             throw new MSLAException("Can't load file " + fileName, e);
         }

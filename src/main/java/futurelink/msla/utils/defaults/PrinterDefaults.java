@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -37,18 +38,18 @@ public class PrinterDefaults {
         @Getter private final String machineManufacturer;
         @Getter private final String machineName;
         @Getter private final String fileExtension;
-        @Getter private final String fileHandler;
         @Getter private float pixelSizeUm;
         @Getter private Size resolution;
-        @Getter private final FileProps fileProps = new FileProps();
+        @Getter private final MSLAFileProps fileProps = new MSLAFileProps();
+        @Getter private final Class<? extends MSLAFile<?>> fileClass;
         @Getter private LayerDefaults layerDefaults;
         private final HashMap<String, PrinterOptionParams> options = new HashMap<>();
 
-        public Defaults(String manufacturer, String name, String extension, String fileHandler) {
+        public Defaults(String manufacturer, String name, String extension, Class<? extends MSLAFile<?>> fileClass) {
             this.machineName = name;
             this.machineManufacturer = manufacturer;
             this.fileExtension = extension;
-            this.fileHandler = fileHandler;
+            this.fileClass = fileClass;
         }
 
         @Override public final String getMachineFullName() { return getMachineManufacturer() + " " + getMachineName(); }
@@ -126,10 +127,18 @@ public class PrinterDefaults {
     }
 
     public final Optional<Defaults> getPrinter(String name) { return Optional.ofNullable(printers.get(name)); }
+
     public final Set<String> getSupportedPrinters(Class<? extends MSLAFile<?>> cls) {
         return printers.keySet().stream().filter(printerName ->
-                cls.getSimpleName().equals(printers.get(printerName).fileHandler)
+                cls.getSimpleName().equals(printers.get(printerName).fileClass.getSimpleName())
         ).collect(Collectors.toSet());
+    }
+
+    public final List<MSLAFileDefaults> getSuitableDefaults(MSLAFile<?> file) {
+        return printers.keySet().stream()
+                .filter(printerName -> file.isMachineValid(printers.get(printerName)))
+                .map(printers::get)
+                .collect(Collectors.toList());
     }
 
     private void parseOptionsBlockElement(Defaults defaults, String optionsBlockName, Element optionsBlockElement)
@@ -180,22 +189,28 @@ public class PrinterDefaults {
         if (file == null) throw new MSLAException("Printer file format is not set");
         logger.info("Loading defaults for '" + manufacturer + " " + name + "' (" + file + ")");
 
-        var def = new Defaults(manufacturer, name, extension, file);
-        var elem = printerElement.elements("file_options");
-        if (elem.size() > 1) throw new MSLAException("Can't be more than one <file_options> tag for printer '" + name + "'");
-        else if (elem.size() == 1) parseFileOptions(def, elem.get(0));
+        try {
+            var fileClass = ClassLoader.getSystemClassLoader().loadClass(file);
+            if (!MSLAFile.class.isAssignableFrom(fileClass)) throw new MSLAException("File class is not an MSLAFile");
+            var def = new Defaults(manufacturer, name, extension, (Class<? extends MSLAFile<?>>) fileClass);
+            var elem = printerElement.elements("file_options");
+            if (elem.size() > 1) throw new MSLAException("Can't be more than one <file_options> tag for printer '" + name + "'");
+            else if (elem.size() == 1) parseFileOptions(def, elem.get(0));
 
-        elem = printerElement.elements("layer_options");
-        if (elem.size() > 1) throw new MSLAException("Can't be more than one <layer_options> for printer '" + name + "'");
-        else if (elem.size() == 1) parseLayerOptions(def, elem.get(0));
+            elem = printerElement.elements("layer_options");
+            if (elem.size() > 1) throw new MSLAException("Can't be more than one <layer_options> for printer '" + name + "'");
+            else if (elem.size() == 1) parseLayerOptions(def, elem.get(0));
 
-        for (var it = printerElement.elementIterator("options"); it.hasNext();) {
-            var optionsBlockElement = it.next();
-            var optionsBlockName = optionsBlockElement.attributeValue("name");
-            if (optionsBlockName == null) throw new MSLAException("<options> must have name attribute");
-            parseOptionsBlockElement(def, optionsBlockName, optionsBlockElement);
+            for (var it = printerElement.elementIterator("options"); it.hasNext();) {
+                var optionsBlockElement = it.next();
+                var optionsBlockName = optionsBlockElement.attributeValue("name");
+                if (optionsBlockName == null) throw new MSLAException("<options> must have name attribute");
+                parseOptionsBlockElement(def, optionsBlockName, optionsBlockElement);
+            }
+
+            return def;
+        } catch (ClassNotFoundException e) {
+            throw new MSLAException("Can't find an mSLA file class '" + file + "'", e);
         }
-
-        return def;
     }
 }

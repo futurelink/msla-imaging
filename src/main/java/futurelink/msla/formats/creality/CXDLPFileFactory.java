@@ -2,8 +2,8 @@ package futurelink.msla.formats.creality;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFile;
-import futurelink.msla.formats.iface.MSLAFileDefaults;
 import futurelink.msla.formats.iface.MSLAFileFactory;
+import futurelink.msla.formats.iface.MSLAFileProps;
 import futurelink.msla.utils.defaults.PrinterDefaults;
 
 import java.io.DataInputStream;
@@ -14,7 +14,7 @@ import java.util.Set;
 public class CXDLPFileFactory implements MSLAFileFactory {
     @Override public String getName() { return "ChituBox"; }
 
-    @Override public MSLAFile<?> create(MSLAFileDefaults.FileProps initialProps) throws MSLAException {
+    @Override public MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException {
         return new CXDLPFile();
     }
 

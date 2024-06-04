@@ -22,7 +22,7 @@ public class CTBFileTest extends CommonTestRoutines {
     void ReadTestFile() throws IOException, InterruptedException {
         logger.info("Temporary dir: " + temp_dir);
         try {
-            var file = (CTBFile) FileFactory.instance.load("Elegoo Saturn",
+            var file = (CTBFile) FileFactory.instance.load(
                     resourceFile("test_data/ChituboxFileTest/Example_ELEGOO_SATURN.ctb")
             );
             assertTrue(file.isValid());
@@ -97,7 +97,7 @@ public class CTBFileTest extends CommonTestRoutines {
         writeMSLAFile(outFile, file);
 
         // Read exported file and do checks
-        file = (CTBFile) FileFactory.instance.load("ELEGOO Saturn", outFile);
+        file = (CTBFile) FileFactory.instance.load(outFile);
         assertTrue(file.isValid());
 
         // Asynchronously extract image files

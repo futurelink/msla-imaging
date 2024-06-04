@@ -60,6 +60,11 @@ public interface MSLAFile<T> {
     void reset(MSLAFileDefaults defaults) throws MSLAException;
 
     /**
+     * Checks if MSLAFileDefaults object can be applied to current file.
+     */
+    boolean isMachineValid(MSLAFileDefaults defaults);
+
+    /**
      * Gets file UUID
      */
     UUID getUUID();
