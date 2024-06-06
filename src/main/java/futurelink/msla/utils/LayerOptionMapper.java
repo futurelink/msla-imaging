@@ -17,12 +17,12 @@ import java.util.logging.Logger;
 public class LayerOptionMapper extends MSLAOptionMapper {
     private final Logger logger = Logger.getLogger(FileOptionMapper.class.getName());
 
-    private final MSLAFile file;
+    private final MSLAFile<?> file;
     private Integer layerNumber;
     @Getter private MSLALayerDefaults defaults;
     private final HashMap<String, Option> optionsMap;
 
-    public LayerOptionMapper(MSLAFile file, MSLALayerDefaults defaults) throws MSLAException {
+    public LayerOptionMapper(MSLAFile<?> file, MSLALayerDefaults defaults) throws MSLAException {
         if (file == null) throw new MSLAException("File is mandatory for option mapper");
         if (!file.getLayers().hasOptions()) throw new MSLAException("Layer options are not supported in this file format");
         this.file = file;
@@ -36,7 +36,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
         if (layerNumber < 0) throw new MSLAException("Layer number can't be negative");
         if (layerNumber >= file.getLayers().count()) throw new MSLAException("Layer number is too large");
         this.layerNumber = layerNumber;
-        this.enumerateOptions(((MSLAFileLayer)file.getLayers().get(layerNumber)).getFileFields(), new LinkedList<>());
+        this.enumerateOptions(file.getLayers().get(layerNumber).getFileFields(), new LinkedList<>());
     }
 
     /**
@@ -186,7 +186,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     {
         if (container == null) throw new MSLAException("Container can't be null");
         var containerName = location.get(location.size() - 1);
-        var layer = ((MSLAFileLayer) file.getLayers().get(layerNumber)).getFileFields();
+        var layer = file.getLayers().get(layerNumber).getFileFields();
         try {
             var optionContainerField = layer.getClass().getDeclaredField(containerName);
             optionContainerField.setAccessible(true);

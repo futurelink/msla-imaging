@@ -7,7 +7,7 @@ import futurelink.msla.formats.creality.CXDLPFileFactory;
 import futurelink.msla.formats.elegoo.GOOFileFactory;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileFactory;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public final class FileFactory {
      * @return MSLAFile
      */
     public MSLAFile<?> create(String machineName) throws MSLAException {
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var machineFactory = getMachineFactory(machineName).orElseThrow(
                 () -> new MSLAException("Machine '" + machineName + "' is not supported"));

@@ -5,7 +5,7 @@ import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -36,7 +36,7 @@ public class FileOptionMapper extends MSLAOptionMapper {
 
     @SuppressWarnings("uncheked")
     public List<MSLAFileDefaults> getMatchingDefaults() {
-        return PrinterDefaults.instance.getSuitableDefaults(file);
+        return MachineDefaults.instance.getMachineDefaults(file);
     }
 
     /**

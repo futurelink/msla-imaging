@@ -3,7 +3,7 @@ package futurelink.msla.tools;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.utils.FileOptionMapper;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -32,7 +32,7 @@ public class ImageTools {
 
     public static void createFromSVG(String machineName, String svgFileName, String outputFileName)
             throws IOException, MSLAException {
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         try (var stream = new FileInputStream(svgFileName)) {
             var reader = new BufferedReader(new InputStreamReader(stream));
@@ -60,10 +60,9 @@ public class ImageTools {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static void createFromBufferedImage(String machineName, BufferedImage image, String outputFileName)
             throws MSLAException  {
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var wsFile = FileFactory.instance.create(machineName);
         if (!wsFile.isValid()) throw new MSLAException("File header has no resolution info");

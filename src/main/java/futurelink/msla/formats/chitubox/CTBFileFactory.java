@@ -5,7 +5,7 @@ import futurelink.msla.formats.chitubox.tables.CTBFileHeader;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileFactory;
 import futurelink.msla.formats.iface.MSLAFileProps;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -52,7 +52,7 @@ public class CTBFileFactory implements MSLAFileFactory {
     }
 
     @Override public Set<String> getSupportedMachines() {
-        return PrinterDefaults.instance.getSupportedPrinters(CTBFile.class);
+        return MachineDefaults.instance.getMachines(CTBFile.class);
     }
 
     public final String getVersionByMagic(byte[] magic) {

@@ -21,13 +21,13 @@ import java.util.stream.Collectors;
  * Printer defaults utility class.
  * Loads printer_defaults.xml file and creates settings for all supported machines.
  */
-public class PrinterDefaults {
-    private static final Logger logger = Logger.getLogger(PrinterDefaults.class.getName());
+public class MachineDefaults {
+    private static final Logger logger = Logger.getLogger(MachineDefaults.class.getName());
     private final HashMap<String, Defaults> printers = new HashMap<>();
-    public static PrinterDefaults instance;
+    public static MachineDefaults instance;
 
     static {
-        try { instance = new PrinterDefaults(); } catch (MSLAException e) { throw new RuntimeException(e); }
+        try { instance = new MachineDefaults(); } catch (MSLAException e) { throw new RuntimeException(e); }
     }
 
     /**
@@ -42,7 +42,7 @@ public class PrinterDefaults {
         @Getter private final MSLAFileProps fileProps = new MSLAFileProps();
         @Getter private final Class<? extends MSLAFile<?>> fileClass;
         @Getter private LayerDefaults layerDefaults;
-        private final HashMap<String, PrinterOptionParams> options = new HashMap<>();
+        private final HashMap<String, MachineOptionParams> options = new HashMap<>();
 
         public Defaults(String manufacturer, String name, String extension, Class<? extends MSLAFile<?>> fileClass) {
             this.machineName = name;
@@ -53,7 +53,7 @@ public class PrinterDefaults {
 
         @Override public final String getMachineFullName() { return getMachineManufacturer() + " " + getMachineName(); }
 
-        public final PrinterOptionParams getOptionsBlock(String blockName) {
+        public final MachineOptionParams getOptionsBlock(String blockName) {
             if (blockName == null) throw new NullPointerException("Block name can't be null");
             return options.get(blockName);
         }
@@ -105,7 +105,7 @@ public class PrinterDefaults {
      * Internal machine layer-specific defaults class.
      */
     public static class LayerDefaults implements MSLALayerDefaults {
-        private final PrinterOptionParams options = new PrinterOptionParams();
+        private final MachineOptionParams options = new MachineOptionParams();
 
         @Override
         public void setFields(String blockName, MSLAFileBlockFields fields) throws MSLAException {
@@ -118,7 +118,7 @@ public class PrinterDefaults {
         }
     }
 
-    private PrinterDefaults() throws MSLAException {
+    private MachineDefaults() throws MSLAException {
         var xmlReader = new SAXReader();
         try(var resource = getClass().getClassLoader().getResourceAsStream("printer_defaults.xml")) {
             if (resource == null) throw new MSLAException("Printer defaults not found");
@@ -134,15 +134,29 @@ public class PrinterDefaults {
         }
     }
 
-    public final Optional<Defaults> getPrinter(String name) { return Optional.ofNullable(printers.get(name)); }
-
-    public final Set<String> getSupportedPrinters(Class<? extends MSLAFile<?>> cls) {
+    /**
+     * Returns a set of machines that supports given file class.
+     * @param fileClass an MSLAFile class
+     */
+    public final Set<String> getMachines(Class<? extends MSLAFile<?>> fileClass) {
         return printers.keySet().stream().filter(printerName ->
-                cls.getSimpleName().equals(printers.get(printerName).fileClass.getSimpleName())
+                fileClass.getSimpleName().equals(printers.get(printerName).fileClass.getSimpleName())
         ).collect(Collectors.toSet());
     }
 
-    public final List<MSLAFileDefaults> getSuitableDefaults(MSLAFile<?> file) {
+    /**
+     * Returns an optional of 'Defaults' object by given machine name.
+     * @param name machine full name
+     */
+    public final Optional<Defaults> getMachineDefaults(String name) {
+        return Optional.ofNullable(printers.get(name));
+    }
+
+    /**
+     * Returns a set of machines that supports given file.
+     * @param file an MSLAFile instance
+     */
+    public final List<MSLAFileDefaults> getMachineDefaults(MSLAFile<?> file) {
         return printers.keySet().stream()
                 .filter(printerName -> file.isMachineValid(printers.get(printerName)))
                 .map(printers::get)
@@ -153,7 +167,7 @@ public class PrinterDefaults {
             throws MSLAException
     {
         logger.fine("Getting options into '" + optionsBlockName + "'");
-        var opts = new PrinterOptionParams();
+        var opts = new MachineOptionParams();
         defaults.options.put(optionsBlockName, opts);
         for (var it = optionsBlockElement.elementIterator("option"); it.hasNext();) {
             var option = it.next();
@@ -186,37 +200,42 @@ public class PrinterDefaults {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Defaults parsePrinter(Element printerElement) throws MSLAException {
         var name = printerElement.attributeValue("name");
-        var manufacturer = printerElement.attributeValue("manufacturer");
-        var extension = printerElement.attributeValue("extension");
-        var file = printerElement.attributeValue("file");
         if (name == null) throw new MSLAException("Printer name is not set");
+
+        var manufacturer = printerElement.attributeValue("manufacturer");
         if (manufacturer == null) throw new MSLAException("Printer manufacturer is not set");
+
+        var extension = printerElement.attributeValue("extension");
         if (extension == null) throw new MSLAException("Printer file extension is not set");
+
+        var file = printerElement.attributeValue("file");
         if (file == null) throw new MSLAException("Printer file format is not set");
         logger.info("Loading defaults for '" + manufacturer + " " + name + "' (" + file + ")");
 
         try {
             var fileClass = ClassLoader.getSystemClassLoader().loadClass(file);
-            if (!MSLAFile.class.isAssignableFrom(fileClass)) throw new MSLAException("File class is not an MSLAFile");
-            var def = new Defaults(manufacturer, name, extension, (Class<? extends MSLAFile<?>>) fileClass);
-            var elem = printerElement.elements("file_options");
-            if (elem.size() > 1) throw new MSLAException("Can't be more than one <file_options> tag for printer '" + name + "'");
-            else if (elem.size() == 1) parseFileOptions(def, elem.get(0));
+            if (MSLAFile.class.isAssignableFrom(fileClass)) {
+                var def = new Defaults(manufacturer, name, extension, (Class<? extends MSLAFile<?>>) fileClass);
+                var elem = printerElement.elements("file_options");
+                if (elem.size() > 1) throw new MSLAException("Can't be more than one <file_options> tag for printer '" + name + "'");
+                else if (elem.size() == 1) parseFileOptions(def, elem.get(0));
 
-            elem = printerElement.elements("layer_options");
-            if (elem.size() > 1) throw new MSLAException("Can't be more than one <layer_options> for printer '" + name + "'");
-            else if (elem.size() == 1) parseLayerOptions(def, elem.get(0));
+                elem = printerElement.elements("layer_options");
+                if (elem.size() > 1) throw new MSLAException("Can't be more than one <layer_options> for printer '" + name + "'");
+                else if (elem.size() == 1) parseLayerOptions(def, elem.get(0));
 
-            for (var it = printerElement.elementIterator("options"); it.hasNext();) {
-                var optionsBlockElement = it.next();
-                var optionsBlockName = optionsBlockElement.attributeValue("name");
-                if (optionsBlockName == null) throw new MSLAException("<options> must have name attribute");
-                parseOptionsBlockElement(def, optionsBlockName, optionsBlockElement);
-            }
+                for (var it = printerElement.elementIterator("options"); it.hasNext();) {
+                    var optionsBlockElement = it.next();
+                    var optionsBlockName = optionsBlockElement.attributeValue("name");
+                    if (optionsBlockName == null) throw new MSLAException("<options> must have name attribute");
+                    parseOptionsBlockElement(def, optionsBlockName, optionsBlockElement);
+                }
 
-            return def;
+                return def;
+            } else throw new MSLAException("File class is not an MSLAFile");
         } catch (ClassNotFoundException e) {
             throw new MSLAException("Can't find an mSLA file class '" + file + "'", e);
         }

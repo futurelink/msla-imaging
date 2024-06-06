@@ -4,7 +4,7 @@ import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.utils.FileOptionMapper;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +14,7 @@ public class PhotonWorkshopOptionsTest extends CommonTestRoutines {
     @Test
     void AvailableOptionsTest() throws MSLAException {
         var machine = "Anycubic Photon Mono X 6K";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
@@ -26,7 +26,7 @@ public class PhotonWorkshopOptionsTest extends CommonTestRoutines {
     @Test
     void SetOptionTest() throws MSLAException {
         var machine = "Anycubic Photon Mono X 6K";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);

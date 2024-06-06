@@ -4,7 +4,7 @@ import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.utils.FileOptionMapper;
 import futurelink.msla.utils.LayerOptionMapper;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -14,10 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FileOptionMapperTest extends CommonTestRoutines {
     @Test
-    @SuppressWarnings("unchecked")
     void LayerOptionsTest() throws MSLAException {
         var machine = "ELEGOO SATURN";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machine));
         var file = FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
@@ -33,7 +32,7 @@ public class FileOptionMapperTest extends CommonTestRoutines {
         var encoders = file.getEncodersPool();
         try {
             file.addLayer(new ImageReader(file, resource), null);
-            while (encoders.isEncoding()) Thread.sleep(100); // Wait while reading-encoding is done
+            while (encoders.isEncoding()) Thread.sleep(10); // Wait while reading-encoding is done
         } catch (IOException | InterruptedException e) {
             throw new MSLAException("Error adding layers", e);
         }
@@ -51,7 +50,7 @@ public class FileOptionMapperTest extends CommonTestRoutines {
     @Test
     void LayerOptionParamsTest() throws MSLAException {
         var machine = "Anycubic Photon M3 Max";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machine));
         var file = FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);

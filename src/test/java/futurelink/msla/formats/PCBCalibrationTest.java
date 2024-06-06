@@ -3,7 +3,7 @@ package futurelink.msla.formats;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.PCBCalibration;
 import futurelink.msla.utils.FileOptionMapper;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +19,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
 
         assertFileExactSize(filePath, 3048460);
 
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machineName));
         var file = FileFactory.instance.load(filePath);
         var options = new FileOptionMapper(file, defaults);
@@ -43,7 +43,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
 
         assertFileExactSize(filePath,472231);
 
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machineName));
         var file = FileFactory.instance.load(filePath);
         var options = new FileOptionMapper(file, defaults);

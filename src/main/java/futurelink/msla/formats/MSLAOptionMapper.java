@@ -97,6 +97,13 @@ public abstract class MSLAOptionMapper {
      */
     abstract public Set<String> available();
 
+    public final void set(String option, Float value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(String option, Integer value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(String option, Long value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(String option, Double value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(String option, Short value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(String option, Byte value) throws MSLAException { set(option, String.valueOf(value)); }
+
     /**
      * Sets option by name.
      * Throws MSLAException if mapper's options are not editable.
@@ -116,9 +123,10 @@ public abstract class MSLAOptionMapper {
         } else {
             var optionType = getType(option);
             if (optionType == Integer.class) populateOption(option, Integer.parseInt(value));
+            else if (optionType == Short.class) populateOption(option, Short.parseShort(value));
+            else if (optionType == Long.class) populateOption(option, Long.parseLong(value));
             else if (optionType == Float.class) populateOption(option, Float.parseFloat(value));
             else if (optionType == Double.class) populateOption(option, Double.parseDouble(value));
-            else if (optionType == Short.class) populateOption(option, Short.parseShort(value));
             else if (optionType == Byte.class) populateOption(option, Byte.parseByte(value));
             else if (optionType == Character.class) populateOption(option, value.toCharArray()[0]);
         }

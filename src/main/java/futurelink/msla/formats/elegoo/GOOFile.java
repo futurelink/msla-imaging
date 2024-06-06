@@ -62,7 +62,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
         return defaults.getFileClass().equals(this.getClass()) &&
-                (getResolution() == null) || defaults.getResolution().equals(getResolution());
+                (getResolution() == null || defaults.getResolution().equals(getResolution()));
     }
 
     @Override

@@ -5,7 +5,7 @@ import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileHeaderTable;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileMachineTable;
 import futurelink.msla.formats.creality.CXDLPFile;
 import futurelink.msla.utils.FileFactory;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +14,7 @@ public class DefaultsLoaderTest extends CommonTestRoutines {
     @Test
     void testDefaultsLoader() throws MSLAException {
         var machine = "Anycubic Photon M3 Max";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         assertEquals("Anycubic Photon M3 Max", defaults.getMachineFullName());
         assertEquals("6480x3600", defaults.getOptionsBlock("Header").getOption("Resolution").getDefaultValue());
@@ -37,15 +37,15 @@ public class DefaultsLoaderTest extends CommonTestRoutines {
         defaults.setFields("Machine", machineOptions);
         assertEquals("pw0Img", machineOptions.getLayerImageFormat());
 
-        System.out.println(PrinterDefaults.instance.getSupportedPrinters(CXDLPFile.class));
-        System.out.println(PrinterDefaults.instance.getSupportedPrinters(PhotonWorkshopFile.class));
+        System.out.println(MachineDefaults.instance.getMachines(CXDLPFile.class));
+        System.out.println(MachineDefaults.instance.getMachines(PhotonWorkshopFile.class));
     }
 
     @Test
     void testSuitableDefaults() throws MSLAException {
         var machine = "Anycubic Photon Mono X 6K";
         var wsFile = FileFactory.instance.create(machine);
-        var suitableDefaults = PrinterDefaults.instance.getSuitableDefaults(wsFile);
+        var suitableDefaults = MachineDefaults.instance.getMachineDefaults(wsFile);
         assertEquals(1, suitableDefaults.size());
         assertEquals(machine, suitableDefaults.get(0).getMachineFullName());
     }

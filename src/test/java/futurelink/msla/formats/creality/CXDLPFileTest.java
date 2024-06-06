@@ -6,7 +6,7 @@ import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
 import futurelink.msla.utils.FileOptionMapper;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -22,7 +22,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
         delete_file(outFile); // Clean up files just in case
 
         var machine = "CREALITY HALOT-ONE PLUS";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = (CXDLPFile) FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
@@ -41,7 +41,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
                 throw new MSLAException("Can't read layer image", e);
             }
         }
-        while (file.getEncodersPool().isEncoding()) Thread.sleep(100);
+        while (file.getEncodersPool().isEncoding()) Thread.sleep(10);
         logger.info("Done");
 
         System.out.println(file);
@@ -55,7 +55,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
     @Test
     void TestFileWithDefaultParams() throws MSLAException {
         var machine = "CREALITY HALOT-RAY";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = (CXDLPFile) FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
@@ -82,7 +82,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
         var writer = new ImageWriter(file, temp_dir, "extracted_", "png");
         file.readLayer(writer, 1);
         file.readLayer(writer, 10);
-        while (file.getDecodersPool().isDecoding()) Thread.sleep(100); // Wait while decoding-writing is done
+        while (file.getDecodersPool().isDecoding()) Thread.sleep(10); // Wait while decoding-writing is done
         logger.info("Done");
 
         assertFileMinSize(temp_dir + "extracted_1.png", 12000);
@@ -96,7 +96,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
         } catch (IOException e) {
             throw new MSLAException("Can't read test file", e);
         }
-        while (newFile.getEncodersPool().isEncoding()) { Thread.sleep(100);  }
+        while (newFile.getEncodersPool().isEncoding()) { Thread.sleep(10);  }
 
         // Write new file
         writeMSLAFile(outFile, newFile);
@@ -109,7 +109,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
         writer = new ImageWriter(file, temp_dir, "final_", "png");
         file.readLayer(writer, 0);
         file.readLayer(writer, 1);
-        while (file.getDecodersPool().isDecoding()) { Thread.sleep(100); } // Wait while decoding-writing is done
+        while (file.getDecodersPool().isDecoding()) { Thread.sleep(10); } // Wait while decoding-writing is done
 
         assertFileMinSize(temp_dir + "final_0.png", 12000);
         assertFileMinSize(temp_dir + "final_1.png", 12000);
@@ -131,7 +131,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
         var writer = new ImageWriter(file, temp_dir, "png");
         file.readLayer(writer, 1);
         file.readLayer(writer, 10);
-        while (file.getDecodersPool().isDecoding()) { Thread.sleep(100); } // Wait while decoding-writing is done
+        while (file.getDecodersPool().isDecoding()) { Thread.sleep(10); } // Wait while decoding-writing is done
 
         System.out.println(file);
 

@@ -20,7 +20,7 @@ import java.util.Set;
  * Basically, this class is important for building UI of the application that is
  * supposed to work with this library.
  */
-public class PrinterOptionParams {
+public class MachineOptionParams {
 
     @Getter
     public static class Param implements MSLADefaultsParams {
@@ -129,9 +129,13 @@ public class PrinterOptionParams {
     }
 
     @Getter public static class ParamBoolean extends Param {
-        private Integer trueValue;
-        private Integer falseValue;
-        public ParamBoolean(String group, String value) { super(group, value); }
+        private final String trueValue;
+        private final String falseValue;
+        public ParamBoolean(String group, String value, String trueValue, String falseValue) {
+            super(group, value);
+            this.trueValue = trueValue;
+            this.falseValue = falseValue;
+        }
         @Override public String getType() { return "boolean"; }
         @Override public String toString() {
             return "Boolean option [ default = " + getDefaultValue() + ", true = " + trueValue + ", false = " + falseValue + " ]"; }
@@ -158,8 +162,8 @@ public class PrinterOptionParams {
         Param opt;
         if ("int".equals(type) || "float".equals(type)) {
             var minValue = option.attributeValue("minValue");
-            var maxValue = option.attributeValue("maxValue");
             if (minValue == null) throw new MSLAException("Attribute 'minValue' is required in option '" + name + "'");
+            var maxValue = option.attributeValue("maxValue");
             if (maxValue == null) throw new MSLAException("Attribute 'maxValue' is required in option '" + name + "'");
             if ("int".equals(type)) {
                 opt = new ParamInt(group, value, Integer.parseInt(minValue), Integer.parseInt(maxValue));
@@ -167,7 +171,13 @@ public class PrinterOptionParams {
                 opt = new ParamFloat(group,value, Float.parseFloat(minValue), Float.parseFloat(maxValue));
             }
         } else if ("char".equals(type)) opt = new ParamChar(group, value);
-        else if ("boolean".equals(type)) opt = new ParamBoolean(group, value);
+        else if ("boolean".equals(type)) {
+            var trueValue = option.attributeValue("trueValue");
+            if (trueValue == null) throw new MSLAException("Attribute 'trueValue' is required in option '" + name + "'");
+            var falseValue = option.attributeValue("falseValue");
+            if (falseValue == null) throw new MSLAException("Attribute 'falseValue' is required in option '" + name + "'");
+            opt = new ParamBoolean(group, value, trueValue, falseValue);
+        }
         else if ("".equals(type) || type == null) opt = new Param(group, value);
         else throw new MSLAException("Option type " + type + " is unknown");
         options.put(name, opt);

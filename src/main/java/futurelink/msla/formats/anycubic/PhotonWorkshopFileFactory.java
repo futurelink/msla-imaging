@@ -4,7 +4,7 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileFactory;
 import futurelink.msla.formats.iface.MSLAFileProps;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -52,6 +52,6 @@ public class PhotonWorkshopFileFactory implements MSLAFileFactory {
 
     @Override
     public Set<String> getSupportedMachines() {
-        return PrinterDefaults.instance.getSupportedPrinters(PhotonWorkshopFile.class);
+        return MachineDefaults.instance.getMachines(PhotonWorkshopFile.class);
     }
 }
