@@ -19,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Getter
-public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
+public class CTBFilePreview extends CTBFileBlock implements MSLAPreview {
     public enum Type { Small, Large }
 
     private BufferedImage Image;
@@ -43,10 +43,11 @@ public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
         @MSLAFileField(order = 8, lengthAt = "ImageLength") private Byte[] ImageData;
     }
 
-    public CTBFilePreview(Type previewType) {
+    public CTBFilePreview(int version, Type previewType) {
+        super(version);
         fileFields.Resolution = switch (previewType) {
-            case Large -> new Size(400, 300);
             case Small -> new Size(200, 125);
+            case Large -> new Size(400, 300);
         };
         setImage(null);
         fileFields.ImageOffset = 0;
@@ -144,7 +145,6 @@ public class CTBFilePreview implements MSLAFileBlock, MSLAPreview {
 
     @Override public String getName() { return null; }
     @Override public Size getResolution() { return fileFields.Resolution; }
-    @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {

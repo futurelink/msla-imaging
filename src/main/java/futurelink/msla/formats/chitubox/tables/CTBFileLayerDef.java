@@ -67,7 +67,6 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
         if (layerDefaults != null) layerDefaults.setFields(null, fileFields);
     }
-    @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
 
     @Override public String getName() { return null; }
     @Override public int getDataLength() throws FileFieldsException {

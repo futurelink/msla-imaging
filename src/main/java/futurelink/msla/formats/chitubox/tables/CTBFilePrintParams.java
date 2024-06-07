@@ -39,7 +39,6 @@ public class CTBFilePrintParams extends CTBFileBlock {
     }
 
     @Override public String getName() { return OPTIONS_SECTION_NAME; }
-    @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {

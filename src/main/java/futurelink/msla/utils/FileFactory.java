@@ -3,6 +3,7 @@ package futurelink.msla.utils;
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.PhotonWorkshopFileFactory;
 import futurelink.msla.formats.chitubox.CTBFileFactory;
+import futurelink.msla.formats.chitubox.encrypted.CTBEncryptedFileFactory;
 import futurelink.msla.formats.creality.CXDLPFileFactory;
 import futurelink.msla.formats.elegoo.GOOFileFactory;
 import futurelink.msla.formats.iface.MSLAFile;
@@ -28,6 +29,7 @@ public final class FileFactory {
         addFileTypeFactory(new CXDLPFileFactory());
         addFileTypeFactory(new GOOFileFactory());
         addFileTypeFactory(new CTBFileFactory());
+        addFileTypeFactory(new CTBEncryptedFileFactory());
     }
 
     public void addFileTypeFactory(MSLAFileFactory factory) {

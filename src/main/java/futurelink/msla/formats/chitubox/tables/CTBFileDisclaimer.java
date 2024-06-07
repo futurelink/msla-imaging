@@ -16,18 +16,6 @@ public class CTBFileDisclaimer implements MSLAFileBlock {
 
     private final Fields fileFields = new Fields();
 
-    @Override public String getName() { return null; }
-
-    @Override
-    public int getDataLength() throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this);
-    }
-
-    @Override
-    public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(getFileFields(), fieldName);
-    }
-
     @Getter
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
@@ -35,8 +23,12 @@ public class CTBFileDisclaimer implements MSLAFileBlock {
         private int DisclaimerSize() { return CTBv4_DISCLAIMER.length(); }
     }
 
-    @Override
-    public String toString() {
+    @Override public String getName() { return null; }
+    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
+    @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(getFileFields(), fieldName);
+    }
+    @Override public String toString() {
         return fileFields.fieldsAsString(" = ", "\n");
     }
 }

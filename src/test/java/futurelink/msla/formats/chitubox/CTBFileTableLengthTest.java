@@ -20,7 +20,7 @@ public class CTBFileTableLengthTest extends CommonTestRoutines {
 
     @Test
     void CTBFilePreviewTest() throws FileFieldsException {
-        var block = new CTBFilePreview(CTBFilePreview.Type.Large);
+        var block = new CTBFilePreview(4, CTBFilePreview.Type.Large);
         var length = FileFieldsIO.getBlockLength(block);
         assertEquals(152, length);
     }

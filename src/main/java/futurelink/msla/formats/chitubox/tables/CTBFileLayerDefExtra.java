@@ -32,8 +32,6 @@ public class CTBFileLayerDefExtra implements MSLAFileBlock {
         @MSLAFileField(order = 11) @MSLAOption("Light PWM") private Float LightPWM;
     }
 
-    @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
-
     @Override public String getName() { return null; }
     @Override public int getDataLength() { return TABLE_SIZE; }
     @Override

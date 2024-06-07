@@ -27,8 +27,8 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     private CTBFileDisclaimer Disclaimer = null;
     @Getter private CTBFilePrintParamsV4 PrintParamsV4 = null;
     private CTBFileResinParams ResinParams = null;
-    private final CTBFilePreview PreviewSmall = new CTBFilePreview(CTBFilePreview.Type.Small);
-    private final CTBFilePreview PreviewLarge = new CTBFilePreview(CTBFilePreview.Type.Large);
+    private CTBFilePreview PreviewSmall = null;
+    private CTBFilePreview PreviewLarge = null;
     @Getter private CTBFileLayers Layers = null;
 
     public CTBFile(Byte Version) throws MSLAException {
@@ -39,6 +39,9 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
         Header = new CTBFileHeader(Version);
         if (Header.getFileFields().getVersion() <= 0)
             throw new MSLAException("The MSLA file does not have a version number.");
+
+        PreviewLarge = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Large);
+        PreviewSmall = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Small);
 
         MachineName = new CTBFileMachineName();
         PrintParams = new CTBFilePrintParams(Version);
@@ -65,7 +68,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
         if (index == 0) return PreviewLarge;
         else return PreviewSmall;
     }
-    @Override public MSLAPreview getLargePreview() throws MSLAException { return PreviewLarge; }
+    @Override public MSLAPreview getLargePreview() { return PreviewLarge; }
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return Header.getFileFields().getResolution(); }
     @Override public float getPixelSizeUm() { return 0; }
@@ -142,15 +145,17 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
         }
 
         // Read large preview
-        logger.info("Reading large preview");
         if (Header.getFileFields().getPreviewLargeOffset() > 0) {
+            logger.info("Reading large preview");
+            PreviewLarge = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Large);
             PreviewLarge.read(stream, Header.getFileFields().getPreviewLargeOffset());
             var pixels = PreviewLarge.readImage(stream);
         }
 
         // Read small preview
-        logger.info("Reading small preview");
         if (Header.getFileFields().getPreviewSmallOffset() > 0) {
+            logger.info("Reading small preview");
+            PreviewSmall = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Small);
             PreviewSmall.read(stream, Header.getFileFields().getPreviewSmallOffset());
             var pixels = PreviewSmall.readImage(stream);
         }

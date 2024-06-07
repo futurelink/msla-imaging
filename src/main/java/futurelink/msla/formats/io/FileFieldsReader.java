@@ -32,7 +32,7 @@ public class FileFieldsReader {
             if (field.getType() == FileFieldsIO.MSLAField.Type.Field) {
                 var f = fields.getClass().getDeclaredField(field.getName());
                 var type = f.getGenericType();
-                logger.fine("Setting value for " + field + " of " + type + " - " + type.getClass());
+                logger.info("Setting value for " + field + " of " + type);
 
                 Method m = null;
                 boolean hasSetter = false;
@@ -44,8 +44,8 @@ public class FileFieldsReader {
                     var internalType = ((ParameterizedType) type).getRawType();
                     if (internalType == ArrayList.class) {
                         var listElementType = ((ParameterizedType) type).getActualTypeArguments()[0];
-                        logger.fine("List generic type is " + listElementType + " of " + listElementType.getClass());
-                        logger.fine("Reading " + length + " components");
+                        logger.info("List generic type is " + listElementType + " of " + listElementType.getClass());
+                        logger.info("Reading " + length + " components");
                         var constr = ((Class<?>) listElementType).getDeclaredConstructor();
                         var array = new ArrayList<>();
                         if (hasSetter) {
@@ -68,7 +68,7 @@ public class FileFieldsReader {
 
                 // Field type is a MSLAFileBlockFields
                 else if (MSLAFileBlockFields.class.isAssignableFrom((Class<?>) type)) {
-                    logger.fine("Reading block of type " + type);
+                    logger.info("Reading block of type " + type);
                     f.setAccessible(true);
                     dataRead = readFields(dis, (MSLAFileBlockFields) f.get(fields));
                     f.setAccessible(false);
@@ -76,7 +76,7 @@ public class FileFieldsReader {
 
                 // Field type is a MSLAFileBlockFields
                 else if (MSLAFileBlock.class.isAssignableFrom((Class<?>) type)) {
-                    logger.fine("Reading block of type " + type);
+                    logger.info("Reading block of type " + type);
                     f.setAccessible(true);
                     dataRead = readBlock(dis, (MSLAFileBlock) f.get(fields));
                     f.setAccessible(false);
@@ -86,11 +86,12 @@ public class FileFieldsReader {
                 else {
                     var value = readFieldValue(dis, type, (int) length, field.getCharset());
                     if (hasSetter) {
-                        logger.fine("Calling setter for " + field + " of " + type);
+                        logger.info("Calling setter for " + field + " of " + type + " value " + value.toString());
                         m.setAccessible(true);
                         m.invoke(fields, value);
                         m.setAccessible(false);
                     } else {
+                        logger.info("Setting " + field + " of " + type + " value " + value.toString());
                         f.setAccessible(true);
                         f.set(fields, value);
                         f.setAccessible(false);
@@ -115,7 +116,7 @@ public class FileFieldsReader {
                 try { m = fields.getClass().getDeclaredMethod("set" + field.getName(), type); hasSetter = true; }
                 catch (NoSuchMethodException ignored) {}
                 if (hasSetter) {
-                    logger.fine("Calling setter for " + field + " of " + type);
+                    logger.info("Calling setter for " + field + " of " + type);
                     m.setAccessible(true);
                     m.invoke(fields, value);
                     m.setAccessible(false);
