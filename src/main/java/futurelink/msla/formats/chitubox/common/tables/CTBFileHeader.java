@@ -1,7 +1,6 @@
-package futurelink.msla.formats.chitubox.tables;
+package futurelink.msla.formats.chitubox.common.tables;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.iface.annotations.MSLAOption;
@@ -15,7 +14,7 @@ import java.util.Objects;
 import java.util.Random;
 
 @Getter
-public class CTBFileHeader implements MSLAFileBlock {
+public class CTBFileHeader extends CTBFileBlock {
     private final String OPTIONS_SECTION_NAME = "Header";
 
     public static final int MAGIC_CBD_DLP = 0x12FD0019; // 318570521
@@ -88,6 +87,7 @@ public class CTBFileHeader implements MSLAFileBlock {
     }
 
     public CTBFileHeader(int version) throws MSLAException {
+        super(version);
         var r = new Random();
         fileFields = new Fields();
         fileFields.setVersion(version);
@@ -100,6 +100,5 @@ public class CTBFileHeader implements MSLAFileBlock {
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
         return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
     }
-    @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
     @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
 }

@@ -1,4 +1,4 @@
-package futurelink.msla.formats.chitubox.tables;
+package futurelink.msla.formats.chitubox.common.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
@@ -27,17 +27,17 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
         private final CTBFileLayerDef parent;
-        @MSLAFileField(order = 1) @Setter private Float PositionZ;
-        @MSLAFileField(order = 2) @MSLAOption(MSLAOption.ExposureTime) @Setter private Float ExposureTime;
-        @MSLAFileField(order = 3) @MSLAOption("Light off time") @Setter private Float LightOffSeconds;
-        @MSLAFileField(order = 4) @Setter private Integer DataAddress;
-        @MSLAFileField(order = 5) @Setter private Integer DataSize;
-        @MSLAFileField(order = 6) private final Integer PageNumber = 0; // For files larger than 4Gb
-        @MSLAFileField(order = 7) private Integer TableSize;
-        @MSLAFileField(order = 8) private final Integer Unknown3 = 0;
-        @MSLAFileField(order = 9) private final Integer Unknown4 = 0;
-        @MSLAFileField(order = 10) @MSLAOptionContainer private CTBFileLayerDefExtra Extra = null;
-        @MSLAFileField(order = 11, lengthAt = "DataSize") @Setter private byte[] Data = new byte[0];
+        @MSLAFileField @Setter private Float PositionZ;
+        @MSLAFileField(order = 1) @MSLAOption(MSLAOption.ExposureTime) @Setter private Float ExposureTime;
+        @MSLAFileField(order = 2) @MSLAOption("Light off time") @Setter private Float LightOffSeconds;
+        @MSLAFileField(order = 3) @Setter private Integer DataAddress;
+        @MSLAFileField(order = 4) @Setter private Integer DataSize;
+        @MSLAFileField(order = 5) private final Integer PageNumber = 0; // For files larger than 4Gb
+        @MSLAFileField(order = 6) private Integer TableSize;
+        @MSLAFileField(order = 7) private final Integer Unknown3 = 0;
+        @MSLAFileField(order = 8) private final Integer Unknown4 = 0;
+        @MSLAFileField(order = 9) @MSLAOptionContainer private CTBFileLayerDefExtra Extra = null;
+        @MSLAFileField(order = 10, lengthAt = "DataSize") @Setter private byte[] Data = new byte[0];
 
         public Fields(CTBFileLayerDef parent) {
             this.parent = parent;
@@ -67,7 +67,6 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
         if (layerDefaults != null) layerDefaults.setFields(null, fileFields);
     }
-    @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
 
     @Override public String getName() { return null; }
     @Override public int getDataLength() throws FileFieldsException {

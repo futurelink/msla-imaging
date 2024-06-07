@@ -1,7 +1,7 @@
-package futurelink.msla.formats.chitubox.tables;
+package futurelink.msla.formats.chitubox.common.tables;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.chitubox.CTBFile;
+import futurelink.msla.formats.chitubox.common.CTBCommonFile;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.io.FileFieldsException;
 import lombok.Setter;
@@ -12,12 +12,12 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFileLayerDef, byte[]> {
-    private final CTBFile parent;
+    private final CTBCommonFile parent;
     private final Logger logger = Logger.getLogger(CTBFileLayers.class.getName());
     private final ArrayList<CTBFileLayerDef> LayerDefinition = new ArrayList<>();
     @Setter private MSLALayerDefaults layerDefaults;
 
-    public CTBFileLayers(CTBFile parent) {
+    public CTBFileLayers(CTBCommonFile parent) {
         super(parent.getHeader().getFileFields().getVersion());
         this.parent = parent;
     }

@@ -1,4 +1,4 @@
-package futurelink.msla.formats.chitubox.tables;
+package futurelink.msla.formats.chitubox.common.tables;
 
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
@@ -47,7 +47,6 @@ public class CTBFilePrintParamsV4 extends CTBFileBlock {
     }
 
     @Override public String getName() { return OPTIONS_SECTION_NAME; }
-    @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {

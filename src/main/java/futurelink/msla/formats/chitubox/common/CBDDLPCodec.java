@@ -1,4 +1,4 @@
-package futurelink.msla.formats.chitubox;
+package futurelink.msla.formats.chitubox.common;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;

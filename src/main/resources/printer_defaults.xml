@@ -386,7 +386,7 @@
         </options>
     </printer>
 
-    <printer manufacturer="ELEGOO" name="SATURN" extension="ctb" file="futurelink.msla.formats.chitubox.CTBFile">
+    <printer manufacturer="ELEGOO" name="SATURN" extension="ctb" file="futurelink.msla.formats.chitubox.common.CTBCommonFile">
         <file_options>
             <option name="Version" value="4"/>
         </file_options>

@@ -1,8 +1,8 @@
-package futurelink.msla.formats.chitubox;
+package futurelink.msla.formats.chitubox.common;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAFileGeneric;
-import futurelink.msla.formats.chitubox.tables.*;
+import futurelink.msla.formats.chitubox.common.tables.*;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
 import futurelink.msla.formats.io.FileFieldsException;
@@ -16,8 +16,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-public class CTBFile extends MSLAFileGeneric<byte[]> {
-    private final Logger logger = Logger.getLogger(CTBFile.class.getName());
+public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
+    private final Logger logger = Logger.getLogger(CTBCommonFile.class.getName());
 
     /* File sections */
     @Getter @MSLAOptionContainer private CTBFileHeader Header = null;
@@ -27,11 +27,11 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     private CTBFileDisclaimer Disclaimer = null;
     @Getter private CTBFilePrintParamsV4 PrintParamsV4 = null;
     private CTBFileResinParams ResinParams = null;
-    private final CTBFilePreview PreviewSmall = new CTBFilePreview(CTBFilePreview.Type.Small);
-    private final CTBFilePreview PreviewLarge = new CTBFilePreview(CTBFilePreview.Type.Large);
+    private CTBFilePreview PreviewSmall = null;
+    private CTBFilePreview PreviewLarge = null;
     @Getter private CTBFileLayers Layers = null;
 
-    public CTBFile(Byte Version) throws MSLAException {
+    public CTBCommonFile(Byte Version) throws MSLAException {
         super();
         if (Version == null || Version <= 0)
             throw new MSLAException("File defaults do not have a version number.");
@@ -39,6 +39,9 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
         Header = new CTBFileHeader(Version);
         if (Header.getFileFields().getVersion() <= 0)
             throw new MSLAException("The MSLA file does not have a version number.");
+
+        PreviewLarge = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Large);
+        PreviewSmall = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Small);
 
         MachineName = new CTBFileMachineName();
         PrintParams = new CTBFilePrintParams(Version);
@@ -55,17 +58,17 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
         }
     }
 
-    public CTBFile(DataInputStream stream) throws IOException, MSLAException {
+    public CTBCommonFile(DataInputStream stream) throws IOException, MSLAException {
         super();
         read(stream);
     }
 
-    @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return CTBFileCodec.class; }
+    @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return CTBCommonFileCodec.class; }
     @Override public MSLAPreview getPreview(int index) {
         if (index == 0) return PreviewLarge;
         else return PreviewSmall;
     }
-    @Override public MSLAPreview getLargePreview() throws MSLAException { return PreviewLarge; }
+    @Override public MSLAPreview getLargePreview() { return PreviewLarge; }
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return Header.getFileFields().getResolution(); }
     @Override public float getPixelSizeUm() { return 0; }
@@ -87,7 +90,7 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
     }
 
     @Override public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        var layerData = new CTBFileCodec.Input(Layers.get(layer).getFileFields().getData());
+        var layerData = new CTBCommonFileCodec.Input(Layers.get(layer).getFileFields().getData());
         var params = new HashMap<String, Object>();
         params.put("EncryptionKey", Header.getFileFields().getEncryptionKey());
         return getDecodersPool().decode(layer, writer, layerData, params);
@@ -142,15 +145,17 @@ public class CTBFile extends MSLAFileGeneric<byte[]> {
         }
 
         // Read large preview
-        logger.info("Reading large preview");
         if (Header.getFileFields().getPreviewLargeOffset() > 0) {
+            logger.info("Reading large preview");
+            PreviewLarge = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Large);
             PreviewLarge.read(stream, Header.getFileFields().getPreviewLargeOffset());
             var pixels = PreviewLarge.readImage(stream);
         }
 
         // Read small preview
-        logger.info("Reading small preview");
         if (Header.getFileFields().getPreviewSmallOffset() > 0) {
+            logger.info("Reading small preview");
+            PreviewSmall = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Small);
             PreviewSmall.read(stream, Header.getFileFields().getPreviewSmallOffset());
             var pixels = PreviewSmall.readImage(stream);
         }

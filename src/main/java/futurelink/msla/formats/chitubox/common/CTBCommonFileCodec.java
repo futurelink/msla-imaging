@@ -1,4 +1,4 @@
-package futurelink.msla.formats.chitubox;
+package futurelink.msla.formats.chitubox.common;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
@@ -10,8 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class CTBFileCodec implements MSLALayerCodec<byte[]> {
-    private static final Logger logger = Logger.getLogger(CTBFileCodec.class.getName());
+public class CTBCommonFileCodec implements MSLALayerCodec<byte[]> {
+    private static final Logger logger = Logger.getLogger(CTBCommonFileCodec.class.getName());
     private Integer EncryptionKey = 0;
 
     public static class Input implements MSLALayerDecodeInput<byte[]> {

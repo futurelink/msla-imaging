@@ -2,7 +2,7 @@ package futurelink.msla.formats.chitubox;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.chitubox.tables.*;
+import futurelink.msla.formats.chitubox.common.tables.*;
 import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.formats.io.FileFieldsIO;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ public class CTBFileTableLengthTest extends CommonTestRoutines {
 
     @Test
     void CTBFilePreviewTest() throws FileFieldsException {
-        var block = new CTBFilePreview(CTBFilePreview.Type.Large);
+        var block = new CTBFilePreview(4, CTBFilePreview.Type.Large);
         var length = FileFieldsIO.getBlockLength(block);
         assertEquals(152, length);
     }

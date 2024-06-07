@@ -1,4 +1,4 @@
-package futurelink.msla.formats.chitubox.tables;
+package futurelink.msla.formats.chitubox.common.tables;
 
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
@@ -31,8 +31,6 @@ public class CTBFileLayerDefExtra implements MSLAFileBlock {
         @MSLAFileField(order = 10) @MSLAOption("Rest time after retract") private Float RestTimeAfterRetract;
         @MSLAFileField(order = 11) @MSLAOption("Light PWM") private Float LightPWM;
     }
-
-    @Override public FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.LittleEndian; }
 
     @Override public String getName() { return null; }
     @Override public int getDataLength() { return TABLE_SIZE; }

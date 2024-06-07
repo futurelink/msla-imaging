@@ -27,16 +27,14 @@ public interface MSLAFileBlock {
     default FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.BigEndian; }
 
     default void beforeRead() {}
-    default void afterRead() {}
+    default void afterRead() throws MSLAException {}
     default void beforeWrite() throws MSLAException {}
 
     default long read(DataInputStream input, long position) throws MSLAException {
         try {
-            input.reset();
-            input.skipBytes((int) position);
             var reader = new FileFieldsReader(input, getEndianness());
-            return reader.read(this);
-        } catch (IOException | FileFieldsException e) {
+            return reader.read(this, position);
+        } catch (FileFieldsException e) {
             throw new MSLAException("Error reading " + this.getClass().getName() + " table", e);
         }
     }

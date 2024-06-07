@@ -7,6 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface MSLAFileField {
     int length() default 0;
     String lengthAt() default "";
+    String offsetAt() default "";
     int order() default 0;
     boolean dontCount() default false;
     String charset() default "US-ASCII";

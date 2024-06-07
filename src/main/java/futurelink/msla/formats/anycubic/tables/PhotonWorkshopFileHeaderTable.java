@@ -101,7 +101,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     public long read(DataInputStream stream, long position) throws MSLAException {
         try {
             var reader = new FileFieldsReader(stream, FileFieldsIO.Endianness.LittleEndian);
-            var dataRead = reader.read(this);
+            var dataRead = reader.read(this, position);
             if (dataRead != TableLength) throw new MSLAException(
                 "Header was not completely read out (" + dataRead + " of " + TableLength + "), some extra data left unread"
             );

@@ -22,6 +22,7 @@ public class FileFieldsIO {
         private final int length;
         private final boolean dontCount;
         private final String lengthAt;
+        private final String offsetAt;
         private final Charset charset;
         private MSLAField(Field field, MSLAFileField anno) {
             this.name = field.getName();
@@ -30,6 +31,7 @@ public class FileFieldsIO {
             this.order = anno.order();
             this.dontCount = anno.dontCount();
             this.lengthAt = anno.lengthAt();
+            this.offsetAt = anno.offsetAt();
             this.charset = Charset.forName(anno.charset());
         }
         private MSLAField(Method field, MSLAFileField anno) {
@@ -39,6 +41,7 @@ public class FileFieldsIO {
             this.length = anno.length();
             this.dontCount = anno.dontCount();
             this.lengthAt = anno.lengthAt();
+            this.offsetAt = anno.offsetAt();
             this.charset = Charset.forName(anno.charset());
         }
         @Override public String toString() { return name + ":" + length; }

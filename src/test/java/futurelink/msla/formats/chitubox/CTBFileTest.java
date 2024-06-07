@@ -2,6 +2,7 @@ package futurelink.msla.formats.chitubox;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.chitubox.common.CTBCommonFile;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
@@ -18,52 +19,64 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CTBFileTest extends CommonTestRoutines {
+
     @Test
-    void ReadTestFile() throws IOException, InterruptedException {
+    void ReadChituboxFileTest() throws MSLAException, IOException {
         logger.info("Temporary dir: " + temp_dir);
-        try {
-            var file = (CTBFile) FileFactory.instance.load(
-                    resourceFile("test_data/ChituboxFileTest/Example_ELEGOO_SATURN.ctb")
-            );
-            assertTrue(file.isValid());
-            assertEquals("3840 x 2400", file.getResolution().toString());
+        var file = FileFactory.instance.load(
+                resourceFile("test_data/ChituboxFileTest/Example_Chitubox_Slices.ctb")
+        );
+        assertTrue(file.isValid());
 
-            ImageIO.write(file.getPreview((short) 0).getImage(), "png", new File(temp_dir + "ctb_preview.png"));
-            assertFileExactSize(temp_dir + "ctb_preview.png", 6924);
+        ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "encrypted_file_small_preview.png"));
+        ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "encrypted_file_large_preview.png"));
 
-            // Asynchronously extract image files
-            var layerPixels = new int[3];
-            var layerFiles = new String[3];
-            var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
-                layerPixels[layerNumber] = pixels;
-                layerFiles[layerNumber] = fileName;
-            });
-            file.readLayer(writer, 0);
-            file.readLayer(writer, 1);
-            file.readLayer(writer, 2);
-            while (file.getDecodersPool().isDecoding()) Thread.sleep(10); // Wait while decoding-writing is done
+        assertFileExactSize(temp_dir + "encrypted_file_small_preview.png", 4612);
+        assertFileExactSize(temp_dir + "encrypted_file_large_preview.png", 14994);
+    }
 
-            // Check pixels were written
-            assertEquals(82031, layerPixels[0]);
-            assertEquals(83634, layerPixels[1]);
-            assertEquals(85202, layerPixels[2]);
+    @Test
+    void ReadELEGOOFileTest() throws IOException, InterruptedException, MSLAException {
+        logger.info("Temporary dir: " + temp_dir);
+        var file = (CTBCommonFile) FileFactory.instance.load(
+                resourceFile("test_data/ChituboxFileTest/Example_ELEGOO_SATURN.ctb")
+        );
+        assertTrue(file.isValid());
+        assertEquals("3840 x 2400", file.getResolution().toString());
 
-            // Check files exist
-            assertFileExactSize(layerFiles[0], 10841);
-            assertFileExactSize(layerFiles[1], 10852);
-            assertFileExactSize(layerFiles[2], 10869);
+        ImageIO.write(file.getPreview((short) 0).getImage(), "png", new File(temp_dir + "ctb_preview.png"));
+        assertFileExactSize(temp_dir + "ctb_preview.png", 6924);
 
-            ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "large_preview.png"));
-            ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "small_preview.png"));
-        } catch (MSLAException e) {
-            throw new RuntimeException(e);
-        }
+        // Asynchronously extract image files
+        var layerPixels = new int[3];
+        var layerFiles = new String[3];
+        var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
+            layerPixels[layerNumber] = pixels;
+            layerFiles[layerNumber] = fileName;
+        });
+        file.readLayer(writer, 0);
+        file.readLayer(writer, 1);
+        file.readLayer(writer, 2);
+        while (file.getDecodersPool().isDecoding()) Thread.sleep(10); // Wait while decoding-writing is done
+
+        // Check pixels were written
+        assertEquals(82031, layerPixels[0]);
+        assertEquals(83634, layerPixels[1]);
+        assertEquals(85202, layerPixels[2]);
+
+        // Check files exist
+        assertFileExactSize(layerFiles[0], 10841);
+        assertFileExactSize(layerFiles[1], 10852);
+        assertFileExactSize(layerFiles[2], 10869);
+
+        ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "large_preview.png"));
+        ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "small_preview.png"));
     }
 
     @Test
     void CreateTestFile() throws MSLAException, InterruptedException, IOException {
         var outFile = temp_dir + "chitubox_file_test.ctb";
-        var file = (CTBFile) FileFactory.instance.create("ELEGOO SATURN");
+        var file = FileFactory.instance.create("ELEGOO SATURN");
         assertTrue(file.isValid());
 
         var files = new String[]{
@@ -97,7 +110,7 @@ public class CTBFileTest extends CommonTestRoutines {
         writeMSLAFile(outFile, file);
 
         // Read exported file and do checks
-        file = (CTBFile) FileFactory.instance.load(outFile);
+        file = FileFactory.instance.load(outFile);
         assertTrue(file.isValid());
 
         // Asynchronously extract image files
@@ -131,7 +144,7 @@ public class CTBFileTest extends CommonTestRoutines {
         var machine = "ELEGOO SATURN";
         var defaults = MachineDefaults.instance.getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
-        var file = (CTBFile) FileFactory.instance.create(machine);
+        var file = (CTBCommonFile) FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
         assertTrue(file.isValid());
 
