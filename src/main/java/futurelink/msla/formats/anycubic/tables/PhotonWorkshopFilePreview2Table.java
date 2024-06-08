@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 
 @Getter
 public class PhotonWorkshopFilePreview2Table extends PhotonWorkshopFilePreview {
-    private final Fields fileFields;
+    private final Fields blockFields;
 
     @Getter
     @SuppressWarnings("unused")
@@ -40,7 +40,7 @@ public class PhotonWorkshopFilePreview2Table extends PhotonWorkshopFilePreview {
 
     public PhotonWorkshopFilePreview2Table(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        fileFields = new Fields(this);
+        blockFields = new Fields(this);
         setImage(null);
     }
 
@@ -50,7 +50,7 @@ public class PhotonWorkshopFilePreview2Table extends PhotonWorkshopFilePreview {
         if (image != null) Image.getGraphics().drawImage(image, 0, 0, null);
     }
 
-    @Override int calculateTableLength() { return 20 + getFileFields().getImageDataSize(); }
+    @Override int calculateTableLength() { return 20 + getBlockFields().getImageDataSize(); }
 
-    public String toString() { return "-- Preview 2 --\n" + fileFields.fieldsAsString(" = ", "\n"); }
+    public String toString() { return "-- Preview 2 --\n" + blockFields.fieldsAsString(" = ", "\n"); }
 }

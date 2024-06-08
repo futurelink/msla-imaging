@@ -18,7 +18,7 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
     @Setter private MSLALayerDefaults layerDefaults;
 
     public CTBFileLayers(CTBCommonFile parent) {
-        super(parent.getHeader().getFileFields().getVersion());
+        super(parent.getHeader().getBlockFields().getVersion());
         this.parent = parent;
     }
 
@@ -54,32 +54,32 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
     {
         var layerNumber = count();
         var layerDef = allocate();
-        var layer = layerDef.getFileFields();
-        layer.setPositionZ((layerNumber + 1) * parent.getHeader().getFileFields().getLayerHeightMillimeter());
-        layer.setExposureTime(parent.getHeader().getFileFields().getLayerExposureSeconds());
-        layer.setLightOffSeconds(parent.getHeader().getFileFields().getLightOffDelay());
+        var layer = layerDef.getBlockFields();
+        layer.setPositionZ((layerNumber + 1) * parent.getHeader().getBlockFields().getLayerHeightMillimeter());
+        layer.setExposureTime(parent.getHeader().getBlockFields().getLayerExposureSeconds());
+        layer.setLightOffSeconds(parent.getHeader().getBlockFields().getLightOffDelay());
 
         // Fill in layer overrides with defaults
         var extra = layer.getExtra();
         if (extra != null) {
-            var extraFields = extra.getFileFields();
-            extraFields.setLiftHeight(parent.getPrintParams().getFileFields().getLiftHeight());
-            extraFields.setLiftSpeed(parent.getPrintParams().getFileFields().getLiftSpeed());
-            extraFields.setLiftHeight2(parent.getSlicerInfo().getFileFields().getLiftHeight2());
-            extraFields.setLiftSpeed2(parent.getSlicerInfo().getFileFields().getLiftSpeed2());
-            extraFields.setRetractSpeed(parent.getPrintParams().getFileFields().getRetractSpeed());
-            extraFields.setRetractHeight2(parent.getSlicerInfo().getFileFields().getRetractHeight2());
-            extraFields.setRetractSpeed2(parent.getSlicerInfo().getFileFields().getRetractSpeed2());
+            var extraFields = extra.getBlockFields();
+            extraFields.setLiftHeight(parent.getPrintParams().getBlockFields().getLiftHeight());
+            extraFields.setLiftSpeed(parent.getPrintParams().getBlockFields().getLiftSpeed());
+            extraFields.setLiftHeight2(parent.getSlicerInfo().getBlockFields().getLiftHeight2());
+            extraFields.setLiftSpeed2(parent.getSlicerInfo().getBlockFields().getLiftSpeed2());
+            extraFields.setRetractSpeed(parent.getPrintParams().getBlockFields().getRetractSpeed());
+            extraFields.setRetractHeight2(parent.getSlicerInfo().getBlockFields().getRetractHeight2());
+            extraFields.setRetractSpeed2(parent.getSlicerInfo().getBlockFields().getRetractSpeed2());
             if (parent.getPrintParamsV4() != null) {
-                extraFields.setRestTimeBeforeLift(parent.getPrintParamsV4().getFileFields().getRestTimeBeforeLift());
-                extraFields.setRestTimeAfterLift(parent.getPrintParamsV4().getFileFields().getRestTimeAfterLift());
-                extraFields.setRestTimeAfterRetract(parent.getPrintParamsV4().getFileFields().getRestTimeAfterRetract());
+                extraFields.setRestTimeBeforeLift(parent.getPrintParamsV4().getBlockFields().getRestTimeBeforeLift());
+                extraFields.setRestTimeAfterLift(parent.getPrintParamsV4().getBlockFields().getRestTimeAfterLift());
+                extraFields.setRestTimeAfterRetract(parent.getPrintParamsV4().getBlockFields().getRestTimeAfterRetract());
             } else {
                 extraFields.setRestTimeBeforeLift(0.0f);
-                extraFields.setRestTimeAfterLift(parent.getSlicerInfo().getFileFields().getRestTimeAfterLift());
-                extraFields.setRestTimeAfterRetract(parent.getSlicerInfo().getFileFields().getRestTimeAfterRetract());
+                extraFields.setRestTimeAfterLift(parent.getSlicerInfo().getBlockFields().getRestTimeAfterLift());
+                extraFields.setRestTimeAfterRetract(parent.getSlicerInfo().getBlockFields().getRestTimeAfterRetract());
             }
-            extraFields.setLightPWM(parent.getHeader().getFileFields().getLightPWM().floatValue());
+            extraFields.setLightPWM(parent.getHeader().getBlockFields().getLightPWM().floatValue());
         }
 
         encoder.encode(layerNumber, reader, params, (ln, data) -> {
@@ -94,13 +94,13 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
         long bytesRead = 0;
         try {
             logger.info("Reading preliminary layer definitions");
-            for (int i = 0; i < parent.getHeader().getFileFields().getLayerCount(); i++) {
+            for (int i = 0; i < parent.getHeader().getBlockFields().getLayerCount(); i++) {
                 var layerDef = allocate();
-                layerDef.getFileFields().getParent().setBriefMode(true);
-                var len = layerDef.getFileFields().getParent().read(stream, position);
-                if (len != layerDef.getFileFields().getParent().getDataLength())
+                layerDef.getBlockFields().getParent().setBriefMode(true);
+                var len = layerDef.getBlockFields().getParent().read(stream, position);
+                if (len != layerDef.getBlockFields().getParent().getDataLength())
                     throw new MSLAException("Error reading brief layer definition for layer " + i + ": data size mismatch");
-                position += layerDef.getFileFields().getParent().getDataLength();
+                position += layerDef.getBlockFields().getParent().getDataLength();
                 bytesRead += len;
             }
         } catch (FileFieldsException e) {
@@ -112,9 +112,9 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
         for (int i = 0; i < LayerDefinition.size(); i++) {
             var def = LayerDefinition.get(i);
             def.setBriefMode(false);
-            var defOffset = def.getFileFields().getDataAddress() - def.getFileFields().getTableSize();
+            var defOffset = def.getBlockFields().getDataAddress() - def.getBlockFields().getTableSize();
             var len = def.read(stream, defOffset);
-            var expectedLen = def.getFileFields().getDataSize() + def.getFileFields().getTableSize();
+            var expectedLen = def.getBlockFields().getDataSize() + def.getBlockFields().getTableSize();
             if (len != expectedLen)
                 throw new MSLAException("Error reading layer " + i + ": data size mismatch: " + len + " vs " + expectedLen);
             bytesRead += len;
@@ -125,7 +125,7 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
     @Override public String getName() { return null; }
     @Override public int getDataLength() throws FileFieldsException { return 0; }
     @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException { return 0; }
-    @Override public MSLAFileBlockFields getFileFields() {
+    @Override public MSLAFileBlockFields getBlockFields() {
         return null;
     }
 }

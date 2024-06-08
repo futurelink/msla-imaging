@@ -12,7 +12,7 @@ public class CTBFilePrintParamsV4 extends CTBFileBlock {
     private final String OPTIONS_SECTION_NAME = "PrintParamsV4";
     private static final int CTBv4_RESERVED_SIZE = 380;
 
-    private final Fields fileFields;
+    private final Fields blockFields;
 
     @Getter
     @SuppressWarnings("unused")
@@ -43,14 +43,14 @@ public class CTBFilePrintParamsV4 extends CTBFileBlock {
 
     public CTBFilePrintParamsV4(int version) {
         super(version);
-        fileFields = new Fields();
+        blockFields = new Fields();
     }
 
     @Override public String getName() { return OPTIONS_SECTION_NAME; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(this.getBlockFields(), fieldName);
     }
-    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 }

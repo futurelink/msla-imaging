@@ -63,14 +63,14 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
             throw new MSLAException("File defaults do not have a version number.");
 
         Header = new CTBEncryptedFileHeader(Version);
-        if (Header.getFileFields().getVersion() <= 0)
+        if (Header.getBlockFields().getVersion() <= 0)
             throw new MSLAException("The mSLA file does not have a version number.");
 
         SlicerSettings = new CTBEncryptedFileSlicerSettings(Version);
         MachineName = new CTBFileMachineName();
         Disclaimer = new CTBFileDisclaimer();
         Layers = new CTBEncryptedFileLayers(this);
-        if (Header.getFileFields().getVersion() >= 5) Resin = new CTBEncryptedFileResin();
+        if (Header.getBlockFields().getVersion() >= 5) Resin = new CTBEncryptedFileResin();
     }
 
     public CTBEncryptedFile(DataInputStream stream) throws IOException, MSLAException {
@@ -127,7 +127,7 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
     }
 
     private byte[] generateSignature() throws MSLAException {
-        var checksum = SlicerSettings.getFileFields().getChecksumValue();
+        var checksum = SlicerSettings.getBlockFields().getChecksumValue();
         if (checksum == 0)
             throw new MSLAException("Can't check file signature, checksum is zero.");
         try {
@@ -146,24 +146,24 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
     private void read(DataInputStream stream) throws MSLAException {
         Header = new CTBEncryptedFileHeader(0); // Version is going to be read from file
         Header.read(stream, 0);
-        if (Header.getFileFields().getVersion() == null)
+        if (Header.getBlockFields().getVersion() == null)
             throw new MSLAException("Malformed file, Version is not identified");
 
-        logger.info("CTB encrypted file version " + Header.getFileFields().getVersion());
+        logger.info("CTB encrypted file version " + Header.getBlockFields().getVersion());
 
-        SlicerSettings = new CTBEncryptedFileSlicerSettings(Header.getFileFields().getVersion());
+        SlicerSettings = new CTBEncryptedFileSlicerSettings(Header.getBlockFields().getVersion());
         SlicerSettings.read(new DataInputStream(readEncryptedBlock(
                 stream,
-                Header.getFileFields().getSettingsOffset(),
-                Header.getFileFields().getSettingsSize()
+                Header.getBlockFields().getSettingsOffset(),
+                Header.getBlockFields().getSettingsSize()
         )), 0);
 
         /* Validate signature */
         try {
             // Read signature
             stream.reset();
-            stream.skipBytes(Header.getFileFields().getSignatureOffset());
-            var signature = stream.readNBytes(Header.getFileFields().getSignatureSize());
+            stream.skipBytes(Header.getBlockFields().getSignatureOffset());
+            var signature = stream.readNBytes(Header.getBlockFields().getSignatureSize());
             logger.fine("Signature is " + Arrays.toString(signature));
             if (!Arrays.equals(signature, generateSignature()))
                 throw new MSLAException("The file checksum does not match, malformed data.");
@@ -172,50 +172,50 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
         }
 
         // Read disclaimer block
-        if (SlicerSettings.getFileFields().getDisclaimerOffset() > 0) {
+        if (SlicerSettings.getBlockFields().getDisclaimerOffset() > 0) {
             Disclaimer = new CTBFileDisclaimer();
-            Disclaimer.read(stream, SlicerSettings.getFileFields().getDisclaimerOffset());
-            logger.info(Disclaimer.getFileFields().getDisclaimer());
+            Disclaimer.read(stream, SlicerSettings.getBlockFields().getDisclaimerOffset());
+            logger.info(Disclaimer.getBlockFields().getDisclaimer());
         }
 
         // Read machine name
-        if (SlicerSettings.getFileFields().getMachineNameOffset() > 0) {
-            MachineName.getFileFields().setMachineNameSize(SlicerSettings.getFileFields().getMachineNameSize());
-            MachineName.read(stream, SlicerSettings.getFileFields().getMachineNameOffset());
+        if (SlicerSettings.getBlockFields().getMachineNameOffset() > 0) {
+            MachineName.getBlockFields().setMachineNameSize(SlicerSettings.getBlockFields().getMachineNameSize());
+            MachineName.read(stream, SlicerSettings.getBlockFields().getMachineNameOffset());
         }
 
         // Read large preview
-        if (SlicerSettings.getFileFields().getPreviewLargeOffset() > 0) {
+        if (SlicerSettings.getBlockFields().getPreviewLargeOffset() > 0) {
             logger.info("Reading large preview");
-            PreviewLarge = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Large);
-            PreviewLarge.read(stream, SlicerSettings.getFileFields().getPreviewLargeOffset());
+            PreviewLarge = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Large);
+            PreviewLarge.read(stream, SlicerSettings.getBlockFields().getPreviewLargeOffset());
             var pixels = PreviewLarge.readImage(stream);
         }
 
         // Read small preview
-        if (SlicerSettings.getFileFields().getPreviewSmallOffset() > 0) {
+        if (SlicerSettings.getBlockFields().getPreviewSmallOffset() > 0) {
             logger.info("Reading small preview");
-            PreviewSmall = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Small);
-            PreviewSmall.read(stream, SlicerSettings.getFileFields().getPreviewSmallOffset());
+            PreviewSmall = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Small);
+            PreviewSmall.read(stream, SlicerSettings.getBlockFields().getPreviewSmallOffset());
             var pixels = PreviewSmall.readImage(stream);
         }
 
         // Read resin settings
-        if (Header.getFileFields().getVersion() >= 5 && SlicerSettings.getFileFields().getResinParametersAddress() > 0)
-            Resin.read(stream, SlicerSettings.getFileFields().getResinParametersAddress());
+        if (Header.getBlockFields().getVersion() >= 5 && SlicerSettings.getBlockFields().getResinParametersAddress() > 0)
+            Resin.read(stream, SlicerSettings.getBlockFields().getResinParametersAddress());
 
         // Read layers pointer table
         Layers = new CTBEncryptedFileLayers(this);
-        Layers.read(stream, SlicerSettings.getFileFields().getLayersDefinitionOffset());
+        Layers.read(stream, SlicerSettings.getBlockFields().getLayersDefinitionOffset());
 
         for (int i = 0; i < Layers.count(); i++) {
-            logger.info(Layers.getFileFields().getLayerPointers().get(i).toString());
+            logger.info(Layers.getBlockFields().getLayerPointers().get(i).toString());
             logger.info(Layers.get(i).toString());
         }
     }
 
-    @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return null; }
-    @Override public String getMachineName() { return MachineName.getFileFields().getMachineName(); }
+    @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return CTBEncryptedFileCodec.class; }
+    @Override public String getMachineName() { return MachineName.getBlockFields().getMachineName(); }
     @Override public MSLAPreview getPreview(int index) throws MSLAException { return (index == 0) ? PreviewSmall : PreviewLarge; }
     @Override public MSLAPreview getLargePreview() { return PreviewLarge; }
     @Override public void setPreview(int index, BufferedImage image) {

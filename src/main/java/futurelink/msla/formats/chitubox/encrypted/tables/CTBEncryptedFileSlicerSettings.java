@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 public class CTBEncryptedFileSlicerSettings extends CTBFileBlock {
-    private final Fields fileFields;
+    private final Fields blockFields;
 
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
@@ -95,7 +95,7 @@ public class CTBEncryptedFileSlicerSettings extends CTBFileBlock {
         @MSLAFileField(order = 73) final private Integer Padding9 = 0;
     }
 
-    public CTBEncryptedFileSlicerSettings(Integer version) { super(version); fileFields = new Fields(); }
+    public CTBEncryptedFileSlicerSettings(Integer version) { super(version); blockFields = new Fields(); }
 
     @Override public String getName() { return "SlicerSettings"; }
     @Override public int getDataLength() throws FileFieldsException { return 0; }

@@ -5,10 +5,11 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.annotations.MSLAFileField;
 import futurelink.msla.formats.io.FileFieldsException;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class CTBEncryptedFileResin implements MSLAFileBlock {
-    private final Fields fileFields;
+    private final Fields blockFields = new Fields();
 
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
@@ -18,10 +19,10 @@ public class CTBEncryptedFileResin implements MSLAFileBlock {
         @MSLAFileField(order = 3) @Getter private byte ResinColorR;
         @MSLAFileField(order = 4) @Getter private byte ResinColorA;
         @MSLAFileField(order = 5) @Getter private Integer MachineNameAddress = 0;
-        @MSLAFileField(order = 6) private Integer ResinTypeLength = 0;
-        @MSLAFileField(order = 7) private Integer ResinTypeAddress = 0;
-        @MSLAFileField(order = 8) private Integer ResinNameLength = 0;
-        @MSLAFileField(order = 9) private Integer ResinNameAddress = 0;
+        @MSLAFileField(order = 6) @Setter private Integer ResinTypeLength = 0;
+        @MSLAFileField(order = 7) @Setter private Integer ResinTypeAddress = 0;
+        @MSLAFileField(order = 8) @Setter private Integer ResinNameLength = 0;
+        @MSLAFileField(order = 9) @Setter private Integer ResinNameAddress = 0;
         @MSLAFileField(order = 10) @Getter private Integer MachineNameLength = "DefaultMachineName".length();
         @MSLAFileField(order = 11) @Getter private float ResinDensity = 1.1f;
         @MSLAFileField(order = 12) private final Integer Padding2 = 0;
@@ -29,8 +30,6 @@ public class CTBEncryptedFileResin implements MSLAFileBlock {
         @MSLAFileField(order = 14, lengthAt="ResinNameLength") private String ResinName = "";
         @MSLAFileField(order = 15, lengthAt="MachineNameLength") private String MachineName = "DefaultMachineName";
     }
-
-    public CTBEncryptedFileResin() { fileFields = new Fields(); }
 
     @Override public String getName() { return "Resin"; }
     @Override public int getDataLength() throws FileFieldsException { return 0; }

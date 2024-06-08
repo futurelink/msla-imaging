@@ -223,7 +223,7 @@ public class FileFieldsIO {
      * @param lastFieldName calculate length of a block up to this field
      */
     public static Integer getBlockLength(MSLAFileBlock block, String lastFieldName) throws FileFieldsException {
-        return getBlockLength(block.getFileFields(), lastFieldName);
+        return getBlockLength(block.getBlockFields(), lastFieldName);
     }
 
     /**
@@ -231,6 +231,6 @@ public class FileFieldsIO {
      * @param block file data block object to calculate length
      */
     public static Integer getBlockLength(MSLAFileBlock block) throws FileFieldsException {
-        return getBlockLength(block.getFileFields(), null);
+        return getBlockLength(block.getBlockFields(), null);
     }
 }

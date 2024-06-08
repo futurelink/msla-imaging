@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.util.HashMap;
 
+/**
+ * mSla file properties structure.
+ */
 @Getter
 @SuppressWarnings("unused")
 public class MSLAFileProps extends HashMap<String, String> {

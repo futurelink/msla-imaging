@@ -56,7 +56,7 @@ public class FileOptionMapper extends MSLAOptionMapper {
                         var blockPropertyName = field.getName();
                         var getterMethod = fileClass.getDeclaredMethod("get" + blockPropertyName);
                         var fileBlock = ((MSLAFileBlock) getterMethod.invoke(file));
-                        Arrays.stream(fileBlock.getFileFields().getClass().getDeclaredFields())
+                        Arrays.stream(fileBlock.getBlockFields().getClass().getDeclaredFields())
                                 .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
                                 .forEach((f) -> {
                                     var optionName = f.getAnnotation(MSLAOption.class).value().isEmpty() ?
@@ -101,8 +101,8 @@ public class FileOptionMapper extends MSLAOptionMapper {
         try {
             var option = this.optionsMap.get(optionName);
             var fileBlock = getOptionFileBlock(optionName);
-            if (fileBlock.getFileFields() != null) {
-                var fields = fileBlock.getFileFields();
+            if (fileBlock.getBlockFields() != null) {
+                var fields = fileBlock.getBlockFields();
                 logger.info("Setting '" + option.getName() + "' of " + fields.getClass());
                 try {
                     var setter = fields.getClass().getDeclaredMethod("set" + option.getName(), option.getType());
@@ -125,8 +125,8 @@ public class FileOptionMapper extends MSLAOptionMapper {
             if (!this.optionsMap.containsKey(optionName)) throw new MSLAException("Option '" + optionName + "' is not known");
             var option = this.optionsMap.get(optionName);
             var fileBlock = getOptionFileBlock(optionName);
-            if (fileBlock.getFileFields() != null) {
-                var fields = fileBlock.getFileFields();
+            if (fileBlock.getBlockFields() != null) {
+                var fields = fileBlock.getBlockFields();
                 logger.info("Getting '" + option.getName() + "' in '" + fileBlock.getClass().getSimpleName() +"' of " + option.getType());
                 try {
                     var getter = fields.getClass().getDeclaredMethod("get" + option.getName());

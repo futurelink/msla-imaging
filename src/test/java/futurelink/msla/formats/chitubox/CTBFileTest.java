@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CTBFileTest extends CommonTestRoutines {
 
     @Test
-    void ReadChituboxFileTest() throws MSLAException, IOException {
+    void ReadChituboxFileTest() throws MSLAException, IOException, InterruptedException {
         logger.info("Temporary dir: " + temp_dir);
         var file = FileFactory.instance.load(
                 resourceFile("test_data/ChituboxFileTest/Example_Chitubox_Slices.ctb")
@@ -33,6 +33,18 @@ public class CTBFileTest extends CommonTestRoutines {
 
         assertFileExactSize(temp_dir + "encrypted_file_small_preview.png", 4612);
         assertFileExactSize(temp_dir + "encrypted_file_large_preview.png", 14994);
+
+        // Asynchronously extract image files
+        var layerPixels = new int[3];
+        var layerFiles = new String[3];
+        var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
+            layerPixels[layerNumber] = pixels;
+            layerFiles[layerNumber] = fileName;
+        });
+        file.readLayer(writer, 0);
+        file.readLayer(writer, 1);
+        file.readLayer(writer, 2);
+        while (file.getDecodersPool().isDecoding()) Thread.sleep(10); // Wait while decoding-writing is done
     }
 
     @Test
@@ -69,8 +81,11 @@ public class CTBFileTest extends CommonTestRoutines {
         assertFileExactSize(layerFiles[1], 10852);
         assertFileExactSize(layerFiles[2], 10869);
 
-        ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "large_preview.png"));
-        ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "small_preview.png"));
+        ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "elegoo_large_preview.png"));
+        ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "elegoo_small_preview.png"));
+
+        assertFileExactSize(temp_dir + "elegoo_large_preview.png", 6924);
+        assertFileExactSize(temp_dir + "elegoo_small_preview.png", 3789);
     }
 
     @Test

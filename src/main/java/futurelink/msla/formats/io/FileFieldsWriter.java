@@ -121,7 +121,7 @@ public class FileFieldsWriter {
         } catch (MSLAException e) {
             throw new FileFieldsException("Could not execute before write operations", e);
         }
-        writeFields(dos, block.getFileFields());
+        writeFields(dos, block.getBlockFields());
     }
 
     public final void write(MSLAFileBlock block) throws FileFieldsException, IOException {

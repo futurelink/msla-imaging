@@ -22,7 +22,7 @@ public class CTBFilePreview extends CTBFileBlock implements MSLAPreview {
     public enum Type { Small, Large }
 
     private BufferedImage Image;
-    private final Fields fileFields = new Fields();
+    private final Fields blockFields = new Fields();
     private final short REPEAT_MASK_RGB565 = 0x20;
 
     @Getter
@@ -44,34 +44,34 @@ public class CTBFilePreview extends CTBFileBlock implements MSLAPreview {
 
     public CTBFilePreview(int version, Type previewType) {
         super(version);
-        fileFields.Resolution = switch (previewType) {
+        blockFields.Resolution = switch (previewType) {
             case Small -> new Size(200, 125);
             case Large -> new Size(400, 300);
         };
         setImage(null);
-        fileFields.ImageOffset = 0;
+        blockFields.ImageOffset = 0;
     }
 
     public void setImage(BufferedImage image) {
-        Image = new BufferedImage(fileFields.ResolutionX(), fileFields.ResolutionY(), BufferedImage.TYPE_INT_RGB);
+        Image = new BufferedImage(blockFields.ResolutionX(), blockFields.ResolutionY(), BufferedImage.TYPE_INT_RGB);
         if (image != null) Image.getGraphics().drawImage(image, 0, 0, null);
-        fileFields.ImageData = Encode();
-        fileFields.ImageLength = fileFields.ImageData.length;
+        blockFields.ImageData = Encode();
+        blockFields.ImageLength = blockFields.ImageData.length;
     }
 
     @Override
     public void afterRead() {
-        Image = new BufferedImage(fileFields.ResolutionX(), fileFields.ResolutionY(), BufferedImage.TYPE_INT_RGB);
-        Decode(fileFields.ImageData);
+        Image = new BufferedImage(blockFields.ResolutionX(), blockFields.ResolutionY(), BufferedImage.TYPE_INT_RGB);
+        Decode(blockFields.ImageData);
     }
 
     public final long readImage(DataInputStream stream) throws MSLAException {
         try {
-            stream.reset(); stream.skipBytes(fileFields.ImageOffset);
-            byte[] readData = stream.readNBytes(fileFields.getImageLength());
+            stream.reset(); stream.skipBytes(blockFields.ImageOffset);
+            byte[] readData = stream.readNBytes(blockFields.getImageLength());
             Byte[] imageData = new Byte[readData.length];
             Arrays.setAll(imageData, i -> readData[i]);
-            if (imageData.length != fileFields.ImageLength)
+            if (imageData.length != blockFields.ImageLength)
                 throw new MSLAException("Error reading preview image data, it was not fully read");
             return Decode(imageData);
         } catch (IOException e) { throw new MSLAException("Error reading preview image data", e); }
@@ -137,17 +137,17 @@ public class CTBFilePreview extends CTBFileBlock implements MSLAPreview {
         }
 
         RleRGB565(rawData, rep, color_565);
-        fileFields.ImageLength = rawData.size();
+        blockFields.ImageLength = rawData.size();
 
         return rawData.toArray(Byte[]::new);
     }
 
     @Override public String getName() { return null; }
-    @Override public Size getResolution() { return fileFields.Resolution; }
+    @Override public Size getResolution() { return blockFields.Resolution; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(this.getBlockFields(), fieldName);
     }
-    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 }

@@ -49,7 +49,7 @@ public class CTBFileTableLengthTest extends CommonTestRoutines {
     @Test
     void CTBFileLayerDefTest() throws FileFieldsException, MSLAException {
         var block = new CTBFileLayerDef(4);
-        var length = FileFieldsIO.getBlockLength(block.getFileFields());
+        var length = FileFieldsIO.getBlockLength(block.getBlockFields());
         assertEquals(CTBFileLayerDef.BRIEF_TABLE_SIZE, length);
     }
 

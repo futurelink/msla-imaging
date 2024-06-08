@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage;
 @Getter
 public class GOOFilePreview implements MSLAFileBlock, MSLAPreview {
     private BufferedImage Image;
-    private final Fields fileFields;
+    private final Fields blockFields = new Fields();
 
     @Getter
     public static class Fields implements MSLAFileBlockFields {
@@ -27,15 +27,14 @@ public class GOOFilePreview implements MSLAFileBlock, MSLAPreview {
     }
 
     public GOOFilePreview(Size resolution) {
-        this.fileFields = new Fields();
-        this.fileFields.Resolution = new Size(resolution);
-        this.fileFields.Data = new byte[this.getFileFields().getImageLength()];
+        this.blockFields.Resolution = new Size(resolution);
+        this.blockFields.Data = new byte[this.getBlockFields().getImageLength()];
         this.Image = new BufferedImage(resolution.getWidth(), resolution.getHeight(), BufferedImage.TYPE_USHORT_565_RGB);
     }
 
     @Override public BufferedImage getImage() { return Image; }
     @Override public void setImage(BufferedImage image) {}
-    @Override public Size getResolution() { return this.getFileFields().Resolution; }
+    @Override public Size getResolution() { return this.getBlockFields().Resolution; }
 
     @Override public String getName() { return null; }
     @Override public int getDataLength() throws FileFieldsException { return 0; }
@@ -43,7 +42,7 @@ public class GOOFilePreview implements MSLAFileBlock, MSLAPreview {
 
     @Override
     public void afterRead() {
-        var fields = getFileFields();
+        var fields = getBlockFields();
         this.Image = new BufferedImage(getResolution().getWidth(), getResolution().getHeight(), BufferedImage.TYPE_USHORT_565_RGB);
         var buffer = this.Image.getRaster().getDataBuffer();
         for (int i = 0; i < fields.getImageLength(); i+=2) {
@@ -57,12 +56,12 @@ public class GOOFilePreview implements MSLAFileBlock, MSLAPreview {
     }
 
     @Override public void beforeWrite() throws MSLAException {
-        var fields = getFileFields();
+        var fields = getBlockFields();
         var buffer = getImage().getData().getDataBuffer();
         var size = buffer.getSize() * 2;
         if (fields.getImageLength() != size)
             throw new MSLAException("Preview size " + size + " does not match resolution size " +
-                    getFileFields().getImageLength());
+                    getBlockFields().getImageLength());
 
         fields.setData(new byte[size]);
         for (int i = 0; i < size; i+=2) {

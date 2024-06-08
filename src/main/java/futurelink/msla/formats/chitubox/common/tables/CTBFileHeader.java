@@ -26,7 +26,7 @@ public class CTBFileHeader extends CTBFileBlock {
     private static final short DefaultLightPWM = 255;
     private static final short DefaultBottomLightPWM = 255;
 
-    private final Fields fileFields;
+    private final Fields blockFields;
 
     @Getter
     @SuppressWarnings("unused")
@@ -89,16 +89,16 @@ public class CTBFileHeader extends CTBFileBlock {
     public CTBFileHeader(int version) throws MSLAException {
         super(version);
         var r = new Random();
-        fileFields = new Fields();
-        fileFields.setVersion(version);
-        fileFields.EncryptionKey = r.nextInt(Integer.MAX_VALUE);
+        blockFields = new Fields();
+        blockFields.setVersion(version);
+        blockFields.EncryptionKey = r.nextInt(Integer.MAX_VALUE);
     }
 
     @Override public String getName() { return OPTIONS_SECTION_NAME; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(this.getBlockFields(), fieldName);
     }
-    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 }

@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 public class CTBFileMachineName implements MSLAFileBlock {
-    private final Fields fileFields = new Fields();
+    private final Fields blockFields = new Fields();
 
     @Getter
     @SuppressWarnings("unused")
@@ -30,9 +30,9 @@ public class CTBFileMachineName implements MSLAFileBlock {
     @Override public String getName() { return "MachineName"; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(getBlockFields(), fieldName);
     }
     @Override public String toString() {
-        return fileFields.fieldsAsString(" = ", "\n");
+        return blockFields.fieldsAsString(" = ", "\n");
     }
 }

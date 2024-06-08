@@ -15,18 +15,17 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class CTBEncryptedFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBEncryptedFileLayerDef, byte[]> {
-    @Getter private final Fields fileFields;
+    @Getter private final Fields blockFields;
     private final Logger logger = Logger.getLogger(CTBEncryptedFileLayers.class.getName());
     private final CTBEncryptedFile parent;
     @Setter private MSLALayerDefaults layerDefaults;
     private final ArrayList<CTBEncryptedFileLayerDef> LayerDefinitions = new ArrayList<>();
 
-    @Getter
     @SuppressWarnings("unused")
     public static class LayerPointerEntry implements MSLAFileBlockFields {
-        @MSLAFileField private Integer LayerOffset;
-        @MSLAFileField(order = 1) private Integer PageNumber;
-        @MSLAFileField(order = 2) private final Integer LayerTableSize = 88; // always 0x58
+        @MSLAFileField @Getter private Integer LayerOffset;
+        @MSLAFileField(order = 1) @Getter private Integer PageNumber;
+        @MSLAFileField(order = 2) @Getter private final Integer LayerTableSize = 88; // always 0x58
         @MSLAFileField(order = 3) private final Integer Padding2 = 0; // 0
 
         @Override
@@ -43,26 +42,26 @@ public class CTBEncryptedFileLayers extends CTBFileBlock implements MSLAFileLaye
     public CTBEncryptedFileLayers(CTBEncryptedFile parent) {
         super(parent.getHeader().getVersion());
         this.parent = parent;
-        this.fileFields = new Fields();
-        this.fileFields.LayersCount = parent.getSlicerSettings().getFileFields().getLayerCount();
+        this.blockFields = new Fields();
+        this.blockFields.LayersCount = parent.getSlicerSettings().getBlockFields().getLayerCount();
     }
 
     @Override public String getName() { return "Layers"; }
     @Override public int getDataLength() throws FileFieldsException { return 0; }
     @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException { return 0; }
 
-    @Override public int count() { return getFileFields().LayersCount; }
+    @Override public int count() { return getBlockFields().LayersCount; }
     @Override public CTBEncryptedFileLayerDef get(int index) {
         return LayerDefinitions.get(index);
     }
     @Override public CTBEncryptedFileLayerDef allocate() throws MSLAException {
-        fileFields.LayerPointers.add(new LayerPointerEntry());
-        fileFields.LayersCount++;
+        blockFields.LayerPointers.add(new LayerPointerEntry());
+        blockFields.LayersCount++;
 
         var layer = new CTBEncryptedFileLayerDef();
         layer.setDefaults(layerDefaults);
         LayerDefinitions.add(layer);
-        parent.getSlicerSettings().getFileFields().setLayerCount(fileFields.LayersCount);
+        parent.getSlicerSettings().getBlockFields().setLayerCount(blockFields.LayersCount);
         return layer;
     }
 
@@ -88,9 +87,9 @@ public class CTBEncryptedFileLayers extends CTBFileBlock implements MSLAFileLaye
          * a layer data, that has length defined in header.
          */
         logger.info("Reading layer definitions & data");
-        for (int i = 0; i < getFileFields().LayersCount; i++) {
+        for (int i = 0; i < getBlockFields().LayersCount; i++) {
             var layer = new CTBEncryptedFileLayerDef();
-            layer.read(stream, getFileFields().getLayerPointers().get(i).LayerOffset);
+            layer.read(stream, getBlockFields().getLayerPointers().get(i).LayerOffset);
             LayerDefinitions.add(layer);
         }
 

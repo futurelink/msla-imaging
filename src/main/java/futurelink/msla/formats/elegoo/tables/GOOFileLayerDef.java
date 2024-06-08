@@ -11,7 +11,7 @@ import lombok.Getter;
 
 @Getter
 public class GOOFileLayerDef extends GOOFileTable implements MSLAFileLayer {
-    private final Fields fileFields = new Fields();
+    private final Fields blockFields = new Fields();
 
     @SuppressWarnings("unused")
     static public class Fields implements MSLAFileBlockFields {
@@ -39,11 +39,11 @@ public class GOOFileLayerDef extends GOOFileTable implements MSLAFileLayer {
     }
 
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
-        if (layerDefaults != null) layerDefaults.setFields(null, fileFields);
+        if (layerDefaults != null) layerDefaults.setFields(null, blockFields);
     }
 
     @Override public String getName() { return null; }
-    @Override public int getDataLength() { return 72 + fileFields.DataLength; }
-    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
+    @Override public int getDataLength() { return 72 + blockFields.DataLength; }
+    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 
 }

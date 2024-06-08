@@ -8,7 +8,7 @@ import lombok.experimental.Delegate;
 
 @Getter
 public class CXDLPFileSliceInfo extends CXDLPFileTable {
-    @Delegate private final Fields fileFields;
+    @Delegate private final Fields blockFields = new Fields();
 
     @SuppressWarnings("unused")
     @Getter
@@ -58,11 +58,7 @@ public class CXDLPFileSliceInfo extends CXDLPFileTable {
         }
     }
 
-    public CXDLPFileSliceInfo() {
-        fileFields = new Fields();
-    }
-
     @Override public String getName() { return "SliceInfo"; }
-    @Override public int getDataLength() { return fileFields.getDataLength(); }
+    @Override public int getDataLength() { return blockFields.getDataLength(); }
     @Override public String toString() { return fieldsAsString(" = ", "\n"); }
 }

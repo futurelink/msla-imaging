@@ -37,11 +37,11 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
             throw new MSLAException("File defaults do not have a version number.");
 
         Header = new CTBFileHeader(Version);
-        if (Header.getFileFields().getVersion() <= 0)
+        if (Header.getBlockFields().getVersion() <= 0)
             throw new MSLAException("The MSLA file does not have a version number.");
 
-        PreviewLarge = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Large);
-        PreviewSmall = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Small);
+        PreviewLarge = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Large);
+        PreviewSmall = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Small);
 
         MachineName = new CTBFileMachineName();
         PrintParams = new CTBFilePrintParams(Version);
@@ -49,12 +49,12 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
         Layers = new CTBFileLayers(this);
 
         // Version 4 or later data
-        if (Header.getFileFields().getVersion() >= 4) {
+        if (Header.getBlockFields().getVersion() >= 4) {
             PrintParamsV4 = new CTBFilePrintParamsV4(Version);
             Disclaimer = new CTBFileDisclaimer();
 
             // Version 5 or later data
-            if (Header.getFileFields().getVersion() >= 5) ResinParams = new CTBFileResinParams(Version);
+            if (Header.getBlockFields().getVersion() >= 5) ResinParams = new CTBFileResinParams(Version);
         }
     }
 
@@ -70,7 +70,7 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     }
     @Override public MSLAPreview getLargePreview() { return PreviewLarge; }
     @Override public float getDPI() { return 0; }
-    @Override public Size getResolution() { return Header.getFileFields().getResolution(); }
+    @Override public Size getResolution() { return Header.getBlockFields().getResolution(); }
     @Override public float getPixelSizeUm() { return 0; }
 
     @Override
@@ -85,14 +85,14 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
             MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
     {
         var params = new HashMap<String, Object>();
-        params.put("EncryptionKey", Header.getFileFields().getEncryptionKey());
+        params.put("EncryptionKey", Header.getBlockFields().getEncryptionKey());
         Layers.add(getEncodersPool(), reader, params, callback);
     }
 
     @Override public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        var layerData = new CTBCommonFileCodec.Input(Layers.get(layer).getFileFields().getData());
+        var layerData = new CTBCommonFileCodec.Input(Layers.get(layer).getBlockFields().getData());
         var params = new HashMap<String, Object>();
-        params.put("EncryptionKey", Header.getFileFields().getEncryptionKey());
+        params.put("EncryptionKey", Header.getBlockFields().getEncryptionKey());
         return getDecodersPool().decode(layer, writer, layerData, params);
     }
 
@@ -101,67 +101,67 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     private void read(DataInputStream stream) throws MSLAException {
         Header = new CTBFileHeader(0); // Version is going to be read from file
         Header.read(stream, 0);
-        if (Header.getFileFields().getVersion() == null)
+        if (Header.getBlockFields().getVersion() == null)
             throw new MSLAException("Malformed file, Version is not identified");
 
-        logger.info("CTB file version " + Header.getFileFields().getVersion());
+        logger.info("CTB file version " + Header.getBlockFields().getVersion());
 
-        PrintParams = new CTBFilePrintParams(Header.getFileFields().getVersion());
-        SlicerInfo = new CTBFileSlicerInfo(Header.getFileFields().getVersion());
+        PrintParams = new CTBFilePrintParams(Header.getBlockFields().getVersion());
+        SlicerInfo = new CTBFileSlicerInfo(Header.getBlockFields().getVersion());
         MachineName = new CTBFileMachineName();
 
-        if (Header.getFileFields().getPrintParametersOffset() > 0)
-            PrintParams.read(stream, Header.getFileFields().getPrintParametersOffset());
+        if (Header.getBlockFields().getPrintParametersOffset() > 0)
+            PrintParams.read(stream, Header.getBlockFields().getPrintParametersOffset());
         else throw new MSLAException("Malformed file, PrintParameters section offset is missing");
 
-        if (Header.getFileFields().getSlicerOffset() > 0)
-            SlicerInfo.read(stream, Header.getFileFields().getSlicerOffset());
+        if (Header.getBlockFields().getSlicerOffset() > 0)
+            SlicerInfo.read(stream, Header.getBlockFields().getSlicerOffset());
         else throw new MSLAException("Malformed file, SlicerOffset section offset is missing");
 
-        MachineName.getFileFields().setMachineNameSize(SlicerInfo.getFileFields().getMachineNameSize());
-        MachineName.read(stream, SlicerInfo.getFileFields().getMachineNameOffset());
+        MachineName.getBlockFields().setMachineNameSize(SlicerInfo.getBlockFields().getMachineNameSize());
+        MachineName.read(stream, SlicerInfo.getBlockFields().getMachineNameOffset());
 
-        logger.info("File is for machine '" + MachineName.getFileFields().getMachineName() + "'");
+        logger.info("File is for machine '" + MachineName.getBlockFields().getMachineName() + "'");
 
         // Read version 4 or later data
-        if (Header.getFileFields().getVersion() >= 4) {
+        if (Header.getBlockFields().getVersion() >= 4) {
             logger.info("Reading print parameters for version 4 or later");
-            if (SlicerInfo.getFileFields().getPrintParametersV4Offset() == 0)
+            if (SlicerInfo.getBlockFields().getPrintParametersV4Offset() == 0)
                 throw new MSLAException("Malformed file, PrintParametersV4 section offset is missing");
 
-            PrintParamsV4 = new CTBFilePrintParamsV4(Header.getFileFields().getVersion());
-            PrintParamsV4.read(stream, SlicerInfo.getFileFields().getPrintParametersV4Offset());
+            PrintParamsV4 = new CTBFilePrintParamsV4(Header.getBlockFields().getVersion());
+            PrintParamsV4.read(stream, SlicerInfo.getBlockFields().getPrintParametersV4Offset());
 
             logger.info("Reading disclaimer");
             Disclaimer = new CTBFileDisclaimer();
-            Disclaimer.read(stream, PrintParamsV4.getFileFields().getDisclaimerOffset());
+            Disclaimer.read(stream, PrintParamsV4.getBlockFields().getDisclaimerOffset());
 
             // Read version 5 or later resin settings
-            if (Header.getFileFields().getVersion() >= 5 && PrintParamsV4.getFileFields().getResinParametersOffset() > 0) {
+            if (Header.getBlockFields().getVersion() >= 5 && PrintParamsV4.getBlockFields().getResinParametersOffset() > 0) {
                 logger.info("Reading resin parameters for version 5 or later");
-                ResinParams = new CTBFileResinParams(Header.getFileFields().getVersion());
-                ResinParams.read(stream, PrintParamsV4.getFileFields().getResinParametersOffset());
+                ResinParams = new CTBFileResinParams(Header.getBlockFields().getVersion());
+                ResinParams.read(stream, PrintParamsV4.getBlockFields().getResinParametersOffset());
             }
         }
 
         // Read large preview
-        if (Header.getFileFields().getPreviewLargeOffset() > 0) {
+        if (Header.getBlockFields().getPreviewLargeOffset() > 0) {
             logger.info("Reading large preview");
-            PreviewLarge = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Large);
-            PreviewLarge.read(stream, Header.getFileFields().getPreviewLargeOffset());
+            PreviewLarge = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Large);
+            PreviewLarge.read(stream, Header.getBlockFields().getPreviewLargeOffset());
             var pixels = PreviewLarge.readImage(stream);
         }
 
         // Read small preview
-        if (Header.getFileFields().getPreviewSmallOffset() > 0) {
+        if (Header.getBlockFields().getPreviewSmallOffset() > 0) {
             logger.info("Reading small preview");
-            PreviewSmall = new CTBFilePreview(Header.getFileFields().getVersion(), CTBFilePreview.Type.Small);
-            PreviewSmall.read(stream, Header.getFileFields().getPreviewSmallOffset());
+            PreviewSmall = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Small);
+            PreviewSmall.read(stream, Header.getBlockFields().getPreviewSmallOffset());
             var pixels = PreviewSmall.readImage(stream);
         }
 
         Layers = new CTBFileLayers(this);
-        Layers.read(stream, Header.getFileFields().getLayersDefinitionOffset());
+        Layers.read(stream, Header.getBlockFields().getLayersDefinitionOffset());
     }
 
     @Override public void write(OutputStream stream) throws MSLAException {
@@ -169,46 +169,46 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
         var offset = 0;
         try {
             offset += Header.getDataLength();
-            Header.getFileFields().setPreviewLargeOffset(offset);
+            Header.getBlockFields().setPreviewLargeOffset(offset);
             offset += PreviewLarge.getDataLength();
-            Header.getFileFields().setPreviewSmallOffset(offset);
+            Header.getBlockFields().setPreviewSmallOffset(offset);
             offset += PreviewSmall.getDataLength();
-            Header.getFileFields().setPrintParametersOffset(offset);
-            Header.getFileFields().setPrintParametersSize(PrintParams.getDataLength());
-            offset += Header.getFileFields().getPrintParametersSize();
-            Header.getFileFields().setSlicerOffset(offset);
-            Header.getFileFields().setSlicerSize(SlicerInfo.getDataLength());
-            offset += Header.getFileFields().getSlicerSize();
+            Header.getBlockFields().setPrintParametersOffset(offset);
+            Header.getBlockFields().setPrintParametersSize(PrintParams.getDataLength());
+            offset += Header.getBlockFields().getPrintParametersSize();
+            Header.getBlockFields().setSlicerOffset(offset);
+            Header.getBlockFields().setSlicerSize(SlicerInfo.getDataLength());
+            offset += Header.getBlockFields().getSlicerSize();
 
-            PreviewLarge.getFileFields().setImageOffset(Header.getFileFields().getPreviewLargeOffset() + 32);
-            PreviewSmall.getFileFields().setImageOffset(Header.getFileFields().getPreviewSmallOffset() + 32);
+            PreviewLarge.getBlockFields().setImageOffset(Header.getBlockFields().getPreviewLargeOffset() + 32);
+            PreviewSmall.getBlockFields().setImageOffset(Header.getBlockFields().getPreviewSmallOffset() + 32);
 
-            SlicerInfo.getFileFields().setVersion(Header.getFileFields().getVersion());
-            SlicerInfo.getFileFields().setMachineNameSize(MachineName.getFileFields().getMachineNameSize());
-            SlicerInfo.getFileFields().setMachineNameOffset(offset);
+            SlicerInfo.getBlockFields().setVersion(Header.getBlockFields().getVersion());
+            SlicerInfo.getBlockFields().setMachineNameSize(MachineName.getBlockFields().getMachineNameSize());
+            SlicerInfo.getBlockFields().setMachineNameOffset(offset);
             offset += MachineName.getDataLength();
 
             // For version 4 and greater
             if (PrintParamsV4 != null) {
                 // Calculate disclaimer offset and size
-                PrintParamsV4.getFileFields().setDisclaimerOffset(offset);
-                PrintParamsV4.getFileFields().setDisclaimerLength(Disclaimer.getFileFields().getDisclaimer().length());
+                PrintParamsV4.getBlockFields().setDisclaimerOffset(offset);
+                PrintParamsV4.getBlockFields().setDisclaimerLength(Disclaimer.getBlockFields().getDisclaimer().length());
                 offset += Disclaimer.getDataLength();
-                SlicerInfo.getFileFields().setPrintParametersV4Offset(offset);
-                PrintParamsV4.getFileFields().setLastLayerIndex(Layers.count()-1);
+                SlicerInfo.getBlockFields().setPrintParametersV4Offset(offset);
+                PrintParamsV4.getBlockFields().setLastLayerIndex(Layers.count()-1);
                 offset += PrintParamsV4.getDataLength();
                 if (ResinParams != null) {
-                    PrintParamsV4.getFileFields().setResinParametersOffset(offset);
+                    PrintParamsV4.getBlockFields().setResinParametersOffset(offset);
                     offset += ResinParams.getDataLength();
-                } else PrintParamsV4.getFileFields().setResinParametersOffset(0);
+                } else PrintParamsV4.getBlockFields().setResinParametersOffset(0);
             } else {
-                SlicerInfo.getFileFields().setPrintParametersV4Offset(0);
+                SlicerInfo.getBlockFields().setPrintParametersV4Offset(0);
             }
 
-            Header.getFileFields().setLayersDefinitionOffset(offset);
-            Header.getFileFields().setTotalHeightMillimeter(Layers.count() * Header.getFileFields().getLayerHeightMillimeter());
-            Header.getFileFields().setLayerCount(Layers.count());
-            Header.getFileFields().setPrintTime(0);
+            Header.getBlockFields().setLayersDefinitionOffset(offset);
+            Header.getBlockFields().setTotalHeightMillimeter(Layers.count() * Header.getBlockFields().getLayerHeightMillimeter());
+            Header.getBlockFields().setLayerCount(Layers.count());
+            Header.getBlockFields().setPrintTime(0);
         } catch (FileFieldsException e) {
             throw new MSLAException("Error writing file fields", e);
         }
@@ -230,7 +230,7 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
             // Write brief layer definitions
             var wholeBriefLayerDefSize = Layers.count() * CTBFileLayerDef.BRIEF_TABLE_SIZE;
             for (var i = 0; i < Layers.count(); i++) {
-                var def = Layers.get(i).getFileFields();
+                var def = Layers.get(i).getBlockFields();
                 def.setDataAddress(wholeBriefLayerDefSize +
                         offset + CTBFileLayerDef.BRIEF_TABLE_SIZE +
                         ((def.getExtra() != null) ? CTBFileLayerDefExtra.TABLE_SIZE : 0)
@@ -238,8 +238,8 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
                 def.setDataSize(def.getData().length);
                 def.getParent().setBriefMode(false); // Calculate data length for the whole block with Data & Extra
                 var dataLength = def.getParent().getDataLength();
-                var extra = def.getParent().getFileFields().getExtra();
-                if (extra != null) extra.getFileFields().setTotalSize(dataLength);
+                var extra = def.getParent().getBlockFields().getExtra();
+                if (extra != null) extra.getBlockFields().setTotalSize(dataLength);
                 def.getParent().setBriefMode(true); // Write just in brief mode w/o Data & Extra
                 def.getParent().write(stream);
                 def.getParent().setBriefMode(false);
@@ -248,7 +248,7 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
 
             // Write whole layer definitions
             for (var i = 0; i < Layers.count(); i++) {
-                var def = Layers.get(i).getFileFields();
+                var def = Layers.get(i).getBlockFields();
                 def.getParent().setBriefMode(false);
                 def.getParent().write(stream);
             }
@@ -261,7 +261,7 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public String getMachineName() {
-        return MachineName.getFileFields().getMachineName();
+        return MachineName.getBlockFields().getMachineName();
     }
 
     @Override
@@ -274,11 +274,11 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         super.reset(defaults);
         if (isMachineValid(defaults)) {
-            defaults.setFields(Header.getName(), Header.getFileFields());
-            defaults.setFields(SlicerInfo.getName(), SlicerInfo.getFileFields());
-            defaults.setFields(MachineName.getName(), MachineName.getFileFields());
-            defaults.setFields(PrintParams.getName(), PrintParams.getFileFields());
-            defaults.setFields(PrintParamsV4.getName(), PrintParamsV4.getFileFields());
+            defaults.setFields(Header.getName(), Header.getBlockFields());
+            defaults.setFields(SlicerInfo.getName(), SlicerInfo.getBlockFields());
+            defaults.setFields(MachineName.getName(), MachineName.getBlockFields());
+            defaults.setFields(PrintParams.getName(), PrintParams.getBlockFields());
+            defaults.setFields(PrintParamsV4.getName(), PrintParamsV4.getBlockFields());
             getLayers().setDefaults(defaults.getLayerDefaults());
         } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
     }

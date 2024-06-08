@@ -69,7 +69,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         super.reset(defaults);
         if (isMachineValid(defaults)) {
-            defaults.setFields(Header.getName(), Header.getFileFields());
+            defaults.setFields(Header.getName(), Header.getBlockFields());
             getLayers().setDefaults(defaults.getLayerDefaults());
         } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
     }
@@ -89,7 +89,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        var input = new GOOFileCodec.Input(Layers.get(layer).getFileFields().getData());
+        var input = new GOOFileCodec.Input(Layers.get(layer).getBlockFields().getData());
         return getDecodersPool().decode(layer, writer, input, null);
     }
 

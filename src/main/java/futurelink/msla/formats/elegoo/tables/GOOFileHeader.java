@@ -20,7 +20,7 @@ public class GOOFileHeader extends GOOFileTable {
     private static final int HEADER_LENGTH = 195477;
     private static final byte DefaultBottomLightPWM = 0x01;
     private static final byte DefaultLightPWM = 0x02;
-    @Delegate private final Fields fileFields;
+    @Delegate private final Fields blockFields = new Fields();
 
     @Getter
     @SuppressWarnings("unused")
@@ -98,10 +98,8 @@ public class GOOFileHeader extends GOOFileTable {
         }
     }
 
-    public GOOFileHeader() { fileFields = new Fields(); }
-
     @Override public String getName() { return "Header"; }
     @Override public int getDataLength() { return HEADER_LENGTH; }
-    @Override public String toString() { return "-- Header --\n" + fileFields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return "-- Header --\n" + blockFields.fieldsAsString(" = ", "\n"); }
 
 }

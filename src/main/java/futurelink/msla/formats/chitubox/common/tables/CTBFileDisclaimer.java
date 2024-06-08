@@ -14,7 +14,7 @@ public class CTBFileDisclaimer implements MSLAFileBlock {
             "reproduce, distribute, modify, decompile, disassemble, decrypt, extract, reverse engineer, lease, assign, " +
             "or sublicense the said programs or codes.";
 
-    private final Fields fileFields = new Fields();
+    private final Fields blockFields = new Fields();
 
     @Getter
     @SuppressWarnings("unused")
@@ -26,9 +26,9 @@ public class CTBFileDisclaimer implements MSLAFileBlock {
     @Override public String getName() { return null; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(getBlockFields(), fieldName);
     }
     @Override public String toString() {
-        return fileFields.fieldsAsString(" = ", "\n");
+        return blockFields.fieldsAsString(" = ", "\n");
     }
 }

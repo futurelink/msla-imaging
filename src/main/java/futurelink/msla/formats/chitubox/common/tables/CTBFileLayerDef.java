@@ -13,7 +13,7 @@ import lombok.Setter;
 
 public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
     public static final int BRIEF_TABLE_SIZE = 36;
-    @Getter private final Fields fileFields;
+    @Getter private final Fields blockFields;
 
     /**
      * Brief mode, which means a layer definition excludes
@@ -56,25 +56,25 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
     public CTBFileLayerDef(int version) throws MSLAException {
         super(version);
         if (version <= 0) throw new MSLAException("Can't allocate a layer, version is not set");
-        fileFields = new Fields(this);
-        fileFields.TableSize = BRIEF_TABLE_SIZE;
+        blockFields = new Fields(this);
+        blockFields.TableSize = BRIEF_TABLE_SIZE;
         if (version >= 3) {
-            fileFields.Extra = new CTBFileLayerDefExtra();
-            fileFields.TableSize += CTBFileLayerDefExtra.TABLE_SIZE;
+            blockFields.Extra = new CTBFileLayerDefExtra();
+            blockFields.TableSize += CTBFileLayerDefExtra.TABLE_SIZE;
         }
     }
 
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
-        if (layerDefaults != null) layerDefaults.setFields(null, fileFields);
+        if (layerDefaults != null) layerDefaults.setFields(null, blockFields);
     }
 
     @Override public String getName() { return null; }
     @Override public int getDataLength() throws FileFieldsException {
-        return (isBriefMode) ? BRIEF_TABLE_SIZE : FileFieldsIO.getBlockLength(this.fileFields);
+        return (isBriefMode) ? BRIEF_TABLE_SIZE : FileFieldsIO.getBlockLength(this.blockFields);
     }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(this.getBlockFields(), fieldName);
     }
-    @Override public String toString() { return "{ " + fileFields.fieldsAsString(":", ", ") + " }"; }
+    @Override public String toString() { return "{ " + blockFields.fieldsAsString(":", ", ") + " }"; }
 }

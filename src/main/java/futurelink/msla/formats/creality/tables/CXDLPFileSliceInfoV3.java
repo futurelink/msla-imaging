@@ -9,7 +9,7 @@ import lombok.experimental.Delegate;
 
 @Getter
 public class CXDLPFileSliceInfoV3 extends CXDLPFileTable {
-    @Delegate private final Fields fileFields;
+    @Delegate private final Fields blockFields = new Fields();
     @Getter
     public static class Fields implements MSLAFileBlockFields {
         @MSLAFileField() private Integer SoftwareNameLength = 0;
@@ -53,12 +53,11 @@ public class CXDLPFileSliceInfoV3 extends CXDLPFileTable {
     }
 
     public CXDLPFileSliceInfoV3() {
-        fileFields = new Fields();
-        fileFields.setSoftwareName("v1.9.4");
-        fileFields.setMaterialName("normal");
+        blockFields.setSoftwareName("v1.9.4");
+        blockFields.setMaterialName("normal");
     }
 
     @Override public String getName() { return "SliceInfoV3"; }
-    @Override public int getDataLength() { return fileFields.getDataLength() + 2; }
+    @Override public int getDataLength() { return blockFields.getDataLength() + 2; }
     @Override public String toString() { return fieldsAsString(" = ", "\n"); }
 }

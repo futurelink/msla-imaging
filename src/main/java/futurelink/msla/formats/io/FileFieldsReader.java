@@ -218,7 +218,7 @@ public class FileFieldsReader {
     private long readBlock(FilterInputStream dis, MSLAFileBlock block) throws FileFieldsException {
         long readBytes;
         block.beforeRead();
-        readBytes = readFields(dis, block.getFileFields());
+        readBytes = readFields(dis, block.getBlockFields());
         try {
             block.afterRead();
         } catch (MSLAException e) {

@@ -20,7 +20,7 @@ import java.io.OutputStream;
  */
 @Getter
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
-    @Delegate private final Fields fileFields;
+    @Delegate private final Fields blockFields;
 
     @Getter @Setter
     @SuppressWarnings("unused")
@@ -94,7 +94,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     public PhotonWorkshopFileHeaderTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
         this.Name = "Header";
-        this.fileFields = new Fields(this);
+        this.blockFields = new Fields(this);
     }
 
     @Override
@@ -127,5 +127,5 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         super.write(stream);
     }
 
-    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 }

@@ -36,7 +36,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
         if (layerNumber < 0) throw new MSLAException("Layer number can't be negative");
         if (layerNumber >= file.getLayers().count()) throw new MSLAException("Layer number is too large");
         this.layerNumber = layerNumber;
-        this.enumerateOptions(file.getLayers().get(layerNumber).getFileFields(), new LinkedList<>());
+        this.enumerateOptions(file.getLayers().get(layerNumber).getBlockFields(), new LinkedList<>());
     }
 
     /**
@@ -60,7 +60,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
                         MSLAFileBlockFields fieldsInternal;
                         f.setAccessible(true);
                         if (MSLAFileBlock.class.isAssignableFrom(f.getType())) {
-                            fieldsInternal = ((MSLAFileBlock) f.get(fields)).getFileFields();
+                            fieldsInternal = ((MSLAFileBlock) f.get(fields)).getBlockFields();
                         } else {
                             fieldsInternal = (MSLAFileBlockFields) f.get(fields);
                         }
@@ -131,10 +131,10 @@ public class LayerOptionMapper extends MSLAOptionMapper {
             } else{
                 // Option is inside another container
                 logger.info("Option '" + optionName + "' is inside '" + option.getLocation() + "'");
-                var optionContainer = getOptionContainer(layer.getFileFields(), option.getLocation());
+                var optionContainer = getOptionContainer(layer.getBlockFields(), option.getLocation());
                 if (optionContainer != null) {
                     if (optionContainer instanceof MSLAFileBlock)
-                        optionContainer = ((MSLAFileBlock) optionContainer).getFileFields();
+                        optionContainer = ((MSLAFileBlock) optionContainer).getBlockFields();
                     var optionField = optionContainer.getClass().getDeclaredField(option.getName());
                     optionField.setAccessible(true);
                     optionField.set(optionContainer, option.getType().cast(value));
@@ -163,10 +163,10 @@ public class LayerOptionMapper extends MSLAOptionMapper {
             } else {
                 // Option is inside another container
                 logger.info("Option is inside '" + option.getLocation() + "'");
-                var optionContainer = getOptionContainer(layer.getFileFields(), option.getLocation());
+                var optionContainer = getOptionContainer(layer.getBlockFields(), option.getLocation());
                 if (optionContainer != null) {
                     if (optionContainer instanceof MSLAFileBlock)
-                        optionContainer = ((MSLAFileBlock) optionContainer).getFileFields();
+                        optionContainer = ((MSLAFileBlock) optionContainer).getBlockFields();
                     var optionField = optionContainer.getClass().getDeclaredField(option.getName());
                     optionField.setAccessible(true);
                     var value = optionField.get(optionContainer);
@@ -186,7 +186,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     {
         if (container == null) throw new MSLAException("Container can't be null");
         var containerName = location.get(location.size() - 1);
-        var layer = file.getLayers().get(layerNumber).getFileFields();
+        var layer = file.getLayers().get(layerNumber).getBlockFields();
         try {
             var optionContainerField = layer.getClass().getDeclaredField(containerName);
             optionContainerField.setAccessible(true);
@@ -194,7 +194,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
             optionContainerField.setAccessible(false);
             if (optionContainer != null) {
                 if (optionContainer instanceof MSLAFileBlock)
-                    optionContainer = ((MSLAFileBlock) optionContainer).getFileFields();
+                    optionContainer = ((MSLAFileBlock) optionContainer).getBlockFields();
                 return(MSLAFileBlockFields) optionContainer;
             } else {
                 return null;

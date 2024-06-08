@@ -14,7 +14,7 @@ import java.io.OutputStream;
  */
 @Getter @Setter
 public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
-    private final Fields fileFields;
+    private final Fields blockFields;
 
     @SuppressWarnings("unused")
     @Getter
@@ -52,7 +52,7 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
         super(versionMajor, versionMinor);
         Name = "Extra";
         TableLength = 24; // Constant that doesn't mean anything...
-        fileFields = new Fields(this);
+        blockFields = new Fields(this);
     }
 
     @Override
@@ -67,5 +67,5 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public String toString() { return "-- Extra table --" + "\n" + fileFields.fieldsAsString(" = ", "\n"); }
+    public String toString() { return "-- Extra table --" + "\n" + blockFields.fieldsAsString(" = ", "\n"); }
 }

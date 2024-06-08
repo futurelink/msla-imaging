@@ -8,7 +8,7 @@ import lombok.experimental.Delegate;
 
 @Getter
 public class CXDLPFileHeader extends CXDLPFileTable {
-    @Delegate private Fields fileFields;
+    @Delegate private Fields blockFields;
 
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
@@ -34,11 +34,11 @@ public class CXDLPFileHeader extends CXDLPFileTable {
         public int getDataLength() { return HeaderSize + PrinterModelSize + 16 + 64; }
     }
 
-    public CXDLPFileHeader() { fileFields = new Fields(); }
+    public CXDLPFileHeader() { blockFields = new Fields(); }
 
     @Override public String getName() { return "Header"; }
     public void setLayerCount(short count) {
-        fileFields.LayerCount = count;
+        blockFields.LayerCount = count;
     }
 
     @Override

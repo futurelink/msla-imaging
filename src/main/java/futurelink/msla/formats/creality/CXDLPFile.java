@@ -83,9 +83,9 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         super.reset(defaults);
         if (isMachineValid(defaults)) {
-            defaults.setFields(Header.getName(), Header.getFileFields());
-            defaults.setFields(SliceInfo.getName(), SliceInfo.getFileFields());
-            defaults.setFields(SliceInfoV3.getName(), SliceInfoV3.getFileFields());
+            defaults.setFields(Header.getName(), Header.getBlockFields());
+            defaults.setFields(SliceInfo.getName(), SliceInfo.getBlockFields());
+            defaults.setFields(SliceInfoV3.getName(), SliceInfoV3.getBlockFields());
             getLayers().setDefaults(defaults.getLayerDefaults());
         } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
     }

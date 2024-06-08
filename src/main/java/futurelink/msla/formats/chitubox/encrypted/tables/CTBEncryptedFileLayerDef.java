@@ -12,7 +12,7 @@ import lombok.Getter;
 
 @Getter
 public class CTBEncryptedFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
-    private final Fields fileFields;
+    private final Fields blockFields;
 
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
@@ -21,11 +21,11 @@ public class CTBEncryptedFileLayerDef extends CTBFileBlock implements MSLAFileLa
         @MSLAFileField(order = 2) @Getter private Float ExposureTime;
         @MSLAFileField(order = 3) @Getter private Float LightOffDelay;
         @MSLAFileField(order = 4) @Getter private Integer DataAddress;
-        @MSLAFileField(order = 5) private Integer PageNumber;
-        @MSLAFileField(order = 6) private Integer DataSize;
+        @MSLAFileField(order = 5) @Getter private Integer PageNumber;
+        @MSLAFileField(order = 6) @Getter private Integer DataSize;
         @MSLAFileField(order = 7) private Integer Unknown3;
-        @MSLAFileField(order = 8) private Integer EncryptedDataOffset;
-        @MSLAFileField(order = 9) private Integer EncryptedDataLength;
+        @MSLAFileField(order = 8) @Getter private Integer EncryptedDataOffset;
+        @MSLAFileField(order = 9) @Getter private Integer EncryptedDataLength;
 
         /* Same as 'Extra' in non-encrypted file format */
         @MSLAFileField(order = 10) @Getter private Float LiftHeight;
@@ -43,22 +43,22 @@ public class CTBEncryptedFileLayerDef extends CTBFileBlock implements MSLAFileLa
         @MSLAFileField(order = 22, lengthAt = "DataSize", offsetAt = "DataAddress") private byte[] Data;
     }
 
-    public CTBEncryptedFileLayerDef() { super(0); fileFields = new Fields(); }
+    public CTBEncryptedFileLayerDef() { super(0); blockFields = new Fields(); }
 
     @Override public String getName() { return null; }
 
     @Override public int getDataLength() throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(getFileFields());
+        return FileFieldsIO.getBlockLength(getBlockFields());
     }
 
     @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(this.getBlockFields(), fieldName);
     }
 
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
-        layerDefaults.setFields(null, getFileFields());
+        layerDefaults.setFields(null, getBlockFields());
     }
 
     @Override
-    public String toString() { return "{ " + fileFields.fieldsAsString(":", ", ") + " }"; }
+    public String toString() { return "{ " + blockFields.fieldsAsString(":", ", ") + " }"; }
 }

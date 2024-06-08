@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public class CTBFileResinParams extends CTBFileBlock {
-    private final Fields fileFields = new Fields();
+    private final Fields blockFields = new Fields();
 
     public CTBFileResinParams(int version) {
         super(version);
@@ -39,6 +39,6 @@ public class CTBFileResinParams extends CTBFileBlock {
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(this.getBlockFields(), fieldName);
     }
 }

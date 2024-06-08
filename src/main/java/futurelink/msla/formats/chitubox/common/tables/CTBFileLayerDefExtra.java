@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 public class CTBFileLayerDefExtra implements MSLAFileBlock {
-    private final Fields fileFields = new Fields();
+    private final Fields blockFields = new Fields();
     public static final int TABLE_SIZE = 48;
 
     @Getter
@@ -36,7 +36,7 @@ public class CTBFileLayerDefExtra implements MSLAFileBlock {
     @Override public int getDataLength() { return TABLE_SIZE; }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(this.getBlockFields(), fieldName);
     }
-    @Override public String toString() { return "{ " + fileFields.fieldsAsString(":", ", ") +" }"; }
+    @Override public String toString() { return "{ " + blockFields.fieldsAsString(":", ", ") +" }"; }
 }

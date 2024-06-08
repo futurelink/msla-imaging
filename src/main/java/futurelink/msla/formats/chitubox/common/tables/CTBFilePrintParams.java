@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 public class CTBFilePrintParams extends CTBFileBlock {
     private final String OPTIONS_SECTION_NAME = "PrintParams";
-    private final Fields fileFields;
+    private final Fields blockFields;
 
     @Getter
     @SuppressWarnings("unused")
@@ -35,14 +35,14 @@ public class CTBFilePrintParams extends CTBFileBlock {
 
     public CTBFilePrintParams(int version) {
         super(version);
-        fileFields = new Fields();
+        blockFields = new Fields();
     }
 
     @Override public String getName() { return OPTIONS_SECTION_NAME; }
     @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getFileFields(), fieldName);
+        return FileFieldsIO.getBlockLength(this.getBlockFields(), fieldName);
     }
-    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 }

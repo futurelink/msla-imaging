@@ -18,7 +18,7 @@ import java.io.OutputStream;
  */
 @Getter
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
-    @Delegate private final Fields fileFields;
+    @Delegate private final Fields blockFields;
 
     @Getter @Setter
     @SuppressWarnings("unused")
@@ -88,12 +88,12 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
         }
     }
 
-    public String getLayerImageFormat() { return fileFields.getLayerImageFormat(); }
+    public String getLayerImageFormat() { return blockFields.getLayerImageFormat(); }
 
     public PhotonWorkshopFileMachineTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
         Name = "Machine";
-        fileFields = new Fields(this);
+        blockFields = new Fields(this);
     }
 
     @Override
@@ -121,5 +121,5 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public String toString() { return "-- Machine data --\n" + fileFields.fieldsAsString(" = ", "\n"); }
+    public String toString() { return "-- Machine data --\n" + blockFields.fieldsAsString(" = ", "\n"); }
 }

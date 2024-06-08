@@ -25,7 +25,7 @@ public class PhotonWorkshopFileLayerDef implements MSLAFileBlockFields, MSLAFile
         return "Data at " + DataAddress + ", length " + DataLength + ", time " + ExposureTime + ", pixels: " + NonZeroPixelCount;
     }
 
-    @Override public MSLAFileBlockFields getFileFields() { return this; }
+    @Override public MSLAFileBlockFields getBlockFields() { return this; }
 
     @Override
     public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
