@@ -71,7 +71,30 @@ public class CTBEncryptedFileLayers extends CTBFileBlock implements MSLAFileLaye
             Map<String, Object> params,
             MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
     {
+        var layerNumber = count();
+        var layerDef = allocate();
 
+        // Fill in layer overrides with defaults
+        var layer = layerDef.getBlockFields();
+        layer.setPositionZ((layerNumber + 1) * parent.getSlicerSettings().getBlockFields().getLayerHeight());
+        layer.setExposureTime(parent.getSlicerSettings().getBlockFields().getExposureTime());
+        layer.setLightOffDelay(parent.getSlicerSettings().getBlockFields().getLightOffDelay());
+        layer.setLiftHeight(parent.getSlicerSettings().getBlockFields().getLiftHeight());
+        layer.setLiftSpeed(parent.getSlicerSettings().getBlockFields().getLiftSpeed());
+        layer.setLiftHeight2(parent.getSlicerSettings().getBlockFields().getLiftHeight2());
+        layer.setLiftSpeed2(parent.getSlicerSettings().getBlockFields().getLiftSpeed2());
+        layer.setRetractSpeed(parent.getSlicerSettings().getBlockFields().getRetractSpeed());
+        layer.setRetractHeight2(parent.getSlicerSettings().getBlockFields().getRetractHeight2());
+        layer.setRetractSpeed2(parent.getSlicerSettings().getBlockFields().getRetractSpeed2());
+        layer.setRestTimeBeforeLift(parent.getSlicerSettings().getBlockFields().getRestTimeBeforeLift());
+        layer.setRestTimeAfterLift(parent.getSlicerSettings().getBlockFields().getRestTimeAfterLift());
+        layer.setRestTimeAfterRetract(parent.getSlicerSettings().getBlockFields().getRestTimeAfterRetract());
+        layer.setLightPWM(parent.getSlicerSettings().getBlockFields().getLightPWM().floatValue());
+
+        encoder.encode(layerNumber, reader, params, (ln, data) -> {
+            layer.setData(data.data());
+            if (callback != null) callback.onFinish(ln, data);
+        });
     }
 
     @Override

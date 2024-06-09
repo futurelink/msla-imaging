@@ -45,7 +45,7 @@ public class FileOptionMapper extends MSLAOptionMapper {
      * is considered to be MSLAFileBlock or MSLAFileBlockFields that have
      * option fields inside.
      */
-    public void enumerateOptions() {
+    public void enumerateOptions() throws MSLAException {
         var fileClass = file.getClass();
         var fields = fileClass.getDeclaredFields();
         this.optionsMap.clear();
@@ -56,24 +56,26 @@ public class FileOptionMapper extends MSLAOptionMapper {
                         var blockPropertyName = field.getName();
                         var getterMethod = fileClass.getDeclaredMethod("get" + blockPropertyName);
                         var fileBlock = ((MSLAFileBlock) getterMethod.invoke(file));
-                        Arrays.stream(fileBlock.getBlockFields().getClass().getDeclaredFields())
-                                .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
-                                .forEach((f) -> {
-                                    var optionName = f.getAnnotation(MSLAOption.class).value().isEmpty() ?
-                                            f.getName() :
-                                            f.getAnnotation(MSLAOption.class).value();
-                                    var location = List.of(blockPropertyName); // TODO make hierarchy
-                                    var opt = new Option(f.getName(), f.getType(), location);
-                                    if (defaults != null)
-                                        opt.setParameters(defaults.getParameters(blockPropertyName, f.getName()));
-                                    this.optionsMap.put(optionName, opt);
-                                });
+                        if (fileBlock != null) {
+                            Arrays.stream(fileBlock.getBlockFields().getClass().getDeclaredFields())
+                                    .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
+                                    .forEach((f) -> {
+                                        var optionName = f.getAnnotation(MSLAOption.class).value().isEmpty() ?
+                                                f.getName() :
+                                                f.getAnnotation(MSLAOption.class).value();
+                                        var location = List.of(blockPropertyName); // TODO make hierarchy
+                                        var opt = new Option(f.getName(), f.getType(), location);
+                                        if (defaults != null)
+                                            opt.setParameters(defaults.getParameters(blockPropertyName, f.getName()));
+                                        this.optionsMap.put(optionName, opt);
+                                    });
+                        } else logger.info("Block '" + blockPropertyName + "' is not defined or created");
                     }
                 }
             }
             logger.info("Available options: " + optionsMap);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new MSLAException("Can't enumerate options", e);
         }
     }
 

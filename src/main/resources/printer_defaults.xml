@@ -446,4 +446,60 @@
             <option group="Bottom layers" name="BottomRetractHeight2" value="0"/>
         </options>
     </printer>
+
+    <printer manufacturer="ELEGOO" name="JUPITER" extension="ctb" file="futurelink.msla.formats.chitubox.encrypted.CTBEncryptedFile">
+        <file_options>
+            <option name="Version" value="4"/>
+        </file_options>
+        <layer_options>
+            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+        </layer_options>
+        <options name="SlicerSettings">
+            <option name="Resolution" value="5448x3064"/>
+            <option name="PixelSizeUm" value="35.0f"/>
+            <option name="BedSizeX" value="277.848"/>
+            <option name="BedSizeY" value="156.264"/>
+            <option name="BedSizeZ" value="300.0"/>
+            <option group="General" name="LightOffDelay" value="0"/>
+            <option group="General" name="AntiAliasLevel" value="1"/>
+            <option group="General" name="LightPWM" value="255"/>
+            <option group="General" name="LayerHeightMillimeter" value="0.05"/>
+            <option group="Normal layers" name="LayerExposureSeconds" value="2.5"/>
+            <option group="Bottom layers" name="BottomLayersCount" value="5"/>
+            <option group="Bottom layers" name="BottomLightPWM" value="255"/>
+            <option group="Bottom layers" name="BottomExposureSeconds" value="30"/>
+            <option group="General" name="PerLayerSettings" value="0"/>
+            <option group="General" name="AntiAliasFlag" value="15"/>
+            <option group="General" name="AntiAliasLevel" value="4"/>
+            <option group="General" name="TransitionLayerCount" value="10"/>
+            <option group="Normal layers" name="LiftHeight2" value="0.0"/>
+            <option group="Normal layers" name="LiftSpeed2" value="0.0"/>
+            <option group="Normal layers" name="RetractHeight2" value="0.0"/>
+            <option group="Normal layers" name="RetractSpeed2" value="0.0"/>
+            <option group="Normal layers" name="RestTimeAfterLift" value="0.0"/>
+            <option group="Normal layers" name="RestTimeAfterRetract" value="0.5"/>
+            <option group="Normal layers" name="RestTimeAfterLift2" value="0.0"/>
+            <option group="Bottom layers" name="BottomLiftHeight2" value="0.0"/>
+            <option group="Bottom layers" name="BottomLiftSpeed2" value="0.0"/>
+            <option group="Normal layers" name="LightOffDelay" value="0"/>
+            <option group="Normal layers" name="LiftHeight" value="7"/>
+            <option group="Normal layers" name="LiftSpeed" value="70"/>
+            <option group="Normal layers" name="RetractSpeed" value="180"/>
+            <option group="Bottom layers" name="BottomLiftHeight" value="7"/>
+            <option group="Bottom layers" name="BottomLiftSpeed" value="70"/>
+            <option group="Bottom layers" name="BottomLightOffDelay" value="0"/>
+            <option group="Bottom layers" name="BottomLayerCount" value="5"/>
+            <option group="Bottom layers" name="BottomRetractSpeed" value="180"/>
+            <option group="Bottom layers" name="BottomRetractSpeed2" value="0"/>
+            <option group="Normal layers" name="RestTimeAfterRetract" value="0.5"/>
+            <option group="Normal layers" name="RestTimeAfterLift" value="0"/>
+            <option group="Normal layers" name="RestTimeBeforeLift" value="0"/>
+            <option group="Bottom layers" name="BottomRetractHeight2" value="0"/>
+        </options>
+        <options name="MachineName">
+            <!-- Must be the same as "manufacturer" + ' ' + "name" attributes in printer header -->
+            <option name="MachineName" value="ELEGOO JUPITER"/>
+        </options>
+        <options name="Resin"/>
+    </printer>
 </printers>

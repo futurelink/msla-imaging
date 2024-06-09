@@ -47,4 +47,5 @@ public class CTBEncryptedFileHeader extends CTBFileBlock {
     @Override public String getName() { return "Header"; }
     @Override public int getDataLength() throws FileFieldsException { return 0; }
     @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException { return 0; }
+    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 }

@@ -1,6 +1,7 @@
 package futurelink.msla.formats.chitubox.common;
 
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.chitubox.CTBCrypto;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.tools.BufferedImageInputStream;
 
@@ -105,7 +106,11 @@ public class CTBCommonFileCodec implements MSLALayerCodec<byte[]> {
 
             var key = (Integer) getParam("EncryptionKey");
             if (key == null) logger.warning("No EncryptionKey parameter set to codec, make sure if that is correct");
-            else LayerRLECryptList(key, layerNumber, data);
+            else CTBCrypto.LayerRLECrypt(key, layerNumber, new CTBCrypto.LayerRLECryptCallback() {
+                @Override public byte getByte(int index) { return data.get(index); }
+                @Override public void setByte(int index, byte b) { data.set(index, b); }
+                @Override public int getSize() { return data.size(); }
+            });
 
             return new Output(data);
         } catch (IOException e) {
@@ -124,7 +129,11 @@ public class CTBCommonFileCodec implements MSLALayerCodec<byte[]> {
 
         var key = (Integer) getParam("EncryptionKey");
         if (key == null) logger.warning("No EncryptionKey parameter set to codec, make sure if that is correct");
-        else LayerRLECryptBuffer(key, layerNumber, encodedRLE);
+        else CTBCrypto.LayerRLECrypt(key, layerNumber, new CTBCrypto.LayerRLECryptCallback() {
+            @Override public byte getByte(int index) { return encodedRLE[index]; }
+            @Override public void setByte(int index, byte b) { encodedRLE[index] = b; }
+            @Override public int getSize() { return encodedRLE.length; }
+        });
 
         int pixels = 0;
         int position = 0;
@@ -164,29 +173,5 @@ public class CTBCommonFileCodec implements MSLALayerCodec<byte[]> {
             position += stride;
         }
         return pixels;
-    }
-
-    private void LayerRLECryptList(int seed, int layerIndex, List<Byte> input)  {
-        if (seed == 0) return;
-        int init = seed * 0x2d83cdac + 0xd8a83423;
-        int key = (layerIndex * 0x1e1530cd + 0xec3d47cd) * init;
-        int index = 0;
-        for (int i = 0; i < input.size(); i++) {
-            byte k = (byte)((key >> 8 * index) & 0xff);
-            if ((++index & 3) == 0) { key += init; index = 0; }
-            input.set(i, (byte)(input.get(i) ^ k));
-        }
-    }
-
-    private void LayerRLECryptBuffer(int seed, int layerIndex, byte[] input)  {
-        if (seed == 0) return;
-        int init = seed * 0x2d83cdac + 0xd8a83423;
-        int key = (layerIndex * 0x1e1530cd + 0xec3d47cd) * init;
-        int index = 0;
-        for (int i = 0; i < input.length; i++) {
-            byte k = (byte)((key >> 8 * index) & 0xff);
-            if ((++index & 3) == 0) { key += init; index = 0; }
-            input[i] = (byte)(input[i] ^ k);
-        }
     }
 }

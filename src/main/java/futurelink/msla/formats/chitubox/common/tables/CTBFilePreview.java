@@ -25,16 +25,15 @@ public class CTBFilePreview extends CTBFileBlock implements MSLAPreview {
     private final Fields blockFields = new Fields();
     private final short REPEAT_MASK_RGB565 = 0x20;
 
-    @Getter
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
-        Size Resolution = new Size(0,0);
+        @Getter Size Resolution = new Size(0,0);
         @MSLAFileField private Integer ResolutionX() { return Resolution.getWidth(); }
         void setResolutionX(Integer value) { Resolution = new Size(value, Resolution.getHeight()); }
         @MSLAFileField(order = 1) private Integer ResolutionY() { return Resolution.getHeight(); }
         void setResolutionY(Integer value) { Resolution = new Size(Resolution.getWidth(), value); }
-        @MSLAFileField(order = 2) @Setter private Integer ImageOffset;
-        @MSLAFileField(order = 3) private Integer ImageLength;
+        @MSLAFileField(order = 2) @Setter @Getter private Integer ImageOffset;
+        @MSLAFileField(order = 3) @Getter private Integer ImageLength;
         @MSLAFileField(order = 4) private final Integer Unknown1 = 0;
         @MSLAFileField(order = 5) private final Integer Unknown2 = 0;
         @MSLAFileField(order = 6) private final Integer Unknown3 = 0;

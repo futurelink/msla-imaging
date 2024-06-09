@@ -27,6 +27,7 @@ public class CTBFileTest extends CommonTestRoutines {
                 resourceFile("test_data/ChituboxFileTest/Example_Chitubox_Slices.ctb")
         );
         assertTrue(file.isValid());
+        assertEquals("ELEGOO JUPITER", file.getMachineName());
 
         ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "encrypted_file_small_preview.png"));
         ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "encrypted_file_large_preview.png"));
@@ -45,6 +46,16 @@ public class CTBFileTest extends CommonTestRoutines {
         file.readLayer(writer, 1);
         file.readLayer(writer, 2);
         while (file.getDecodersPool().isDecoding()) Thread.sleep(10); // Wait while decoding-writing is done
+
+        // Assert all pixels were decoded properly
+        assertEquals(72849, layerPixels[0]);
+        assertEquals(74830, layerPixels[1]);
+        assertEquals(76499, layerPixels[2]);
+
+        // Check files exist
+        assertFileExactSize(layerFiles[0], 17987);
+        assertFileExactSize(layerFiles[1], 18021);
+        assertFileExactSize(layerFiles[2], 18044);
     }
 
     @Test

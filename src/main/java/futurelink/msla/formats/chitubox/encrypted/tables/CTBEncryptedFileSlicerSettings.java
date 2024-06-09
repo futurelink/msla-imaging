@@ -12,11 +12,11 @@ import lombok.Setter;
 @Getter
 public class CTBEncryptedFileSlicerSettings extends CTBFileBlock {
     private final Fields blockFields;
+    private final Integer DefaultLayerXORKey = 0xEFBEADDE;
 
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
-        private Size Resolution = null;
-
+        @Getter private Size Resolution = null;
         @MSLAFileField @Getter Long ChecksumValue = 0xCAFEBABEL;
         @MSLAFileField(order = 1) @Getter Integer LayersDefinitionOffset;
         @MSLAFileField(order = 2) @MSLAOption @Getter Float DisplayWidth;
@@ -51,7 +51,7 @@ public class CTBEncryptedFileSlicerSettings extends CTBFileBlock {
         @MSLAFileField(order = 29) final private Integer Unknown3 = 1;
         @MSLAFileField(order = 30) @MSLAOption @Getter Short LightPWM;
         @MSLAFileField(order = 31) @MSLAOption @Getter Short BottomLightPWM;
-        @MSLAFileField(order = 32) @Getter Integer LayerXORKey;
+        @MSLAFileField(order = 32) @Getter Integer EncryptionKey;
         @MSLAFileField(order = 33) @MSLAOption @Getter Float BottomLiftHeight2;
         @MSLAFileField(order = 34) @MSLAOption @Getter Float BottomLiftSpeed2;
         @MSLAFileField(order = 35) @MSLAOption @Getter Float LiftHeight2;
@@ -100,4 +100,5 @@ public class CTBEncryptedFileSlicerSettings extends CTBFileBlock {
     @Override public String getName() { return "SlicerSettings"; }
     @Override public int getDataLength() throws FileFieldsException { return 0; }
     @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException { return 0; }
+    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 }

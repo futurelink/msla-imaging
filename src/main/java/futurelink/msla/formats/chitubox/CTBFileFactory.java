@@ -13,6 +13,8 @@ import futurelink.msla.utils.defaults.MachineDefaults;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CTBFileFactory implements MSLAFileFactory {
     @Override
@@ -52,7 +54,10 @@ public class CTBFileFactory implements MSLAFileFactory {
     }
 
     @Override public Set<String> getSupportedMachines() {
-        return MachineDefaults.instance.getMachines(CTBCommonFile.class);
+        return Stream.of(
+                MachineDefaults.instance.getMachines(CTBCommonFile.class),
+                MachineDefaults.instance.getMachines(CTBEncryptedFile.class)
+                ).flatMap(Set::stream).collect(Collectors.toSet());
     }
 
     public final String getVersionByMagic(byte[] magic) {
