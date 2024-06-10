@@ -3,7 +3,7 @@ package futurelink.msla.formats.anycubic.tables;
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.PhotonWorkshopCodec;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import lombok.Getter;
 import lombok.Setter;
 

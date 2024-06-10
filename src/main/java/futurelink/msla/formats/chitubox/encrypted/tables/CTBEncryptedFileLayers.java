@@ -4,7 +4,7 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.chitubox.encrypted.CTBEncryptedFile;
 import futurelink.msla.formats.chitubox.common.tables.CTBFileBlock;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.io.FileFieldsException;
 import lombok.Getter;
 import lombok.Setter;

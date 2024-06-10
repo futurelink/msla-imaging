@@ -2,6 +2,8 @@ package futurelink.msla.formats;
 
 import futurelink.msla.formats.iface.MSLADefaults;
 import futurelink.msla.formats.iface.MSLADefaultsParams;
+import futurelink.msla.formats.iface.options.MSLAOptionGroup;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +25,7 @@ public abstract class MSLAOptionMapper {
         private final Class<?> type;
         private final List<String> location;
         @Setter private MSLADefaultsParams parameters;
+        @Setter private String group;
         public Option(String name, Class<?> type, List<String> location) {
             this.name = name;
             this.type = type;
@@ -41,7 +44,7 @@ public abstract class MSLAOptionMapper {
      *
      * @param option option name
      */
-    abstract public Class<?> getType(String option);
+    abstract public Class<?> getType(MSLAOptionName option);
 
     /**
      * Gets defaults object.
@@ -65,27 +68,33 @@ public abstract class MSLAOptionMapper {
      *
      * @param option option name
      */
-    abstract public MSLADefaultsParams getParameters(String option);
+    abstract public MSLADefaultsParams getParameters(MSLAOptionName option);
+
+    /**
+     * Return option group name
+     * @param option option name
+     */
+    abstract public MSLAOptionGroup getGroup(MSLAOptionName option);
 
     /**
      * Returns true if mapper has option with specified name.
      * @param option option name
      * @return true if option was mapped, otherwise false
      */
-    abstract protected boolean hasOption(String option);
+    abstract protected boolean hasOption(MSLAOptionName option);
 
     /**
      * Must be implemented in order to be able to populate option value.
      * @param option option name
      * @param value option value
      */
-    abstract protected void populateOption(String option, Serializable value) throws MSLAException;
+    abstract protected void populateOption(MSLAOptionName option, Serializable value) throws MSLAException;
 
     /**
      * Must be implemented in order to be able to get option value by name.
      * @param option option name
      */
-    abstract protected Serializable fetchOption(String option) throws MSLAException;
+    abstract protected Serializable fetchOption(MSLAOptionName option) throws MSLAException;
 
     /**
      * Returns true if options are editable, otherwise false.
@@ -95,14 +104,14 @@ public abstract class MSLAOptionMapper {
     /**
      * Lists all available options
      */
-    abstract public Set<String> available();
+    abstract public Set<MSLAOptionName> available();
 
-    public final void set(String option, Float value) throws MSLAException { set(option, String.valueOf(value)); }
-    public final void set(String option, Integer value) throws MSLAException { set(option, String.valueOf(value)); }
-    public final void set(String option, Long value) throws MSLAException { set(option, String.valueOf(value)); }
-    public final void set(String option, Double value) throws MSLAException { set(option, String.valueOf(value)); }
-    public final void set(String option, Short value) throws MSLAException { set(option, String.valueOf(value)); }
-    public final void set(String option, Byte value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(MSLAOptionName option, Float value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(MSLAOptionName option, Integer value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(MSLAOptionName option, Long value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(MSLAOptionName option, Double value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(MSLAOptionName option, Short value) throws MSLAException { set(option, String.valueOf(value)); }
+    public final void set(MSLAOptionName option, Byte value) throws MSLAException { set(option, String.valueOf(value)); }
 
     /**
      * Sets option by name.
@@ -110,7 +119,7 @@ public abstract class MSLAOptionMapper {
      * @param option option name
      * @param value option value
      */
-    public final void set(String option, String value) throws MSLAException {
+    public final void set(MSLAOptionName option, String value) throws MSLAException {
         if (!isEditable()) throw new MSLAException("Options are not editable in this mapper");
         if (!hasOption(option)) throw new MSLAException("Option '" + option +  "' does not exist!");
 
@@ -137,7 +146,7 @@ public abstract class MSLAOptionMapper {
      * @param option option name
      * @return option value
      */
-    public final String get(String option) throws MSLAException {
+    public final String get(MSLAOptionName option) throws MSLAException {
         if (!hasOption(option)) throw new MSLAException("Option '" + option + "' is not available");
         return fetchOption(option).toString();
     }

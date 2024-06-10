@@ -9,7 +9,7 @@ import futurelink.msla.formats.chitubox.encrypted.tables.CTBEncryptedFileLayers;
 import futurelink.msla.formats.chitubox.encrypted.tables.CTBEncryptedFileSlicerSettings;
 import futurelink.msla.formats.chitubox.common.tables.*;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.iface.options.MSLAOptionContainer;
 import futurelink.msla.utils.Size;
 import lombok.Getter;
 
@@ -38,16 +38,16 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
 
     private final Byte HASH_LENGTH = 32;
 
-    public CTBEncryptedFile(Integer Version) throws MSLAException {
-        super();
-        if (Version == null || Version <= 0)
-            throw new MSLAException("File defaults do not have a version number.");
+    public CTBEncryptedFile(MSLAFileProps initialProps) throws MSLAException {
+        super(initialProps);
+        var Version = (int) initialProps.getByte("Version");
+        if (Version <= 0) throw new MSLAException("File defaults do not have a version number.");
 
-        Header = new CTBEncryptedFileHeader(Version);
+        Header = new CTBEncryptedFileHeader(Version, initialProps);
         if (Header.getBlockFields().getVersion() <= 0)
             throw new MSLAException("The mSLA file does not have a version number.");
 
-        SlicerSettings = new CTBEncryptedFileSlicerSettings(Version);
+        SlicerSettings = new CTBEncryptedFileSlicerSettings(Version, initialProps);
         MachineName = new CTBFileMachineName();
         Disclaimer = new CTBFileDisclaimer();
         Layers = new CTBEncryptedFileLayers(this);
@@ -55,7 +55,7 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
     }
 
     public CTBEncryptedFile(DataInputStream stream) throws IOException, MSLAException {
-        super();
+        super(null);
         read(stream);
     }
 
@@ -100,14 +100,14 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
 
     /* Internal read method */
     private void read(DataInputStream stream) throws MSLAException {
-        Header = new CTBEncryptedFileHeader(0); // Version is going to be read from file
+        Header = new CTBEncryptedFileHeader(0, null); // Version is going to be read from file
         Header.read(stream, 0);
         if (Header.getBlockFields().getVersion() == null)
             throw new MSLAException("Malformed file, Version is not identified");
 
         logger.info("CTB encrypted file version " + Header.getBlockFields().getVersion());
 
-        SlicerSettings = new CTBEncryptedFileSlicerSettings(Header.getBlockFields().getVersion());
+        SlicerSettings = new CTBEncryptedFileSlicerSettings(Header.getBlockFields().getVersion(), null);
         SlicerSettings.read(new DataInputStream(readEncryptedBlock(
                 stream,
                 Header.getBlockFields().getSettingsOffset(),
@@ -178,7 +178,6 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
     }
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return SlicerSettings.getBlockFields().getResolution(); }
-    @Override public float getPixelSizeUm() { return 0; }
     @Override public boolean isValid() { return Header != null && SlicerSettings != null; }
 
     @Override

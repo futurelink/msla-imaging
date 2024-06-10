@@ -3,10 +3,11 @@ package futurelink.msla.formats.chitubox;
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.chitubox.common.CTBCommonFile;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
-import futurelink.msla.utils.FileOptionMapper;
+import futurelink.msla.utils.options.FileOptionMapper;
 import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
@@ -168,16 +169,16 @@ public class CTBFileTest extends CommonTestRoutines {
     @Test
     void OptionsTest() throws MSLAException {
         var machine = "ELEGOO SATURN";
-        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = (CTBCommonFile) FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
         assertTrue(file.isValid());
 
-        assertEquals(70.0, Float.parseFloat(options.get("Normal layers lift speed")));
-        assertEquals(0.0, Float.parseFloat(options.get("Bottom layers light off delay")));
+        assertEquals(70.0, Float.parseFloat(options.get(MSLAOptionName.NormalLayersLiftSpeed)));
+        assertEquals(0.0, Float.parseFloat(options.get(MSLAOptionName.BottomLayersLightOffDelay)));
 
-        options.set("Bottom layers light off delay", "1.0");
-        assertEquals(1.0, Float.parseFloat(options.get("Bottom layers light off delay")));
+        options.set(MSLAOptionName.BottomLayersLightOffDelay, "1.0");
+        assertEquals(1.0, Float.parseFloat(options.get(MSLAOptionName.BottomLayersLightOffDelay)));
     }
 }

@@ -6,6 +6,6 @@ import futurelink.msla.formats.MSLAException;
  * Common defaults interface for both file and layer defaults.
  */
 public interface MSLADefaults {
-    void setFields(String blockName, MSLAFileBlockFields fields) throws MSLAException;
+    void setFields(MSLAFileBlockFields fields) throws MSLAException;
     MSLADefaultsParams getParameters(String blockName, String fieldName);
 }

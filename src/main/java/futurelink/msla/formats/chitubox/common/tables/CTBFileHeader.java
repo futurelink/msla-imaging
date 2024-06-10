@@ -2,8 +2,10 @@ package futurelink.msla.formats.chitubox.common.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.MSLAFileProps;
+import futurelink.msla.formats.iface.MSLAFileField;
+import futurelink.msla.formats.iface.options.MSLAOption;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.formats.io.FileFieldsIO;
 import futurelink.msla.utils.Size;
@@ -52,11 +54,11 @@ public class CTBFileHeader extends CTBFileBlock {
         @MSLAFileField(order = 5) private final Integer Unknown1 = 0;
         @MSLAFileField(order = 6) private final Integer Unknown2 = 0;
         @MSLAFileField(order = 7) private @Setter Float TotalHeightMillimeter = 0.0f;
-        @MSLAFileField(order = 8) @MSLAOption(MSLAOption.LayerHeight) private Float LayerHeightMillimeter;
-        @MSLAFileField(order = 9) @MSLAOption(MSLAOption.ExposureTime) private Float LayerExposureSeconds;
-        @MSLAFileField(order = 10) @MSLAOption(MSLAOption.BottomExposureTime) private Float BottomExposureSeconds;
-        @MSLAFileField(order = 11) private Float LightOffDelay;
-        @MSLAFileField(order = 12) @MSLAOption(MSLAOption.BottomLayersCount) private final Integer BottomLayersCount = 1;
+        @MSLAFileField(order = 8) @MSLAOption(MSLAOptionName.LayerHeight) private Float LayerHeightMillimeter;
+        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.NormalLayersExposureTime) private Float LayerExposureSeconds;
+        @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.BottomLayersExposureTime) private Float BottomExposureSeconds;
+        @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.NormalLayersLightOffDelay) private Float LightOffDelay;
+        @MSLAFileField(order = 12) @MSLAOption(MSLAOptionName.BottomLayersCount) private final Integer BottomLayersCount = 1;
         @MSLAFileField(order = 13) private Integer ResolutionX() { return Resolution != null ? Resolution.getWidth() : 0; }
         private void setResolutionX(Integer width) { Resolution = new Size(width, ResolutionY()); }
         @MSLAFileField(order = 14) private Integer ResolutionY() { return  Resolution != null ? Resolution.getHeight() : 0; }
@@ -69,9 +71,9 @@ public class CTBFileHeader extends CTBFileBlock {
         @MSLAFileField(order = 20) private final Integer ProjectorType = 1;
         @MSLAFileField(order = 21) @Setter private Integer PrintParametersOffset;
         @MSLAFileField(order = 22) @Setter private Integer PrintParametersSize;
-        @MSLAFileField(order = 23) private Integer AntiAliasLevel;
-        @MSLAFileField(order = 24) private final Short LightPWM = DefaultLightPWM;
-        @MSLAFileField(order = 25) private final Short BottomLightPWM = DefaultBottomLightPWM;
+        @MSLAFileField(order = 23) @MSLAOption(MSLAOptionName.AntialiasLevel) private Integer AntiAliasLevel;
+        @MSLAFileField(order = 24) @MSLAOption(MSLAOptionName.NormalLayersLightPWM) private final Short LightPWM = DefaultLightPWM;
+        @MSLAFileField(order = 25) @MSLAOption(MSLAOptionName.BottomLayersLightPWM) private final Short BottomLightPWM = DefaultBottomLightPWM;
         @MSLAFileField(order = 26) @Setter private Integer EncryptionKey;
         @MSLAFileField(order = 27) @Setter private Integer SlicerOffset;
         @MSLAFileField(order = 28) @Setter private Integer SlicerSize;
@@ -86,12 +88,18 @@ public class CTBFileHeader extends CTBFileBlock {
         }
     }
 
-    public CTBFileHeader(int version) throws MSLAException {
+    public CTBFileHeader(int version, MSLAFileProps initialProps) throws MSLAException {
         super(version);
-        var r = new Random();
         blockFields = new Fields();
         blockFields.setVersion(version);
-        blockFields.EncryptionKey = r.nextInt(Integer.MAX_VALUE);
+        blockFields.EncryptionKey = new Random().nextInt(Integer.MAX_VALUE);
+        if (initialProps != null) {
+            blockFields.Resolution = Size.parseSize(initialProps.get("Resolution").getString());
+            blockFields.Version = initialProps.getInt("Version");
+            blockFields.BedSizeX = initialProps.getFloat("DisplayWidth");
+            blockFields.BedSizeY = initialProps.getFloat("DisplayHeight");
+            blockFields.BedSizeZ = initialProps.getFloat("MachineZ");
+        }
     }
 
     @Override public String getName() { return OPTIONS_SECTION_NAME; }

@@ -2,10 +2,11 @@ package futurelink.msla.formats.anycubic;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
-import futurelink.msla.utils.FileOptionMapper;
+import futurelink.msla.utils.options.FileOptionMapper;
 import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
@@ -72,11 +73,11 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
         delete_file(outFile); // Clean up files just in case
 
         var machine = "Anycubic Photon Mono X 6K";
-        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = (PhotonWorkshopFile) FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
-        options.set("Bottom layers exposure time", "12");
+        options.set(MSLAOptionName.BottomLayersExposureTime, "12");
 
         var pngFileLayers = new String[]{
                 resourceFile("test_data/PhotonFileTest/Layer_1.png"),

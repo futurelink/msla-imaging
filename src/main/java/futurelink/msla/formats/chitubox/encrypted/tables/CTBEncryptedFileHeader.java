@@ -3,7 +3,8 @@ package futurelink.msla.formats.chitubox.encrypted.tables;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.chitubox.common.tables.CTBFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileProps;
+import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.io.FileFieldsException;
 import lombok.Getter;
 
@@ -42,7 +43,11 @@ public class CTBEncryptedFileHeader extends CTBFileBlock {
         @MSLAFileField(order = 12) private final Integer Unknown8 = 0; // probably 0 or 1
     }
 
-    public CTBEncryptedFileHeader(Integer version) { super(version); blockFields = new Fields(); }
+    public CTBEncryptedFileHeader(Integer version, MSLAFileProps initialProps) {
+        super(version);
+        blockFields = new Fields();
+        blockFields.Version = version;
+    }
 
     @Override public String getName() { return "Header"; }
     @Override public int getDataLength() throws FileFieldsException { return 0; }

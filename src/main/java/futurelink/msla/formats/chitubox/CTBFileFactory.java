@@ -22,9 +22,9 @@ public class CTBFileFactory implements MSLAFileFactory {
 
     @Override
     public MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException {
-        var Version = initialProps.getByte("Version");
-        if (initialProps.getBoolean("Encrypted")) return new CTBEncryptedFile((int) Version);
-        return new CTBCommonFile(Version);
+        var encrypted = initialProps.getBoolean("Encrypted") != null && initialProps.getBoolean("Encrypted");
+        if (encrypted) return new CTBEncryptedFile(initialProps);
+        return new CTBCommonFile(initialProps);
     }
 
     @Override public MSLAFile<?> load(DataInputStream stream) throws MSLAException {
@@ -49,14 +49,14 @@ public class CTBFileFactory implements MSLAFileFactory {
         }
     }
 
-    @Override public boolean checkDefaults(String machineName) {
+    @Override public boolean checkDefaults(String machineName) throws MSLAException {
         return getSupportedMachines().contains(machineName);
     }
 
-    @Override public Set<String> getSupportedMachines() {
+    @Override public Set<String> getSupportedMachines() throws MSLAException {
         return Stream.of(
-                MachineDefaults.instance.getMachines(CTBCommonFile.class),
-                MachineDefaults.instance.getMachines(CTBEncryptedFile.class)
+                MachineDefaults.getInstance().getMachines(CTBCommonFile.class),
+                MachineDefaults.getInstance().getMachines(CTBEncryptedFile.class)
                 ).flatMap(Set::stream).collect(Collectors.toSet());
     }
 

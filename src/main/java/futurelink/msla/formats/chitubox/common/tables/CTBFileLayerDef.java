@@ -2,9 +2,10 @@ package futurelink.msla.formats.chitubox.common.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.iface.MSLAFileField;
+import futurelink.msla.formats.iface.options.MSLAOption;
+import futurelink.msla.formats.iface.options.MSLAOptionContainer;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.formats.io.FileFieldsIO;
 import lombok.Getter;
@@ -28,8 +29,8 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
     public static class Fields implements MSLAFileBlockFields {
         private final CTBFileLayerDef parent;
         @MSLAFileField @Setter private Float PositionZ;
-        @MSLAFileField(order = 1) @MSLAOption(MSLAOption.ExposureTime) @Setter private Float ExposureTime;
-        @MSLAFileField(order = 2) @MSLAOption("Light off time") @Setter private Float LightOffSeconds;
+        @MSLAFileField(order = 1) @MSLAOption(MSLAOptionName.NormalLayersExposureTime) @Setter private Float ExposureTime;
+        @MSLAFileField(order = 2) @MSLAOption(MSLAOptionName.LightOffTime) @Setter private Float LightOffSeconds;
         @MSLAFileField(order = 3) @Setter private Integer DataAddress;
         @MSLAFileField(order = 4) @Setter private Integer DataSize;
         @MSLAFileField(order = 5) private final Integer PageNumber = 0; // For files larger than 4Gb
@@ -65,7 +66,7 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
     }
 
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
-        if (layerDefaults != null) layerDefaults.setFields(null, blockFields);
+        if (layerDefaults != null) layerDefaults.setFields(blockFields);
     }
 
     @Override public String getName() { return null; }

@@ -4,7 +4,7 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAFileGeneric;
 import futurelink.msla.formats.chitubox.common.tables.*;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.iface.options.MSLAOptionContainer;
 import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.utils.Size;
 import lombok.Getter;
@@ -31,14 +31,11 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     private CTBFilePreview PreviewLarge = null;
     @Getter private CTBFileLayers Layers = null;
 
-    public CTBCommonFile(Byte Version) throws MSLAException {
-        super();
-        if (Version == null || Version <= 0)
-            throw new MSLAException("File defaults do not have a version number.");
-
-        Header = new CTBFileHeader(Version);
-        if (Header.getBlockFields().getVersion() <= 0)
-            throw new MSLAException("The MSLA file does not have a version number.");
+    public CTBCommonFile(MSLAFileProps initialProps) throws MSLAException {
+        super(initialProps);
+        var Version = (byte) initialProps.getByte("Version");
+        if (Version <= 0) throw new MSLAException("File defaults do not have a version number.");
+        Header = new CTBFileHeader(Version, initialProps);
 
         PreviewLarge = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Large);
         PreviewSmall = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Small);
@@ -59,7 +56,7 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     }
 
     public CTBCommonFile(DataInputStream stream) throws IOException, MSLAException {
-        super();
+        super(null);
         read(stream);
     }
 
@@ -71,7 +68,7 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     @Override public MSLAPreview getLargePreview() { return PreviewLarge; }
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return Header.getBlockFields().getResolution(); }
-    @Override public float getPixelSizeUm() { return 0; }
+    @Override public Float getPixelSize() { return 0.0f; }
 
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
@@ -99,7 +96,7 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     /* Internal read method */
     @SuppressWarnings("unused")
     private void read(DataInputStream stream) throws MSLAException {
-        Header = new CTBFileHeader(0); // Version is going to be read from file
+        Header = new CTBFileHeader(0, null); // Version is going to be read from file
         Header.read(stream, 0);
         if (Header.getBlockFields().getVersion() == null)
             throw new MSLAException("Malformed file, Version is not identified");
@@ -274,11 +271,11 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         super.reset(defaults);
         if (isMachineValid(defaults)) {
-            defaults.setFields(Header.getName(), Header.getBlockFields());
-            defaults.setFields(SlicerInfo.getName(), SlicerInfo.getBlockFields());
-            defaults.setFields(MachineName.getName(), MachineName.getBlockFields());
-            defaults.setFields(PrintParams.getName(), PrintParams.getBlockFields());
-            defaults.setFields(PrintParamsV4.getName(), PrintParamsV4.getBlockFields());
+            defaults.setFields(Header.getBlockFields());
+            defaults.setFields(SlicerInfo.getBlockFields());
+            defaults.setFields(MachineName.getBlockFields());
+            defaults.setFields(PrintParams.getBlockFields());
+            defaults.setFields(PrintParamsV4.getBlockFields());
             getLayers().setDefaults(defaults.getLayerDefaults());
         } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
     }

@@ -2,8 +2,9 @@ package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.MSLAFileField;
+import futurelink.msla.formats.iface.options.MSLAOption;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,21 +30,22 @@ public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
         }
         @MSLAFileField(order = 1, dontCount = true) private Integer TableLength() { return parent.calculateTableLength(); }
         private void setTableLength(Integer length) { parent.TableLength = length; }
-        @MSLAFileField(order = 2) @MSLAOption("Bottom layers gradient") Integer BottomGradientSteps = 2;
-        @MSLAFileField(order = 3) @MSLAOption("Bottom layers lift height 1") Float BottomLiftHeight1 = 2.0f;
-        @MSLAFileField(order = 4) @MSLAOption("Bottom layers lift speed 1") Float BottomLiftSpeed1 = 1.0f;
-        @MSLAFileField(order = 5) @MSLAOption("Bottom layers retract speed 1") Float BottomRetractSpeed1 = 2.0f;
-        @MSLAFileField(order = 6) @MSLAOption("Bottom layers lift height 2") Float BottomLiftHeight2 = 6.0f;
-        @MSLAFileField(order = 7) @MSLAOption("Bottom layers lift speed 2") Float BottomLiftSpeed2 = 4.0f;
-        @MSLAFileField(order = 8) @MSLAOption("Bottom layers retract speed 2") Float BottomRetractSpeed2 = 4.0f;
 
-        @MSLAFileField(order = 9) @MSLAOption("Normal layers gradient") Integer NormalGradientSteps = 2;
-        @MSLAFileField(order = 10) @MSLAOption("Normal layers lift height 1") Float NormalLiftHeight1 = 2.0f;
-        @MSLAFileField(order = 11) @MSLAOption("Normal layers lift speed 1") Float NormalLiftSpeed1 = 2.0f;
-        @MSLAFileField(order = 12) @MSLAOption("Normal layers retract speed 1") Float NormalRetractSpeed1 = 2.0f;
-        @MSLAFileField(order = 13) @MSLAOption("Normal layers lift height 2") Float NormalLiftHeight2 = 6.0f;
-        @MSLAFileField(order = 14) @MSLAOption("Normal layers lift speed 2") Float NormalLiftSpeed2 = 4.0f;
-        @MSLAFileField(order = 15) @MSLAOption("Normal layers retract speed 2") Float NormalRetractSpeed2 = 4.0f;
+        @MSLAFileField(order = 2) @MSLAOption(MSLAOptionName.BottomLayersGradient) Integer BottomGradientSteps = 2;
+        @MSLAFileField(order = 3) @MSLAOption(MSLAOptionName.BottomLayersLiftHeight1) Float BottomLiftHeight1 = 2.0f;
+        @MSLAFileField(order = 4) @MSLAOption(MSLAOptionName.BottomLayersLiftSpeed1) Float BottomLiftSpeed1 = 1.0f;
+        @MSLAFileField(order = 5) @MSLAOption(MSLAOptionName.BottomLayersRetractSpeed1) Float BottomRetractSpeed1 = 2.0f;
+        @MSLAFileField(order = 6) @MSLAOption(MSLAOptionName.BottomLayersLiftHeight2) Float BottomLiftHeight2 = 6.0f;
+        @MSLAFileField(order = 7) @MSLAOption(MSLAOptionName.BottomLayersLiftSpeed2) Float BottomLiftSpeed2 = 4.0f;
+        @MSLAFileField(order = 8) @MSLAOption(MSLAOptionName.BottomLayersRetractSpeed2) Float BottomRetractSpeed2 = 4.0f;
+
+        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.NormalLayersGradient) Integer NormalGradientSteps = 2;
+        @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.NormalLayersLiftHeight1) Float NormalLiftHeight1 = 2.0f;
+        @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.NormalLayersLiftSpeed1) Float NormalLiftSpeed1 = 2.0f;
+        @MSLAFileField(order = 12) @MSLAOption(MSLAOptionName.NormalLayersRetractSpeed1) Float NormalRetractSpeed1 = 2.0f;
+        @MSLAFileField(order = 13) @MSLAOption(MSLAOptionName.NormalLayersLiftHeight2) Float NormalLiftHeight2 = 6.0f;
+        @MSLAFileField(order = 14) @MSLAOption(MSLAOptionName.NormalLayersLiftSpeed2) Float NormalLiftSpeed2 = 4.0f;
+        @MSLAFileField(order = 15) @MSLAOption(MSLAOptionName.NormalLayersRetractSpeed2) Float NormalRetractSpeed2 = 4.0f;
 
         public Fields(PhotonWorkshopFileTable parent) { this.parent = parent; }
     }

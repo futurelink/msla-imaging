@@ -2,7 +2,7 @@ package futurelink.msla.formats.creality.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.iface.MSLAPreview;
 import futurelink.msla.utils.Size;
 import lombok.Getter;

@@ -1,10 +1,12 @@
-package futurelink.msla.utils;
+package futurelink.msla.utils.options;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.iface.options.MSLAOption;
+import futurelink.msla.formats.iface.options.MSLAOptionContainer;
+import futurelink.msla.formats.iface.options.MSLAOptionGroup;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -20,7 +22,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     private final MSLAFile<?> file;
     private Integer layerNumber;
     @Getter private MSLALayerDefaults defaults;
-    private final HashMap<String, Option> optionsMap;
+    private final HashMap<MSLAOptionName, Option> optionsMap;
 
     public LayerOptionMapper(MSLAFile<?> file, MSLALayerDefaults defaults) throws MSLAException {
         if (file == null) throw new MSLAException("File is mandatory for option mapper");
@@ -78,19 +80,18 @@ public class LayerOptionMapper extends MSLAOptionMapper {
             // Field is an option
             else if (f.getAnnotation(MSLAOption.class) != null) {
                 var optionName = f.getAnnotation(MSLAOption.class).value();
-                var optionTitle = optionName.isEmpty() ? f.getName() : optionName;
                 var opt = new Option(f.getName(), f.getType(), path);
                 if (defaults != null) {
                     var blockName = path.isEmpty() ? null : path.get(path.size()-1);
                     opt.setParameters(defaults.getParameters(blockName, f.getName()));
                 }
-                optionsMap.put(optionTitle, opt);
+                optionsMap.put(optionName, opt);
             }
         }
     }
 
     @Override
-    public Class<?> getType(String optionName) {
+    public Class<?> getType(MSLAOptionName optionName) {
         if (!this.optionsMap.containsKey(optionName)) return null;
         return this.optionsMap.get(optionName).getType();
     }
@@ -103,21 +104,26 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    public MSLADefaultsParams getParameters(String option) {
+    public MSLADefaultsParams getParameters(MSLAOptionName option) {
         if (this.optionsMap.get(option) == null) return null;
         return this.optionsMap.get(option).getParameters();
     }
 
     @Override
-    public boolean hasOption(String optionName) {
+    public MSLAOptionGroup getGroup(MSLAOptionName option) {
+        return null;
+    }
+
+    @Override
+    public boolean hasOption(MSLAOptionName optionName) {
         return this.optionsMap.containsKey(optionName);
     }
 
     @Override public Boolean isEditable() { return defaults != null; }
-    @Override public Set<String> available() { return optionsMap.keySet(); }
+    @Override public Set<MSLAOptionName> available() { return optionsMap.keySet(); }
 
     @Override
-    protected void populateOption(String optionName, Serializable value) throws MSLAException {
+    protected void populateOption(MSLAOptionName optionName, Serializable value) throws MSLAException {
         if (!isEditable()) throw new MSLAException("Options are not editable because defaults were not specified");
         var option = optionsMap.get(optionName);
         var layer = (MSLAFileLayer) file.getLayers().get(layerNumber);
@@ -149,7 +155,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    protected Serializable fetchOption(String optionName) throws MSLAException {
+    protected Serializable fetchOption(MSLAOptionName optionName) throws MSLAException {
         var option = optionsMap.get(optionName);
         var layer = (MSLAFileLayer) file.getLayers().get(layerNumber);
         try {

@@ -14,9 +14,7 @@ public class PhotonWorkshopFileFactory implements MSLAFileFactory {
     @Override public String getName() { return "Anycubic"; }
 
     @Override public MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException {
-        var VersionMajor = initialProps.getByte("VersionMajor");
-        var VersionMinor = initialProps.getByte("VersionMinor");
-        return new PhotonWorkshopFile(VersionMajor, VersionMinor);
+        return new PhotonWorkshopFile(initialProps);
     }
 
     @Override public MSLAFile<?> load(DataInputStream stream) throws MSLAException {
@@ -37,12 +35,12 @@ public class PhotonWorkshopFileFactory implements MSLAFileFactory {
         }
     }
 
-    @Override public boolean checkDefaults(String machineName) {
+    @Override public boolean checkDefaults(String machineName) throws MSLAException {
         return getSupportedMachines().contains(machineName);
     }
 
     @Override
-    public Set<String> getSupportedMachines() {
-        return MachineDefaults.instance.getMachines(PhotonWorkshopFile.class);
+    public Set<String> getSupportedMachines() throws MSLAException {
+        return MachineDefaults.getInstance().getMachines(PhotonWorkshopFile.class);
     }
 }

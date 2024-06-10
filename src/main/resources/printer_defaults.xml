@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <printers>
-    <printer manufacturer="Anycubic" name="Photon M3 Max" extension="pm3m" file="futurelink.msla.formats.anycubic.PhotonWorkshopFile">
+    <printer
+            manufacturer="Anycubic"
+            name="Photon M3 Max"
+            resolution="6480x3600"
+            pixelSize="34.399998"
+            displayWidth="298.08"
+            displayHeight="165.6"
+            machineZ="300.0"
+            extension="pm3m"
+            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+    >
+        <file_properties>
+            <property name="VersionMajor" value="2"/>
+            <property name="VersionMinor" value="4"/>
+            <property name="LayerImageFormat" value="pw0Img"/>
+        </file_properties>
         <file_options>
-            <option name="VersionMajor" value="2"/>
-            <option name="VersionMinor" value="4"/>
-        </file_options>
-        <options name="Header">
-            <option name="Resolution" value="6480x3600"/>
-            <option name="PixelSizeUm" value="34.399998"/>
             <option name="PriceCurrencySymbol" type="char" value="$"/>
             <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
             <option name="ExposureTime" type="float" value="3.0" minValue="0.5" maxValue="30.0"/>
-            <option name="WaitTimeBeforeCure1" type="float" value="2.0" minValue="0.0" maxValue="120.0"/>
+            <option name="WaitTimeBeforeCure" type="float" value="2.0" minValue="0.0" maxValue="120.0"/>
             <option name="BottomExposureTime" type="float" value="30.0" minValue="0.5" maxValue="120.0"/>
             <option name="BottomLayersCount" type="int" value="6" minValue="0" maxValue="99999"/>
             <option name="LiftHeight" type="float" value="10.0" minValue="1.0" maxValue="50.0"/>
@@ -21,32 +30,34 @@
             <option name="TransitionLayerCount" type="int" value="10" minValue="0" maxValue="99999"/>
             <option name="TransitionLayerType" type="int" value="0" minValue="0" maxValue="1"/>
             <option name="AdvancedMode" type="boolean" value="0" trueValue="1" falseValue="0"/>
-        </options>
-        <options name="Machine">
-            <option name="LayerImageFormat" value="pw0Img"/>
             <option name="MaxAntialiasingLevel" value="16"/>
             <option name="PropertyFields" value="7"/>
-            <option name="DisplayWidth" value="298.08"/>
-            <option name="DisplayHeight" value="165.6"/>
-            <option name="MachineZ" value="300.0"/>
             <option name="MaxFileVersion" value="516"/>
             <option name="MachineBackground" value="6506241"/>
-        </options>
-        <options name="Extra"/>
+        </file_options>
     </printer>
 
-    <printer manufacturer="Anycubic" name="Photon Mono X 6K" extension="pwmb" file="futurelink.msla.formats.anycubic.PhotonWorkshopFile">
+    <printer
+            manufacturer="Anycubic"
+            name="Photon Mono X 6K"
+            resolution="5760x3600"
+            pixelSize="34.399998"
+            displayWidth="198.144"
+            displayHeight="123.84"
+            machineZ="245.0"
+            extension="pwmb"
+            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+    >
+        <file_properties>
+            <property name="VersionMajor" value="2"/>
+            <property name="VersionMinor" value="4"/>
+            <property name="LayerImageFormat" value="pw0Img"/>
+        </file_properties>
         <file_options>
-            <option name="VersionMajor" value="2"/>
-            <option name="VersionMinor" value="4"/>
-        </file_options>
-        <options name="Header">
-            <option name="Resolution" value="5760x3600"/>
-            <option name="PixelSizeUm" value="34.399998"/>
             <option name="PriceCurrencySymbol" value="36"/>
             <option name="LayerHeight" value="0.05"/>
             <option name="ExposureTime" value="2.0f"/>
-            <option name="WaitTimeBeforeCure1" value="0.0f"/>
+            <option name="WaitTimeBeforeCure" value="0.0f"/>
             <option name="BottomExposureTime" value="28.0f"/>
             <option name="BottomLayersCount" value="6"/>
             <option name="LiftHeight" value="8.0"/>
@@ -56,32 +67,34 @@
             <option name="TransitionLayerCount" value="10"/>
             <option name="TransitionLayerType" value="0"/>
             <option name="AdvancedMode" value="1"/>
-        </options>
-        <options name="Machine">
-            <option name="LayerImageFormat" value="pw0Img"/>
             <option name="MaxAntialiasingLevel" value="16"/>
             <option name="PropertyFields" value="7"/>
-            <option name="DisplayWidth" value="198.144f"/>
-            <option name="DisplayHeight" value="123.84f"/>
-            <option name="MachineZ" value="245.0f"/>
             <option name="MaxFileVersion" value="516"/>
             <option name="MachineBackground" value="6506241"/>
-        </options>
-        <options name="Extra"/>
+        </file_options>
     </printer>
 
-    <printer manufacturer="Anycubic" name="Photon Mono 4K" extension="pwma" file="futurelink.msla.formats.anycubic.PhotonWorkshopFile">
+    <printer
+            manufacturer="Anycubic"
+            name="Photon Mono 4K"
+            resolution="3840x2400"
+            pixelSize="35.0"
+            displayWidth="134.4"
+            displayHeight="84.0"
+            machineZ="165.0"
+            extension="pwma"
+            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+    >
+        <file_properties>
+            <property name="VersionMajor" value="2"/>
+            <property name="VersionMinor" value="4"/>
+            <property name="LayerImageFormat" value="pw0Img"/>
+        </file_properties>
         <file_options>
-            <option name="VersionMajor" value="2"/>
-            <option name="VersionMinor" value="4"/>
-        </file_options>
-        <options name="Header">
-            <option name="Resolution" value="3840x2400"/>
-            <option name="PixelSizeUm" value="35.0f"/>
             <option name="PriceCurrencySymbol" value="36"/>
             <option name="LayerHeight" value="0.05"/>
             <option name="ExposureTime" value="2.0f"/>
-            <option name="WaitTimeBeforeCure1" value="0.5f"/>
+            <option name="WaitTimeBeforeCure" value="0.5f"/>
             <option name="BottomExposureTime" value="40.0f"/>
             <option name="BottomLayersCount" value="6"/>
             <option name="LiftHeight" value="6.0f"/>
@@ -91,32 +104,34 @@
             <option name="TransitionLayerCount" value="0"/>
             <option name="TransitionLayerType" value="0"/>
             <option name="AdvancedMode" value="1"/>
-        </options>
-        <options name="Machine">
-            <option name="LayerImageFormat" value="pw0Img"/>
             <option name="MaxAntialiasingLevel" value="16"/>
             <option name="PropertyFields" value="7"/>
-            <option name="DisplayWidth" value="134.4f"/>
-            <option name="DisplayHeight" value="84.0f"/>
-            <option name="MachineZ" value="165.0f"/>
             <option name="MaxFileVersion" value="516"/>
             <option name="MachineBackground" value="6506241"/>
-        </options>
-        <options name="Extra"/>
+        </file_options>
     </printer>
 
-    <printer manufacturer="Anycubic" name="Photon Mono X" extension="pwmx" file="futurelink.msla.formats.anycubic.PhotonWorkshopFile">
+    <printer
+            manufacturer="Anycubic"
+            name="Photon Mono X"
+            resolution="3840x2400"
+            pixelSize="50.0"
+            displayWidth="192.0"
+            displayHeight="120.0"
+            machineZ="245.0"
+            extension="pwmx"
+            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+    >
+        <file_properties>
+            <property name="VersionMajor" value="2"/>
+            <property name="VersionMinor" value="4"/>
+            <property name="LayerImageFormat" value="pw0Img"/>
+        </file_properties>
         <file_options>
-            <option name="VersionMajor" value="2"/>
-            <option name="VersionMinor" value="4"/>
-        </file_options>
-        <options name="Header">
-            <option name="Resolution" value="3840x2400"/>
-            <option name="PixelSizeUm" value="50.0f"/>
             <option name="PriceCurrencySymbol" value="36"/>
             <option name="LayerHeight" value="0.05"/>
             <option name="ExposureTime" value="2.0f"/>
-            <option name="WaitTimeBeforeCure1" value="0.5f"/>
+            <option name="WaitTimeBeforeCure" value="0.5f"/>
             <option name="BottomExposureTime" value="28.0f"/>
             <option name="BottomLayersCount" value="4"/>
             <option name="LiftHeight" value="8.0f"/>
@@ -126,32 +141,34 @@
             <option name="TransitionLayerCount" value="10"/>
             <option name="TransitionLayerType" value="0"/>
             <option name="AdvancedMode" value="1"/>
-        </options>
-        <options name="Machine">
-            <option name="LayerImageFormat" value="pw0Img"/>
             <option name="MaxAntialiasingLevel" value="16"/>
             <option name="PropertyFields" value="7"/>
-            <option name="DisplayWidth" value="192.0f"/>
-            <option name="DisplayHeight" value="120.0f"/>
-            <option name="MachineZ" value="245.0f"/>
             <option name="MaxFileVersion" value="516"/>
             <option name="MachineBackground" value="6506241"/>
-        </options>
-        <options name="Extra"/>
+        </file_options>
     </printer>
 
-    <printer manufacturer="Anycubic" name="Photon M3" extension="pm3" file="futurelink.msla.formats.anycubic.PhotonWorkshopFile">
+    <printer
+            manufacturer="Anycubic"
+            name="Photon M3"
+            resolution="4096x2560"
+            pixelSize="40.0"
+            displayWidth="163.92"
+            displayHeight="102.4"
+            machineZ="180.0"
+            extension="pm3"
+            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+    >
+        <file_properties>
+            <property name="VersionMajor" value="2"/>
+            <property name="VersionMinor" value="4"/>
+            <property name="LayerImageFormat" value="pw0Img"/>
+        </file_properties>
         <file_options>
-            <option name="VersionMajor" value="2"/>
-            <option name="VersionMinor" value="4"/>
-        </file_options>
-        <options name="Header">
-            <option name="Resolution" value="4096x2560"/>
-            <option name="PixelSizeUm" value="40.0f"/>
             <option name="PriceCurrencySymbol" value="36"/>
             <option name="LayerHeight" value="0.05"/>
             <option name="ExposureTime" value="2.0f"/>
-            <option name="WaitTimeBeforeCure1" value="0.5f"/>
+            <option name="WaitTimeBeforeCure" value="0.5f"/>
             <option name="BottomExposureTime" value="23.0f"/>
             <option name="BottomLayersCount" value="4"/>
             <option name="LiftHeight" value="6.0f"/>
@@ -161,29 +178,155 @@
             <option name="TransitionLayerCount" value="10"/>
             <option name="TransitionLayerType" value="0"/>
             <option name="AdvancedMode" value="0"/>
-        </options>
-        <options name="Machine">
-            <option name="LayerImageFormat" value="pw0Img"/>
             <option name="MaxAntialiasingLevel" value="16"/>
             <option name="PropertyFields" value="7"/>
-            <option name="DisplayWidth" value="163.92f"/>
-            <option name="DisplayHeight" value="102.4f"/>
-            <option name="MachineZ" value="180.0f"/>
             <option name="MaxFileVersion" value="516"/>
             <option name="MachineBackground" value="6506241"/>
-        </options>
-        <options name="Extra"/>
+        </file_options>
     </printer>
 
-    <printer manufacturer="CREALITY" name="HALOT-ONE PLUS" extension="cxdlp" file="futurelink.msla.formats.creality.CXDLPFile">
-        <options name="Header">
-            <option name="Resolution" value="4320x2560"/>
-            <option name="PixelSizeUm" value="40.0f"/>
-            <option name="PrinterModel" value="CL-79"/>
-        </options>
-        <options name="SliceInfo">
-            <option name="DisplayWidth" value="172.8"/>
-            <option name="DisplayHeight" value="102.4"/>
+    <printer
+            manufacturer="CREALITY"
+            name="HALOT-ONE PLUS"
+            resolution="4320x2560"
+            pixelSize="40.0"
+            displayWidth="172.8"
+            displayHeight="102.4"
+            machineZ="0.0"
+            extension="cxdlp"
+            file="futurelink.msla.formats.creality.CXDLPFile"
+    >
+        <file_properties>
+            <property name="PrinterModel" value="CL-79"/>
+            <property name="Version" value="3"/>
+        </file_properties>
+        <file_options>
+            <option name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
+            <option name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option name="ExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
+            <option name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
+            <option name="BottomExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
+            <option name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="XYAxisProfileCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="ZPenetrationCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="AntiAliasEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="AntiAliasGreyMinValue" type="int" value="1" minValue="1" maxValue="255"/>
+            <option name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
+            <option name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
+        </file_options>
+    </printer>
+
+    <printer
+            manufacturer="CREALITY"
+            name="HALOT-ONE PRO"
+            resolution="2560x2400"
+            pixelSize="40.0"
+            displayWidth="172.8"
+            displayHeight="102.4"
+            machineZ="0.0"
+            extension="cxdlp"
+            file="futurelink.msla.formats.creality.CXDLPFile"
+    >
+        <file_properties>
+            <property name="PrinterModel" value="CL-70"/>
+        </file_properties>
+        <file_options>
+            <option name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
+            <option name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option name="ExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
+            <option name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
+            <option name="BottomExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
+            <option name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="XYAxisProfileCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="ZPenetrationCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="AntiAliasEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="AntiAliasGreyMinValue" type="int" value="1" minValue="1" maxValue="255"/>
+            <option name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
+            <option name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
+        </file_options>
+    </printer>
+
+    <printer
+            manufacturer="CREALITY"
+            name="HALOT-ONE"
+            resolution="1620x2560"
+            pixelSize="0.0"
+            displayWidth="0.0"
+            displayHeight="0.0"
+            machineZ="0.0"
+            extension="cxdlp"
+            file="futurelink.msla.formats.creality.CXDLPFile"
+    >
+        <file_properties>
+            <property name="PrinterModel" value="CL-60"/>
+        </file_properties>
+        <file_options>
+            <option name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
+            <option name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option name="ExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
+            <option name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
+            <option name="BottomExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
+            <option name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="XYAxisProfileCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="ZPenetrationCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
+            <option name="AntiAliasEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="AntiAliasGreyMinValue" type="int" value="1" minValue="1" maxValue="255"/>
+            <option name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
+            <option name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
+            <option name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
+        </file_options>
+    </printer>
+
+    <printer
+            manufacturer="CREALITY"
+            name="HALOT-RAY"
+            resolution="5760x3600"
+            pixelSize="34.39f"
+            displayWidth="0.0"
+            displayHeight="0.0"
+            machineZ="0.0"
+            extension="cxdlp"
+            file="futurelink.msla.formats.creality.CXDLPFile"
+    >
+        <file_properties>
+            <property name="PrinterModel" value="CL925"/>
+        </file_properties>
+        <file_options>
             <option group="General" name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
             <option group="General" name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
             <option group="General" name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
@@ -196,8 +339,6 @@
             <option group="Bottom layers" name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
             <option group="Bottom layers" name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
             <option group="Bottom layers" name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-        </options>
-        <options name="SliceInfoV3">
             <option group="Advanced" name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
             <option group="Advanced" name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
             <option group="Advanced" name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
@@ -210,134 +351,27 @@
             <option group="Advanced" name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
             <option group="Advanced" name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
             <option group="Advanced" name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
-        </options>
+        </file_options>
     </printer>
 
-    <printer manufacturer="CREALITY" name="HALOT-ONE PRO" extension="cxdlp" file="futurelink.msla.formats.creality.CXDLPFile">
-        <options name="Header">
-            <option name="Resolution" value="2560x2400"/>
-            <option name="PixelSizeUm" value="40.0f"/>
-            <option name="PrinterModel" value="CL-70"/>
-        </options>
-        <options name="SliceInfo">
-            <option name="DisplayWidth" value="172.8"/>
-            <option name="DisplayHeight" value="102.4"/>
-            <option group="General" name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
-            <option group="General" name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option group="General" name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
-            <option group="Normal layers" name="ExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
-            <option group="Normal layers" name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option group="Normal layers" name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option group="Normal layers" name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-            <option group="Bottom layers" name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
-            <option group="Bottom layers" name="BottomExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
-            <option group="Bottom layers" name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option group="Bottom layers" name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option group="Bottom layers" name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-        </options>
-        <options name="SliceInfoV3">
-            <option group="Advanced" name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="XYAxisProfileCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="ZPenetrationCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="AntiAliasEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="AntiAliasGreyMinValue" type="int" value="1" minValue="1" maxValue="255"/>
-            <option group="Advanced" name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
-            <option group="Advanced" name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
-        </options>
-    </printer>
-
-    <printer manufacturer="CREALITY" name="HALOT-ONE" extension="cxdlp" file="futurelink.msla.formats.creality.CXDLPFile">
-        <options name="Header">
-            <option name="Resolution" value="1620x2560"/>
-            <option name="PixelSizeUm" value="50.0f"/>
-            <option name="PrinterModel" value="CL-60"/>
-        </options>
-        <options name="SliceInfo">
-            <option name="DisplayWidth" value="172.8"/>
-            <option name="DisplayHeight" value="102.4"/>
-            <option group="General" name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
-            <option group="General" name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option group="General" name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
-            <option group="Normal layers" name="ExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
-            <option group="Normal layers" name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option group="Normal layers" name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option group="Normal layers" name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-            <option group="Bottom layers" name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
-            <option group="Bottom layers" name="BottomExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
-            <option group="Bottom layers" name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option group="Bottom layers" name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option group="Bottom layers" name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-        </options>
-        <options name="SliceInfoV3">
-            <option group="Advanced" name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="XYAxisProfileCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="ZPenetrationCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="AntiAliasEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="AntiAliasGreyMinValue" type="int" value="1" minValue="1" maxValue="255"/>
-            <option group="Advanced" name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
-            <option group="Advanced" name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
-        </options>
-    </printer>
-
-    <printer manufacturer="CREALITY" name="HALOT-RAY" extension="cxdlp" file="futurelink.msla.formats.creality.CXDLPFile">
-        <options name="Header">
-            <option name="Resolution" value="5760x3600"/>
-            <option name="PixelSizeUm" value="34.39f"/>
-            <option name="PrinterModel" value="CL925"/>
-        </options>
-        <options name="SliceInfo">
-            <option name="DisplayWidth" value="172.8"/>
-            <option name="DisplayHeight" value="102.4"/>
-            <option group="General" name="WaitTimeBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
-            <option group="General" name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option group="General" name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
-            <option group="Normal layers" name="ExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
-            <option group="Normal layers" name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option group="Normal layers" name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option group="Normal layers" name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-            <option group="Bottom layers" name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
-            <option group="Bottom layers" name="BottomExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
-            <option group="Bottom layers" name="BottomLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option group="Bottom layers" name="BottomLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option group="Bottom layers" name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-        </options>
-        <options name="SliceInfoV3">
-            <option group="Advanced" name="DistortionCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="DistortionCompensationFocalLength" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="XYAxisProfileCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="ZPenetrationCompensationEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
-            <option group="Advanced" name="AntiAliasEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="AntiAliasGreyMinValue" type="int" value="1" minValue="1" maxValue="255"/>
-            <option group="Advanced" name="AntiAliasGreyMaxValue" type="int" value="0" minValue="1" maxValue="255"/>
-            <option group="Advanced" name="ImageBlurEnabled" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option group="Advanced" name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
-        </options>
-    </printer>
-
-    <printer manufacturer="ELEGOO" name="Mars 4 Max" extension="goo" file="futurelink.msla.formats.elegoo.GOOFile">
-        <options name="Header">
-            <option name="Resolution" value="5760x3600"/>
-            <option name="PixelSizeUm" value="35.0f"/>
-            <option name="DisplayWidth" value="150"/>
-            <option name="DisplayHeight" value="200"/>
-            <option name="MachineZ" value="200"/>
-            <option name="MachineName" value = "DEFAULT"/>
-            <option name="MachineType" value = "DLP"/>
-            <option name="ProfileName" value = "DEFAULT"/>
-            <option group="General" name="AntiAliasingLevel" type="int" value="8" minValue="0" maxValue="100"/>;
+    <printer
+            manufacturer="ELEGOO"
+            name="Mars 4 Max"
+            resolution="5760x3600"
+            pixelSize="35.0f"
+            displayWidth="150.0"
+            displayHeight="200.0"
+            machineZ="200.0"
+            extension="goo"
+            file="futurelink.msla.formats.elegoo.GOOFile"
+    >
+        <file_properties>
+            <property name="MachineName" value="DEFAULT"/>
+            <property name="MachineType" value="DLP"/>
+            <property name="ProfileName" value="DEFAULT"/>
+        </file_properties>
+        <file_options>
+            <option name="AntiAliasingLevel" type="int" value="8" minValue="0" maxValue="100"/>;
             <option group="General" name="GreyLevel" type="int" value="1" minValue="0" maxValue="100"/>
             <option group="General" name="BlurLevel" type="int" value="0" minValue="0" maxValue="100"/>
             <option group="General" name="MirrorX" type="boolean" value="0" trueValue="1" falseValue="0"/>
@@ -361,7 +395,6 @@
             <option group="Bottom layers" name="BottomRetractSpeed" type="float" value="10" minValue="0" maxValue="100"/>
             <option group="Normal layers" name="RetractHeight" type="float" value="10" minValue="0" maxValue="100"/>
             <option group="Normal layers" name="RetractSpeed" type="float" value="10" minValue="0" maxValue="100"/>
-
             <option group="Bottom layers" name="BottomLiftHeight2" type="float" value="10" minValue="0" maxValue="100"/>
             <option group="Bottom layers" name="BottomLiftSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
             <option group="Normal layers" name="LiftHeight2" type="float" value="10" minValue="0" maxValue="100"/>
@@ -370,35 +403,94 @@
             <option group="Bottom layers" name="BottomRetractSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
             <option group="Normal layers" name="RetractHeight2" type="float" value="10" minValue="0" maxValue="100"/>
             <option group="Normal layers" name="RetractSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
-
             <option group="Bottom layers" name="BottomLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
             <option group="Normal layers" name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
             <option group="General" name="PerLayerSettings" type="boolean" value="0" trueValue="1" falseValue="0"/>
-
             <option group="General" name="PrintTime" type="int" value="0" minValue="0" maxValue="9999999"/>
             <option group="General" name="Volume" type="float" value="0" minValue="0" maxValue="9999999"/>
             <option group="General" name="MaterialGrams" type="float" value="0" minValue="0" maxValue="9999999"/>
             <option group="General" name="MaterialCost" type="float" value="0" minValue="0" maxValue="9999999"/>
-
             <option group="General" name="PriceCurrencySymbol" value="$"/>
             <option group="General" name="GrayScaleLevel" type="int" value="1" minValue="0" maxValue="255"/>
             <option group="General" name="TransitionLayerCount" type="int" value="6" minValue="0" maxValue="255"/>
-        </options>
+        </file_options>
     </printer>
 
-    <printer manufacturer="ELEGOO" name="SATURN" extension="ctb" file="futurelink.msla.formats.chitubox.common.CTBCommonFile">
-        <file_options>
-            <option name="Version" value="4"/>
-        </file_options>
+    <printer
+            manufacturer="ELEGOO"
+            name="SATURN"
+            resolution="3840x2400"
+            pixelSize="35.0f"
+            displayWidth="192.0"
+            displayHeight="120.0"
+            machineZ="200.0"
+            extension="ctb"
+            file="futurelink.msla.formats.chitubox.common.CTBCommonFile"
+    >
+        <file_properties>
+            <property name="Version" value="4"/>
+        </file_properties>
         <layer_options>
             <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
         </layer_options>
-        <options name="Header">
-            <option name="Resolution" value="3840x2400"/>
-            <option name="PixelSizeUm" value="35.0f"/>
-            <option name="BedSizeX" value="192.0"/>
-            <option name="BedSizeY" value="120.0"/>
-            <option name="BedSizeZ" value="200.0"/>
+        <file_options>
+            <option name="LightOffDelay" value="0"/>
+            <option name="AntiAliasLevel" value="1"/>
+            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="LayerHeightMillimeter" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option name="LayerExposureSeconds" value="2.5"/>
+            <option name="BottomLayersCount" value="5"/>
+            <option name="BottomLightPWM" value="255"/>
+            <option name="BottomExposureSeconds" value="30"/>
+            <option name="PerLayerSettings" value="0"/>
+            <option name="AntiAliasFlag" value="15"/>
+            <option name="AntiAliasLevel" value="4"/>
+            <option name="TransitionLayerCount" value="10"/>
+            <option name="LiftHeight2" value="0.0"/>
+            <option name="LiftSpeed2" value="0.0"/>
+            <option name="RetractHeight2" value="0.0"/>
+            <option name="RetractSpeed2" value="0.0"/>
+            <option name="RestTimeAfterLift" value="0.0"/>
+            <option name="RestTimeAfterRetract" value="0.5"/>
+            <option name="RestTimeAfterLift2" value="0.0"/>
+            <option name="BottomLiftHeight2" value="0.0"/>
+            <option name="BottomLiftSpeed2" value="0.0"/>
+            <option name="LightOffDelay" value="0"/>
+            <option name="LiftHeight" value="7"/>
+            <option name="LiftSpeed" value="70"/>
+            <option name="RetractSpeed" value="180"/>
+            <option name="BottomLiftHeight" value="7"/>
+            <option name="BottomLiftSpeed" value="70"/>
+            <option name="BottomLightOffDelay" value="0"/>
+            <option name="BottomLayerCount" value="5"/>
+            <option name="BottomRetractSpeed" value="180"/>
+            <option name="BottomRetractSpeed2" value="0"/>
+            <option name="RestTimeAfterRetract" value="0.5"/>
+            <option name="RestTimeAfterLift" value="0"/>
+            <option name="RestTimeBeforeLift" value="0"/>
+            <option name="BottomRetractHeight2" value="0"/>
+        </file_options>
+    </printer>
+
+    <printer
+            manufacturer="ELEGOO"
+            name="JUPITER"
+            resolution="5448x3064"
+            pixelSize="35.0f"
+            displayWidth="277.848"
+            displayHeight="156.264"
+            machineZ="300.0"
+            extension="ctb"
+            file="futurelink.msla.formats.chitubox.encrypted.CTBEncryptedFile"
+    >
+        <file_properties>
+            <property name="Version" value="4"/>
+            <property name="Encrypted" value="true"/>
+        </file_properties>
+        <layer_options>
+            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+        </layer_options>
+        <file_options>
             <option group="General" name="LightOffDelay" value="0"/>
             <option group="General" name="AntiAliasLevel" value="1"/>
             <option group="General" name="LightPWM" value="255"/>
@@ -407,8 +499,6 @@
             <option group="Bottom layers" name="BottomLayersCount" value="5"/>
             <option group="Bottom layers" name="BottomLightPWM" value="255"/>
             <option group="Bottom layers" name="BottomExposureSeconds" value="30"/>
-        </options>
-        <options name="SlicerInfo">
             <option group="General" name="PerLayerSettings" value="0"/>
             <option group="General" name="AntiAliasFlag" value="15"/>
             <option group="General" name="AntiAliasLevel" value="4"/>
@@ -422,12 +512,6 @@
             <option group="Normal layers" name="RestTimeAfterLift2" value="0.0"/>
             <option group="Bottom layers" name="BottomLiftHeight2" value="0.0"/>
             <option group="Bottom layers" name="BottomLiftSpeed2" value="0.0"/>
-        </options>
-        <options name="MachineName">
-            <!-- Must be the same as "manufacturer" + ' ' + "name" attributes in printer header -->
-            <option name="MachineName" value="ELEGOO SATURN"/>
-        </options>
-        <options name="PrintParams">
             <option group="Normal layers" name="LightOffDelay" value="0"/>
             <option group="Normal layers" name="LiftHeight" value="7"/>
             <option group="Normal layers" name="LiftSpeed" value="70"/>
@@ -436,70 +520,12 @@
             <option group="Bottom layers" name="BottomLiftSpeed" value="70"/>
             <option group="Bottom layers" name="BottomLightOffDelay" value="0"/>
             <option group="Bottom layers" name="BottomLayerCount" value="5"/>
-        </options>
-        <options name="PrintParamsV4">
             <option group="Bottom layers" name="BottomRetractSpeed" value="180"/>
             <option group="Bottom layers" name="BottomRetractSpeed2" value="0"/>
             <option group="Normal layers" name="RestTimeAfterRetract" value="0.5"/>
             <option group="Normal layers" name="RestTimeAfterLift" value="0"/>
             <option group="Normal layers" name="RestTimeBeforeLift" value="0"/>
             <option group="Bottom layers" name="BottomRetractHeight2" value="0"/>
-        </options>
-    </printer>
-
-    <printer manufacturer="ELEGOO" name="JUPITER" extension="ctb" file="futurelink.msla.formats.chitubox.encrypted.CTBEncryptedFile">
-        <file_options>
-            <option name="Version" value="4"/>
         </file_options>
-        <layer_options>
-            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-        </layer_options>
-        <options name="SlicerSettings">
-            <option name="Resolution" value="5448x3064"/>
-            <option name="PixelSizeUm" value="35.0f"/>
-            <option name="BedSizeX" value="277.848"/>
-            <option name="BedSizeY" value="156.264"/>
-            <option name="BedSizeZ" value="300.0"/>
-            <option group="General" name="LightOffDelay" value="0"/>
-            <option group="General" name="AntiAliasLevel" value="1"/>
-            <option group="General" name="LightPWM" value="255"/>
-            <option group="General" name="LayerHeightMillimeter" value="0.05"/>
-            <option group="Normal layers" name="LayerExposureSeconds" value="2.5"/>
-            <option group="Bottom layers" name="BottomLayersCount" value="5"/>
-            <option group="Bottom layers" name="BottomLightPWM" value="255"/>
-            <option group="Bottom layers" name="BottomExposureSeconds" value="30"/>
-            <option group="General" name="PerLayerSettings" value="0"/>
-            <option group="General" name="AntiAliasFlag" value="15"/>
-            <option group="General" name="AntiAliasLevel" value="4"/>
-            <option group="General" name="TransitionLayerCount" value="10"/>
-            <option group="Normal layers" name="LiftHeight2" value="0.0"/>
-            <option group="Normal layers" name="LiftSpeed2" value="0.0"/>
-            <option group="Normal layers" name="RetractHeight2" value="0.0"/>
-            <option group="Normal layers" name="RetractSpeed2" value="0.0"/>
-            <option group="Normal layers" name="RestTimeAfterLift" value="0.0"/>
-            <option group="Normal layers" name="RestTimeAfterRetract" value="0.5"/>
-            <option group="Normal layers" name="RestTimeAfterLift2" value="0.0"/>
-            <option group="Bottom layers" name="BottomLiftHeight2" value="0.0"/>
-            <option group="Bottom layers" name="BottomLiftSpeed2" value="0.0"/>
-            <option group="Normal layers" name="LightOffDelay" value="0"/>
-            <option group="Normal layers" name="LiftHeight" value="7"/>
-            <option group="Normal layers" name="LiftSpeed" value="70"/>
-            <option group="Normal layers" name="RetractSpeed" value="180"/>
-            <option group="Bottom layers" name="BottomLiftHeight" value="7"/>
-            <option group="Bottom layers" name="BottomLiftSpeed" value="70"/>
-            <option group="Bottom layers" name="BottomLightOffDelay" value="0"/>
-            <option group="Bottom layers" name="BottomLayerCount" value="5"/>
-            <option group="Bottom layers" name="BottomRetractSpeed" value="180"/>
-            <option group="Bottom layers" name="BottomRetractSpeed2" value="0"/>
-            <option group="Normal layers" name="RestTimeAfterRetract" value="0.5"/>
-            <option group="Normal layers" name="RestTimeAfterLift" value="0"/>
-            <option group="Normal layers" name="RestTimeBeforeLift" value="0"/>
-            <option group="Bottom layers" name="BottomRetractHeight2" value="0"/>
-        </options>
-        <options name="MachineName">
-            <!-- Must be the same as "manufacturer" + ' ' + "name" attributes in printer header -->
-            <option name="MachineName" value="ELEGOO JUPITER"/>
-        </options>
-        <options name="Resin"/>
     </printer>
 </printers>

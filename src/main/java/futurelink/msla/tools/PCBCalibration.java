@@ -4,9 +4,9 @@ import futurelink.msla.formats.*;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLALayerEncodeOutput;
 import futurelink.msla.formats.iface.MSLALayerEncodeReader;
-import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
-import futurelink.msla.utils.FileOptionMapper;
+import futurelink.msla.utils.options.FileOptionMapper;
 import futurelink.msla.utils.Size;
 import futurelink.msla.utils.defaults.MachineDefaults;
 import lombok.Setter;
@@ -69,7 +69,7 @@ public class PCBCalibration {
             int interval,
             int repetitions) throws MSLAException
     {
-        var defaults = MachineDefaults.instance.getMachineDefaults(machineName)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var wsFile = FileFactory.instance.create(machineName);
         var options = new FileOptionMapper(wsFile, defaults);
@@ -79,10 +79,11 @@ public class PCBCalibration {
                 filePath + "." + defaults.getFileExtension();
         try (var fos = new FileOutputStream(filePath)) {
             // Set options
-            options.set(MSLAOption.BottomLayersCount, 1);
-            options.set(MSLAOption.BottomExposureTime, startTime);
-            options.set(MSLAOption.ExposureTime, interval);
-            options.set(MSLAOption.LiftHeight, 1);
+            options.set(MSLAOptionName.BottomLayersCount, 1);
+            options.set(MSLAOptionName.BottomLayersExposureTime, startTime);
+            options.set(MSLAOptionName.NormalLayersExposureTime, interval);
+            if (options.hasOption(MSLAOptionName.LiftHeight)) options.set(MSLAOptionName.LiftHeight, 1);
+            if (options.hasOption(MSLAOptionName.NormalLayersLiftHeight)) options.set(MSLAOptionName.NormalLayersLiftHeight, 1);
 
             //wsFile.setOption("PerLayerOverride", 0);
             //wsFile.setOption("TransitionLayerCount", 0);
@@ -98,7 +99,7 @@ public class PCBCalibration {
             createPreview(wsFile);
 
             // Generate pattern layers
-            var pattern = new PCBCalibrationPattern(wsFile.getResolution(), wsFile.getPixelSizeUm());
+            var pattern = new PCBCalibrationPattern(wsFile.getResolution(), wsFile.getPixelSize());
             pattern.setStartTime(startTime);
             var reader = new EncodeReader(wsFile, pattern, repetitions);
             for (int i = 0; i < repetitions; i++)

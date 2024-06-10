@@ -1,7 +1,7 @@
 package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.utils.Size;
 import lombok.Getter;
 import lombok.Setter;

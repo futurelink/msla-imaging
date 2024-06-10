@@ -1,7 +1,5 @@
 package futurelink.msla.formats.iface;
 
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedList;

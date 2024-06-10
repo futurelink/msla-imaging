@@ -1,9 +1,10 @@
 package futurelink.msla.formats;
 
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
-import futurelink.msla.utils.FileOptionMapper;
-import futurelink.msla.utils.LayerOptionMapper;
+import futurelink.msla.utils.options.FileOptionMapper;
+import futurelink.msla.utils.options.LayerOptionMapper;
 import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
@@ -16,16 +17,16 @@ public class FileOptionMapperTest extends CommonTestRoutines {
     @Test
     void LayerOptionsTest() throws MSLAException {
         var machine = "ELEGOO SATURN";
-        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machine));
         var file = FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
 
-        // Assert Chitubox format has 24 file options
-        assertEquals(24, options.available().size());
+        // Assert Chitubox format has 27 file options
+        assertEquals(27, options.available().size());
 
-        options.set("Bottom layers exposure time", "12");
-        assertEquals(12f, Float.parseFloat(options.get("Bottom layers exposure time")));
+        options.set(MSLAOptionName.BottomLayersExposureTime, "12");
+        assertEquals(12f, Float.parseFloat(options.get(MSLAOptionName.BottomLayersExposureTime)));
 
         // It's necessary to add a layer to access layer options
         var resource = resourceFile("test_data/ChituboxFileTest/ELEGOO_Saturn_Layer_0.png");
@@ -43,26 +44,30 @@ public class FileOptionMapperTest extends CommonTestRoutines {
 
         // Try to set layer option and retrieve its value
         layerOptions.setLayerNumber(0);
-        layerOptions.set("Light PWM", "128");
-        assertEquals(128f, Float.parseFloat(layerOptions.get("Light PWM")));
+        layerOptions.set(MSLAOptionName.LayerLightPWM, "128");
+        assertEquals(128f, Float.parseFloat(layerOptions.get(MSLAOptionName.LayerLightPWM)));
     }
 
     @Test
     void LayerOptionParamsTest() throws MSLAException {
         var machine = "Anycubic Photon M3 Max";
-        var defaults = MachineDefaults.instance.getMachineDefaults(machine)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machine));
         var file = FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
-        assertEquals(30.0f, options.getParameters("Bottom layers exposure time").getFloat());
-        assertEquals(Float.class, options.getType("Bottom layers exposure time"));
+        assertEquals(30.0f, options.getParameters(MSLAOptionName.BottomLayersExposureTime).getFloat());
+        assertEquals(Float.class, options.getType(MSLAOptionName.BottomLayersExposureTime));
+
+        // Check option group mappings
+        assertEquals("Print settings", options.getGroup(MSLAOptionName.LayerHeight).name());
+        assertEquals("All layers", options.getGroup(MSLAOptionName.LightPWM).name());
 
         // Check valid value is processed properly
-        options.set("Bottom layers exposure time", "50");
-        assertEquals(50.0f, Float.parseFloat(options.get("Bottom layers exposure time")));
+        options.set(MSLAOptionName.BottomLayersExposureTime, "50");
+        assertEquals(50.0f, Float.parseFloat(options.get(MSLAOptionName.BottomLayersExposureTime)));
 
         // Check min and max values are processed properly
-        assertThrows(MSLAException.class, () -> options.set("Bottom layers exposure time", "121"));
-        assertThrows(MSLAException.class, () -> options.set("Bottom layers exposure time", "-1"));
+        assertThrows(MSLAException.class, () -> options.set(MSLAOptionName.BottomLayersExposureTime, "121"));
+        assertThrows(MSLAException.class, () -> options.set(MSLAOptionName.BottomLayersExposureTime, "-1"));
     }
 }

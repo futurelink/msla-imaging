@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<options_map>
+    <!--
+    All options from futurelink.msla.formats.iface.options.MSLAOptionName must be mapped in this file
+    in order to properly display them in option mapper and any user interface that is going to be used
+    with this library.
+
+    Of course, not all formats support all of these options, that is why this file is used.
+    Depending on file format a list of available options changes, but grouping remains persistent.
+
+    If someone wants to follow another principle of options organization, then another file can be created
+    and loaded.
+    -->
+    <group name="General" order="1">
+        <option name="Volume"/>
+        <option name="Weight"/>
+        <option name="Price"/>
+        <option name="Currency"/>
+        <option name="PrintTime"/>
+        <option name="ResinType"/>
+    </group>
+
+    <!-- Print settings -->
+    <group name="Print settings" order="2">
+        <option name="LayerHeight"/>
+        <option name="TransitionLayersCount"/>
+        <option name="TransitionLayersType"/>
+        <option name="Antialias"/>
+        <option name="AntialiasLevel"/>
+        <option name="Blur"/>
+        <option name="BlurLevel"/>
+        <option name="Grey"/>
+        <option name="GreyLevel"/>
+        <option name="AdvancedMode"/>
+        <option name="IntelligentMode"/>
+        <option name="MirrorX"/>
+        <option name="MirrorY"/>
+    </group>
+
+    <!-- Creality specific options -->
+    <group name="Creality" order="3">
+        <option name="DistortionCompensation"/>
+        <option name="DistortionCompensationThickness"/>
+        <option name="DistortionCompensationLength"/>
+        <option name="XYAxisProfileCompensation"/>
+        <option name="XYAxisProfileCompensationValue"/>
+        <option name="ZPenetrationCompensation"/>
+        <option name="ZPenetrationCompensationLevel"/>
+    </group>
+
+    /**
+    * All layers specific options
+    */
+    <group name="All layers" order="4">
+        <option name="LayerSettings"/>
+        <option name="LiftHeight"/>
+        <option name="LiftHeight2"/>
+        <option name="LiftSpeed"/>
+        <option name="LiftSpeed2"/>
+        <option name="RetractSpeed"/>
+        <option name="RetractSpeed2"/>
+        <option name="RetractHeight"/>
+        <option name="RetractHeight2"/>
+        <option name="LightOffTime"/>
+        <option name="WaitBeforeCure"/>
+        <option name="WaitAfterRetract"/>
+        <option name="WaitAfterRetract2"/>
+        <option name="WaitAfterLift"/>
+        <option name="WaitAfterLift2"/>
+        <option name="WaitAfterLift3"/>
+        <option name="WaitBeforeLift"/>
+        <option name="LightPWM"/>
+    </group>
+
+    <!--Bottom layers specific options -->
+    <group name="Bottom layers" order="7">
+        <option name="BottomLayersCount"/>
+        <option name="BottomLayersExposureTime"/>
+        <option name="BottomLayersLightOffDelay"/>
+        <option name="BottomLayersGradient"/>
+        <option name="BottomLayersLiftHeight"/>
+        <option name="BottomLayersLiftHeight1"/>
+        <option name="BottomLayersLiftHeight2"/>
+        <option name="BottomLayersLiftSpeed"/>
+        <option name="BottomLayersLiftSpeed1"/>
+        <option name="BottomLayersLiftSpeed2"/>
+        <option name="BottomLayersRetractSpeed"/>
+        <option name="BottomLayersRetractSpeed1"/>
+        <option name="BottomLayersRetractSpeed2"/>
+        <option name="BottomLayersRetractHeight"/>
+        <option name="BottomLayersRetractHeight2"/>
+        <option name="BottomLayersWaitAfterCure"/>
+        <option name="BottomLayersWaitBeforeCure"/>
+        <option name="BottomLayersWaitAfterLift"/>
+        <option name="BottomLayersLightPWM"/>
+    </group>
+
+    <group name="Normal layers" order="6">
+        <option name="NormalLayersExposureTime"/>
+        <option name="NormalLayersLightOffDelay"/>
+        <option name="NormalLayersGradient"/>
+        <option name="NormalLayersLiftHeight"/>
+        <option name="NormalLayersLiftHeight1"/>
+        <option name="NormalLayersLiftHeight2"/>
+        <option name="NormalLayersLiftSpeed"/>
+        <option name="NormalLayersLiftSpeed1"/>
+        <option name="NormalLayersLiftSpeed2"/>
+        <option name="NormalLayersRetractSpeed1"/>
+        <option name="NormalLayersRetractSpeed2"/>
+        <option name="NormalLayersRetractHeight2"/>
+        <option name="NormalLayersWaitAfterCure"/>
+        <option name="NormalLayersWaitBeforeCure"/>
+        <option name="NormalLayersWaitAfterLift"/>
+        <option name="NormalLayersWaitBeforeLift"/>
+        <option name="NormalLayersWaitAfterRetract"/>
+        <option name="NormalLayersLightPWM"/>
+    </group>
+
+    <!-- Layer specific options -->
+    <group name="Layer options" order="5">
+        <option name="LayerExposureTime"/>
+        <option name="LayerWaitAfterCure"/>
+        <option name="LayerWaitBeforeCure"/>
+        <option name="LayerWaitAfterLift"/>
+        <option name="LayerWaitBeforeLift"/>
+        <option name="LayerWaitAfterRetract"/>
+        <option name="LayerLiftHeight"/>
+        <option name="LayerLiftSpeed"/>
+        <option name="LayerLightOffDelay"/>
+        <option name="LayerGradient"/>
+        <option name="LayerLiftHeight1"/>
+        <option name="LayerLiftSpeed1"/>
+        <option name="LayerRetractSpeed1"/>
+        <option name="LayerLiftHeight2"/>
+        <option name="LayerLiftSpeed2"/>
+        <option name="LayerRetractSpeed"/>
+        <option name="LayerRetractSpeed2"/>
+        <option name="LayerRetractHeight2"/>
+        <option name="LayerLightPWM"/>
+    </group>
+</options_map>

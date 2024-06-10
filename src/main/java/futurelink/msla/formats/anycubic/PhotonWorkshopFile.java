@@ -9,7 +9,7 @@ import com.google.common.io.LittleEndianDataOutputStream;
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.tables.*;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.iface.options.MSLAOptionContainer;
 import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.utils.Size;
 import lombok.Getter;
@@ -30,10 +30,14 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     @Getter @MSLAOptionContainer private PhotonWorkshopFileExtraTable Extra;
     @Getter @MSLAOptionContainer private PhotonWorkshopFileMachineTable Machine;
 
-    public PhotonWorkshopFile(byte versionMajor, byte versionMinor) {
-        super();
+    public PhotonWorkshopFile(MSLAFileProps initialProps) {
+        super(initialProps);
+        var versionMajor = initialProps.getByte("VersionMajor");
+        var versionMinor = initialProps.getByte("VersionMinor");
         Descriptor = new PhotonWorkshopFileDescriptor(versionMajor, versionMinor);
         Header = new PhotonWorkshopFileHeaderTable(versionMajor, versionMinor);
+        Header.setPixelSizeUm(initialProps.getFloat("PixelSize"));
+        Header.setResolution(Size.parseSize(initialProps.get("Resolution").getString()));
         Machine = new PhotonWorkshopFileMachineTable(versionMajor, versionMinor);
         Preview = new PhotonWorkshopFilePreview1Table(versionMajor, versionMinor);
         Software = new PhotonWorkshopFileSoftwareTable(versionMajor, versionMinor);
@@ -44,7 +48,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     }
 
     public PhotonWorkshopFile(DataInputStream stream) throws IOException, MSLAException {
-        super();
+        super(null);
         iStream = stream;
         readTables(iStream);
 
@@ -59,7 +63,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
 
     @Override public String getMachineName() { return Machine.getMachineName(); }
     @Override public Size getResolution() { return Header.getResolution(); }
-    @Override public float getPixelSizeUm() {
+    @Override public Float getPixelSize() {
         return Header.getPixelSizeUm();
     }
     @Override public boolean isValid() {
@@ -146,8 +150,8 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         super.reset(defaults);
         if (isMachineValid(defaults)) {
-            defaults.setFields(Header.getName(), Header.getBlockFields());
-            defaults.setFields(Machine.getName(), Machine.getBlockFields());
+            defaults.setFields(Header.getBlockFields());
+            defaults.setFields(Machine.getBlockFields());
             getLayers().setDefaults(defaults.getLayerDefaults());
             initCodec(); // Codec must be configured after setting defaults
         } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");

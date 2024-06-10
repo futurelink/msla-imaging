@@ -35,7 +35,13 @@ public final class FileFactory {
     }
 
     private Optional<MSLAFileFactory> getMachineFactory(String machineName) {
-        return supportedFiles.stream().filter((f) -> f.checkDefaults(machineName)).findFirst();
+        return supportedFiles.stream().filter((f) -> {
+            try {
+                return f.checkDefaults(machineName);
+            } catch (MSLAException e) {
+                throw new RuntimeException(e);
+            }
+        }).findFirst();
     }
 
     /**
@@ -45,7 +51,7 @@ public final class FileFactory {
      * @return MSLAFile
      */
     public MSLAFile<?> create(String machineName) throws MSLAException {
-        var defaults = MachineDefaults.instance.getMachineDefaults(machineName)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var machineFactory = getMachineFactory(machineName).orElseThrow(
                 () -> new MSLAException("Machine '" + machineName + "' is not supported"));
@@ -99,7 +105,13 @@ public final class FileFactory {
      */
     public ArrayList<String> getSupportedMachines() {
         var a = new ArrayList<String>();
-        supportedFiles.forEach((f) -> { if (f.getSupportedMachines() != null) a.addAll(f.getSupportedMachines()); });
+        supportedFiles.forEach((f) -> {
+            try {
+                if (f.getSupportedMachines() != null) a.addAll(f.getSupportedMachines());
+            } catch (MSLAException e) {
+                throw new RuntimeException(e);
+            }
+        });
         return a;
     }
 }

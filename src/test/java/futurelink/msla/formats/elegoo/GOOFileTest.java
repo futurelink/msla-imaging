@@ -2,10 +2,11 @@ package futurelink.msla.formats.elegoo;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
-import futurelink.msla.utils.FileOptionMapper;
+import futurelink.msla.utils.options.FileOptionMapper;
 import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ public class GOOFileTest extends CommonTestRoutines {
         var file = FileFactory.instance.create("ELEGOO Mars 4 Max");
         assertEquals(GOOFile.class, file.getClass());
         assertEquals("5760 x 3600", file.getResolution().toString());
-        assertEquals(35.0F, file.getPixelSizeUm());
+        assertEquals(35.0F, file.getPixelSize());
 
         // Write output file
         writeMSLAFile(outFile, file);
@@ -55,7 +56,7 @@ public class GOOFileTest extends CommonTestRoutines {
 
     @Test
     void ReadTestFile() throws InterruptedException, MSLAException, IOException {
-        var defaults = MachineDefaults.instance.getMachineDefaults("ELEGOO Mars 4 Max")
+        var defaults = MachineDefaults.getInstance().getMachineDefaults("ELEGOO Mars 4 Max")
                 .orElseThrow(() -> new MSLAException("Machine is not supported"));
         var file = FileFactory.instance.load(
                 resourceFile("test_data/ElegooFileTest/Example_GOO.goo")
@@ -63,7 +64,7 @@ public class GOOFileTest extends CommonTestRoutines {
         System.out.println(file);
         assertTrue(file.isValid());
         var options = new FileOptionMapper(file, defaults);
-        System.out.println(options.fetchOption("Normal layers lift speed"));
+        System.out.println(options.fetchOption(MSLAOptionName.NormalLayersLiftSpeed));
 
         ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "elegoo_preview_small.png"));
         assertFileExactSize(temp_dir + "elegoo_preview_small.png", 1781);

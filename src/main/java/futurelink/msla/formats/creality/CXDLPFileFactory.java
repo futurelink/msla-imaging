@@ -14,7 +14,7 @@ public class CXDLPFileFactory implements MSLAFileFactory {
     @Override public String getName() { return "ChituBox"; }
 
     @Override public MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException {
-        return new CXDLPFile();
+        return new CXDLPFile(initialProps);
     }
 
     @Override public MSLAFile<?> load(DataInputStream stream) throws MSLAException {
@@ -32,11 +32,11 @@ public class CXDLPFileFactory implements MSLAFileFactory {
         }
     }
 
-    @Override public boolean checkDefaults(String machineName) {
+    @Override public boolean checkDefaults(String machineName) throws MSLAException {
         return getSupportedMachines().contains(machineName);
     }
 
-    @Override public Set<String> getSupportedMachines() {
-        return MachineDefaults.instance.getMachines(CXDLPFile.class);
+    @Override public Set<String> getSupportedMachines() throws MSLAException {
+        return MachineDefaults.getInstance().getMachines(CXDLPFile.class);
     }
 }

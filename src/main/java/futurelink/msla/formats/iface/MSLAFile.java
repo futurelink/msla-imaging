@@ -82,7 +82,7 @@ public interface MSLAFile<T> {
     /**
      * Returns pixel size in um.
      */
-    float getPixelSizeUm();
+    Float getPixelSize();
 
     /**
      * Returns layers object.

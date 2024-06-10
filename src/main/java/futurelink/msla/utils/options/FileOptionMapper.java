@@ -1,10 +1,12 @@
-package futurelink.msla.utils;
+package futurelink.msla.utils.options;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.MSLAOptionMapper;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAOption;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.iface.options.MSLAOption;
+import futurelink.msla.formats.iface.options.MSLAOptionContainer;
+import futurelink.msla.formats.iface.options.MSLAOptionGroup;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.defaults.MachineDefaults;
 import lombok.Getter;
 
@@ -18,7 +20,8 @@ public class FileOptionMapper extends MSLAOptionMapper {
 
     private final MSLAFile<?> file;
     @Getter private MSLAFileDefaults defaults;
-    private final HashMap<String, Option> optionsMap;
+    private final OptionGroupsMapper optionGroupsMapper = OptionGroupsMapper.getInstance();
+    private final HashMap<MSLAOptionName, Option> optionsMap;
 
     public FileOptionMapper(MSLAFile<?> file, MSLAFileDefaults defaults) throws MSLAException {
         this.file = file;
@@ -34,9 +37,8 @@ public class FileOptionMapper extends MSLAOptionMapper {
         else throw new ClassCastException("Can't set defaults other than " + MSLAFileDefaults.class.getName());
     }
 
-    @SuppressWarnings("uncheked")
-    public List<MSLAFileDefaults> getMatchingDefaults() {
-        return MachineDefaults.instance.getMachineDefaults(file);
+    public List<MSLAFileDefaults> getMatchingDefaults() throws MSLAException {
+        return MachineDefaults.getInstance().getMachineDefaults(file);
     }
 
     /**
@@ -60,9 +62,7 @@ public class FileOptionMapper extends MSLAOptionMapper {
                             Arrays.stream(fileBlock.getBlockFields().getClass().getDeclaredFields())
                                     .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
                                     .forEach((f) -> {
-                                        var optionName = f.getAnnotation(MSLAOption.class).value().isEmpty() ?
-                                                f.getName() :
-                                                f.getAnnotation(MSLAOption.class).value();
+                                        var optionName = f.getAnnotation(MSLAOption.class).value();
                                         var location = List.of(blockPropertyName); // TODO make hierarchy
                                         var opt = new Option(f.getName(), f.getType(), location);
                                         if (defaults != null)
@@ -80,24 +80,30 @@ public class FileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    public Class<?> getType(String option) {
+    public Class<?> getType(MSLAOptionName option) {
         if (!this.optionsMap.containsKey(option)) return null;
         return this.optionsMap.get(option).getType();
     }
 
     @Override
-    public MSLADefaultsParams getParameters(String option) {
+    public MSLADefaultsParams getParameters(MSLAOptionName option) {
         if (this.optionsMap.get(option) == null) return null;
         return this.optionsMap.get(option).getParameters();
     }
 
     @Override
-    public boolean hasOption(String option) {
+    public MSLAOptionGroup getGroup(MSLAOptionName option) {
+        if (this.optionGroupsMapper == null) return null;
+        return this.optionGroupsMapper.getGroup(option);
+    }
+
+    @Override
+    public boolean hasOption(MSLAOptionName option) {
         return this.optionsMap.containsKey(option);
     }
 
     @Override
-    public void populateOption(String optionName, Serializable value) throws MSLAException {
+    public void populateOption(MSLAOptionName optionName, Serializable value) throws MSLAException {
         if (!isEditable()) throw new MSLAException("Options are not editable because defaults were not specified");
         getParameters(optionName).checkValue(value.toString());
         try {
@@ -122,7 +128,7 @@ public class FileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    public Serializable fetchOption(String optionName) throws MSLAException {
+    public Serializable fetchOption(MSLAOptionName optionName) throws MSLAException {
         try {
             if (!this.optionsMap.containsKey(optionName)) throw new MSLAException("Option '" + optionName + "' is not known");
             var option = this.optionsMap.get(optionName);
@@ -147,12 +153,12 @@ public class FileOptionMapper extends MSLAOptionMapper {
     }
 
     @Override public Boolean isEditable() { return defaults != null; }
-    @Override public Set<String> available() { return optionsMap.keySet(); }
+    @Override public Set<MSLAOptionName> available() { return optionsMap.keySet(); }
 
     /**
      * Gets the block where option is located
      */
-    private MSLAFileBlock getOptionFileBlock(String optionName) throws MSLAException {
+    private MSLAFileBlock getOptionFileBlock(MSLAOptionName optionName) throws MSLAException {
         try {
             var loc = this.optionsMap.get(optionName).getLocation();
             var fileClass = file.getClass();

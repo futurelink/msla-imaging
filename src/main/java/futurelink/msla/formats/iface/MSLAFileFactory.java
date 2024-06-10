@@ -11,8 +11,8 @@ public interface MSLAFileFactory {
     String getName();
     MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException;
     boolean checkType(DataInputStream stream) throws MSLAException;
-    boolean checkDefaults(String machineName);
-    Set<String> getSupportedMachines();
+    boolean checkDefaults(String machineName) throws MSLAException;
+    Set<String> getSupportedMachines() throws MSLAException;
 
     /**
      * Implement this to load mSLA file data from stream.

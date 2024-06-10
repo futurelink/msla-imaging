@@ -2,7 +2,7 @@ package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.formats.io.FileFieldsIO;
 import futurelink.msla.formats.io.FileFieldsReader;

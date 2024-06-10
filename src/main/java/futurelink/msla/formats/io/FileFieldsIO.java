@@ -2,7 +2,7 @@ package futurelink.msla.formats.io;
 
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import lombok.Getter;
 
 import java.lang.reflect.*;

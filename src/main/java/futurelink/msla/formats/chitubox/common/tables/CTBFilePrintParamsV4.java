@@ -1,7 +1,9 @@
 package futurelink.msla.formats.chitubox.common.tables;
 
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
+import futurelink.msla.formats.iface.options.MSLAOption;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.formats.io.FileFieldsIO;
 import lombok.Getter;
@@ -18,15 +20,15 @@ public class CTBFilePrintParamsV4 extends CTBFileBlock {
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
         @MSLAFileField private Float BottomRetractSpeed;
-        @MSLAFileField(order = 1) private Float BottomRetractSpeed2;
+        @MSLAFileField(order = 1) @MSLAOption(MSLAOptionName.BottomLayersRetractSpeed2) private Float BottomRetractSpeed2;
         @MSLAFileField(order = 2) private final Integer Padding1 = 0;
         @MSLAFileField(order = 3) private final Float Four1 = 4.0F; // 4?
         @MSLAFileField(order = 4) private final Integer Padding2 = 0;
         @MSLAFileField(order = 5) private final Float Four2 = 4.0f; // ?
-        @MSLAFileField(order = 6) private Float RestTimeAfterRetract;
-        @MSLAFileField(order = 7) private Float RestTimeAfterLift;
-        @MSLAFileField(order = 8) private Float RestTimeBeforeLift;
-        @MSLAFileField(order = 9) private Float BottomRetractHeight2;
+        @MSLAFileField(order = 6) @MSLAOption(MSLAOptionName.WaitAfterRetract) private Float RestTimeAfterRetract;
+        @MSLAFileField(order = 7) @MSLAOption(MSLAOptionName.WaitAfterLift) private Float RestTimeAfterLift;
+        @MSLAFileField(order = 8) @MSLAOption(MSLAOptionName.WaitBeforeLift) private Float RestTimeBeforeLift;
+        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.BottomLayersRetractHeight2) private Float BottomRetractHeight2;
         @MSLAFileField(order = 10) private final Float Unknown1 = 2955.996f; // 2955.996 or uint:1161347054 but changes
         @MSLAFileField(order = 11) private final Integer Unknown2 = 73470; // 73470 but changes
         @MSLAFileField(order = 12) private final Integer Unknown3 = 5; // 5?

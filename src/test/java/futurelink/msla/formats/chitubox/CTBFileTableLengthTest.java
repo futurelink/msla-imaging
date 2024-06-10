@@ -13,7 +13,7 @@ public class CTBFileTableLengthTest extends CommonTestRoutines {
 
     @Test
     void CTBFileHeaderTest() throws FileFieldsException, MSLAException {
-        var block = new CTBFileHeader(4);
+        var block = new CTBFileHeader(4, null);
         var length = FileFieldsIO.getBlockLength(block);
         assertEquals(112, length);
     }
