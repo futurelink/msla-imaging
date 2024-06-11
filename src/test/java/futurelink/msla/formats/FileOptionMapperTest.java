@@ -22,8 +22,8 @@ public class FileOptionMapperTest extends CommonTestRoutines {
         var file = FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
 
-        // Assert Chitubox format has 27 file options
-        assertEquals(27, options.available().size());
+        // Assert Chitubox format has 29 file options
+        assertEquals(29, options.available().size());
 
         options.set(MSLAOptionName.BottomLayersExposureTime, "12");
         assertEquals(12f, Float.parseFloat(options.get(MSLAOptionName.BottomLayersExposureTime)));

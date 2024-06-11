@@ -14,10 +14,10 @@ import lombok.Setter;
 public class PhotonWorkshopFileLayerDef implements MSLAFileBlockFields, MSLAFileLayer {
     @MSLAFileField @Setter private Integer DataAddress = 0;
     @MSLAFileField(order = 1) @Setter private Integer DataLength = 0;
-    @MSLAFileField(order = 2) @MSLAOption(MSLAOptionName.LayerLiftHeight) @Setter private Float LiftHeight = 0.0f;
-    @MSLAFileField(order = 3) @MSLAOption(MSLAOptionName.LayerLiftSpeed) @Setter private Float LiftSpeed = 0.0f;
-    @MSLAFileField(order = 4) @MSLAOption(MSLAOptionName.LayerExposureTime) @Setter private Float ExposureTime = 0.0f;
-    @MSLAFileField(order = 5) @MSLAOption(MSLAOptionName.LayerHeight) @Setter private Float LayerHeight = 0.0f;
+    @MSLAFileField(order = 2) @MSLAOption(MSLAOptionName.LayerLiftHeight) @Setter private Float LiftHeight;
+    @MSLAFileField(order = 3) @MSLAOption(MSLAOptionName.LayerLiftSpeed) @Setter private Float LiftSpeed;
+    @MSLAFileField(order = 4) @MSLAOption(MSLAOptionName.LayerExposureTime) @Setter private Float ExposureTime;
+    @MSLAFileField(order = 5) @MSLAOption(MSLAOptionName.LayerHeight) @Setter private Float LayerHeight;
     @MSLAFileField(order = 6) @Setter private Integer NonZeroPixelCount = 0;
     @MSLAFileField(order = 7) private final Integer Padding1 = 0;
 

@@ -44,22 +44,22 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
         @MSLAFileField(order = 10) private Integer MachineBackground = 6506241;
         @MSLAFileField(order = 11) private Float PixelWidthUm;
         @MSLAFileField(order = 12) private Float PixelHeightUm;
-        @MSLAFileField(order = 13) private Integer Padding1 = 0;
-        @MSLAFileField(order = 14) private Integer Padding2 = 0;
-        @MSLAFileField(order = 15) private Integer Padding3 = 0;
-        @MSLAFileField(order = 16) private Integer Padding4 = 0;
-        @MSLAFileField(order = 17) private Integer Padding5 = 0;
-        @MSLAFileField(order = 18) private Integer Padding6 = 0;
-        @MSLAFileField(order = 19) private Integer Padding7 = 0;
-        @MSLAFileField(order = 20) private Integer Padding8 = 0;
+        @MSLAFileField(order = 13) private final Integer Padding1 = 0;
+        @MSLAFileField(order = 14) private final Integer Padding2 = 0;
+        @MSLAFileField(order = 15) private final Integer Padding3 = 0;
+        @MSLAFileField(order = 16) private final Integer Padding4 = 0;
+        @MSLAFileField(order = 17) private final Integer Padding5 = 0;
+        @MSLAFileField(order = 18) private final Integer Padding6 = 0;
+        @MSLAFileField(order = 19) private final Integer Padding7 = 0;
+        @MSLAFileField(order = 20) private final Integer Padding8 = 0;
         @MSLAFileField(order = 21) private Integer DisplayCount = 1;
-        @MSLAFileField(order = 22) private Integer Padding9 = 0;
+        @MSLAFileField(order = 22) private final Integer Padding9 = 0;
         @MSLAFileField(order = 23) private Short ResolutionX;
         @MSLAFileField(order = 24) private Short ResolutionY;
-        @MSLAFileField(order = 25) private Integer Padding10 = 0;
-        @MSLAFileField(order = 26) private Integer Padding11 = 0;
-        @MSLAFileField(order = 27) private Integer Padding12 = 0;
-        @MSLAFileField(order = 28) private Integer Padding13 = 0;
+        @MSLAFileField(order = 25) private final Integer Padding10 = 0;
+        @MSLAFileField(order = 26) private final Integer Padding11 = 0;
+        @MSLAFileField(order = 27) private final Integer Padding12 = 0;
+        @MSLAFileField(order = 28) private final Integer Padding13 = 0;
 
         public Fields(PhotonWorkshopFileTable parent) {
             this.parent = parent;

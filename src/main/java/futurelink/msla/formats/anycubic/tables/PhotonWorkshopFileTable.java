@@ -10,7 +10,6 @@ import lombok.Getter;
  */
 abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {
     public static final int MarkLength = 12;
-    public static final float DefaultLiftHeight = 100;
 
     @Getter protected String Name;
     @Getter protected int TableLength;

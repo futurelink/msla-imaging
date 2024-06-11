@@ -58,7 +58,7 @@ public class CTBFileHeader extends CTBFileBlock {
         @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.NormalLayersExposureTime) private Float LayerExposureSeconds;
         @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.BottomLayersExposureTime) private Float BottomExposureSeconds;
         @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.NormalLayersLightOffDelay) private Float LightOffDelay;
-        @MSLAFileField(order = 12) @MSLAOption(MSLAOptionName.BottomLayersCount) private final Integer BottomLayersCount = 1;
+        @MSLAFileField(order = 12) @MSLAOption(MSLAOptionName.BottomLayersCount) private Integer BottomLayersCount;
         @MSLAFileField(order = 13) private Integer ResolutionX() { return Resolution != null ? Resolution.getWidth() : 0; }
         private void setResolutionX(Integer width) { Resolution = new Size(width, ResolutionY()); }
         @MSLAFileField(order = 14) private Integer ResolutionY() { return  Resolution != null ? Resolution.getHeight() : 0; }
@@ -72,8 +72,8 @@ public class CTBFileHeader extends CTBFileBlock {
         @MSLAFileField(order = 21) @Setter private Integer PrintParametersOffset;
         @MSLAFileField(order = 22) @Setter private Integer PrintParametersSize;
         @MSLAFileField(order = 23) @MSLAOption(MSLAOptionName.AntialiasLevel) private Integer AntiAliasLevel;
-        @MSLAFileField(order = 24) @MSLAOption(MSLAOptionName.NormalLayersLightPWM) private final Short LightPWM = DefaultLightPWM;
-        @MSLAFileField(order = 25) @MSLAOption(MSLAOptionName.BottomLayersLightPWM) private final Short BottomLightPWM = DefaultBottomLightPWM;
+        @MSLAFileField(order = 24) @MSLAOption(MSLAOptionName.NormalLayersLightPWM) private Short LightPWM;
+        @MSLAFileField(order = 25) @MSLAOption(MSLAOptionName.BottomLayersLightPWM) private Short BottomLightPWM;
         @MSLAFileField(order = 26) @Setter private Integer EncryptionKey;
         @MSLAFileField(order = 27) @Setter private Integer SlicerOffset;
         @MSLAFileField(order = 28) @Setter private Integer SlicerSize;

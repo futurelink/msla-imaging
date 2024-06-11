@@ -27,7 +27,7 @@ public class DefaultsLoaderTest extends CommonTestRoutines {
         assertEquals("Anycubic Photon M3 Max", defaults.getMachineFullName());
         assertEquals("6480x3600", defaults.getFileProps().get("Resolution").getString());
         assertEquals("34.399998", defaults.getFileProps().get("PixelSize").getString());
-        assertEquals(13, defaults.getFileProps().size());
+        assertEquals(11, defaults.getFileProps().size());
 
         // Check for header options
         var header = new PhotonWorkshopFileHeaderTable.Fields(null);

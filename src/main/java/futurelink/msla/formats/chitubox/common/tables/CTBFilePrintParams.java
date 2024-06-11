@@ -22,11 +22,11 @@ public class CTBFilePrintParams extends CTBFileBlock {
         @MSLAFileField(order = 2) @MSLAOption(MSLAOptionName.NormalLayersLiftHeight) private Float LiftHeight;
         @MSLAFileField(order = 3) @MSLAOption(MSLAOptionName.NormalLayersLiftSpeed) private Float LiftSpeed;
         @MSLAFileField(order = 4) @MSLAOption(MSLAOptionName.RetractSpeed) private Float RetractSpeed;
-        @MSLAFileField(order = 5) @MSLAOption(MSLAOptionName.Volume) @Setter private Float VolumeMl = 0.0f;
-        @MSLAFileField(order = 6) @MSLAOption(MSLAOptionName.Weight) @Setter private Float WeightG = 0.0f;
-        @MSLAFileField(order = 7) @Setter private Float CostDollars = 0.0f;
-        @MSLAFileField(order = 8) @MSLAOption(MSLAOptionName.BottomLayersLightOffDelay) private final Float BottomLightOffDelay = 0.0f;
-        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.NormalLayersLightOffDelay)  private final Float LightOffDelay = 0.0f;
+        @MSLAFileField(order = 5) @MSLAOption(MSLAOptionName.Volume) @Setter private Float VolumeMl;
+        @MSLAFileField(order = 6) @MSLAOption(MSLAOptionName.Weight) @Setter private Float WeightG;
+        @MSLAFileField(order = 7) @MSLAOption(MSLAOptionName.Price) @Setter private Float Price;
+        @MSLAFileField(order = 8) @MSLAOption(MSLAOptionName.BottomLayersLightOffDelay) private Float BottomLightOffDelay;
+        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.NormalLayersLightOffDelay)  private Float LightOffDelay;
         @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.BottomLayersCount) private Integer BottomLayerCount;
         @MSLAFileField(order = 11) private final Integer Padding1 = 0;
         @MSLAFileField(order = 12) private final Integer Padding2 = 0;
