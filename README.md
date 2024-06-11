@@ -51,9 +51,11 @@ var file = FileFactory.instance.create(machine);
 
 ### Set file options
 ```java
-var options = new FileOptionMapper(file, defaults);
-options.set(MSLAOptionName.BottomLayersExposureTime, "12");
-options.set(MSLAOptionName.LayerHeight, "0.1");
+void setOptions(MSLAFile file, MSLAFileDefaults defaults) {
+    var options = new FileOptionMapper(file, defaults);
+    options.set(MSLAOptionName.BottomLayersExposureTime, "12");
+    options.set(MSLAOptionName.LayerHeight, "0.1");
+}
 ```
 
 ### Extract layer data
@@ -62,25 +64,32 @@ The following code will save 2 images of layers 1 and 10 to current folder.
 Decoding is being done asynchronously, so it has to wait while working.
 
 ```java
-var temp_dir = ".";
-var file = FileFactory.instance.load('/path_to_file/file_name.ctb');
-var writer = new ImageWriter(file, temp_dir, "extracted_", "png");
-file.readLayer(writer, 1);
-file.readLayer(writer, 10);
-while (file.getDecodersPool().isDecoding()); // Wait while decoding-writing is done
+void readFile() {
+    var temp_dir = ".";
+    var file = FileFactory.instance.load('/path_to_file/file_name.ctb');
+    var writer = new ImageWriter(file, temp_dir, "extracted_", "png");
+    file.readLayer(writer, 1);
+    file.readLayer(writer, 10);
+    while (file.getDecodersPool().isDecoding()) ; // Wait while decoding-writing is done
+}
 ```
 
 Image writer can be assigned with a callback:
 
 ```java
-var layerPixels = new int[3];
-var layerFiles = new String[3];
-var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
-    layerPixels[layerNumber] = pixels;
-    layerFiles[layerNumber] = fileName;
-});
-for (var i = 0; i < 3; i++) file.readLayer(writer, i);
-while (file.getDecodersPool().isDecoding());
+void decodeWithCallback() {
+    var layerPixels = new int[3];
+    var layerFiles = new String[3];
+    var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
+        layerPixels[layerNumber] = pixels;
+        layerFiles[layerNumber] = fileName;
+    });
+    for (var i = 0; i < 3; i++) file.readLayer(writer, i);
+    while (file.getDecodersPool().isDecoding());
+    System.out.println("Layer 0 is in a file" + layerFiles[0] + 
+            " and has " + layerPixels[0] + 
+            " non-black pixels");
+}
 ```
 
 ### Add layers from images
@@ -89,15 +98,17 @@ Layers are added in the order of addLayer() calls, but encoded asynchronously.
 Hence, have to wait until encoder is done its work.
 
 ```java
-var pngFileLayers = new String[]{ "Layer_1.png", "Layer_2.png" };
-for (var pngFile : pngFileLayers) {
-    try {
-        file.addLayer(new ImageReader(file, pngFile),  null);
-    } catch (IOException e) { 
-        throw new MSLAException("Can't read layer image", e); 
+void addLayers() {
+    var pngFileLayers = new String[]{"Layer_1.png", "Layer_2.png"};
+    for (var pngFile : pngFileLayers) {
+        try {
+            file.addLayer(new ImageReader(file, pngFile), null);
+        } catch (IOException e) {
+            throw new MSLAException("Can't read layer image", e);
+        }
     }
+    while (file.getEncodersPool().isEncoding());
 }
-while (file.getEncodersPool().isEncoding());
 ```
 
 ### Extracting previews
@@ -106,13 +117,15 @@ Some files formats support only one preview and some of them have more,
 so getPreview() receives preview index.
 
 ```java
-var file = FileFactory.instance.load('/path_to_file/file_name.ctb');
-var image = file.getPreview(0).getImage();
-ImageIO.write(image, "png", new File("path_to_preview/preview.png"));
+void extractPreview() {
+    var file = FileFactory.instance.load('/path_to_file/file_name.ctb');
+    var image = file.getPreview(0).getImage();
+    ImageIO.write(image, "png", new File("path_to_preview/preview.png"));
+}
 ```
 
 This example allows to get large preview. Depending on a mSLA file format
-that is going to be largest preview image available.
+that is going to be the largest preview image available.
 
 ```java
 var image = file.getLargePreview().getImage();
