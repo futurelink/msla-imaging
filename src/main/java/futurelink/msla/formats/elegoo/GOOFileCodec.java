@@ -227,4 +227,7 @@ public class GOOFileCodec implements MSLALayerCodec<byte[]> {
 
         return pixels;
     }
+
+    @Override public void setParam(String paramName, Object paramValue) {}
+    @Override public Object getParam(String paramName) { return null; }
 }

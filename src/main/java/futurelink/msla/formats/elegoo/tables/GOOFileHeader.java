@@ -37,7 +37,7 @@ public class GOOFileHeader extends GOOFileTable {
         @MSLAFileField(length = 32, order = 7) String ProfileName = "DEFAULT";
         @MSLAFileField(order = 8) @MSLAOption(MSLAOptionName.AntialiasLevel) Short AntiAliasingLevel = 8;
         @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.GreyLevel) Short GreyLevel = 1;
-        @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.BlurLevel) Short BlurLevel = 0;
+        @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.ImageBlurLevel) Short BlurLevel = 0;
         @MSLAFileField(order = 11) GOOFilePreview SmallPreview = new GOOFilePreview(new Size(116, 116));
         @MSLAFileField(order = 11) GOOFilePreview BigPreview = new GOOFilePreview(new Size(290, 290));
         @MSLAFileField(order = 12) int LayerCount;

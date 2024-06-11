@@ -3,8 +3,6 @@ package futurelink.msla.formats.iface;
 import futurelink.msla.formats.MSLAException;
 
 import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.Set;
 
 public interface MSLAFileFactory {
@@ -19,16 +17,4 @@ public interface MSLAFileFactory {
      * @param stream input data stream
      */
     MSLAFile<?> load(DataInputStream stream) throws MSLAException;
-
-    /**
-     * Default implementation loads a file.
-     * @param fileName file name
-     */
-    default MSLAFile<?> load(String fileName) throws MSLAException {
-        try {
-            return load(new DataInputStream(new FileInputStream(fileName)));
-        } catch (FileNotFoundException e) {
-            throw new MSLAException("Can't load a file " + fileName, e);
-        }
-    }
 }

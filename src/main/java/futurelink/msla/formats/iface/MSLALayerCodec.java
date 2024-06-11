@@ -24,6 +24,6 @@ public interface MSLALayerCodec<D> {
      */
     int Decode(int layerNumber, MSLALayerDecodeInput<D> data, MSLALayerDecodeWriter writer) throws MSLAException;
 
-    default void setParam(String paramName, Object paramValue) {}
-    default Object getParam(String paramName) { return null; }
+    void setParam(String paramName, Object paramValue);
+    Object getParam(String paramName);
 }

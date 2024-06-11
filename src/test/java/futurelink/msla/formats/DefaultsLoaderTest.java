@@ -1,9 +1,8 @@
 package futurelink.msla.formats;
 
-import futurelink.msla.formats.anycubic.PhotonWorkshopFile;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileHeaderTable;
 import futurelink.msla.formats.anycubic.tables.PhotonWorkshopFileMachineTable;
-import futurelink.msla.formats.creality.CXDLPFile;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,8 @@ public class DefaultsLoaderTest extends CommonTestRoutines {
         var machine = "Anycubic Photon M3 Max";
         var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
-        System.out.println(defaults.getFileOption("Normal layers lift speed"));
+        assertEquals(2.0f, defaults.getFileOption(MSLAOptionName.NormalLayersLiftSpeed1).getFloat());
+        assertEquals(4.0f, defaults.getFileOption(MSLAOptionName.NormalLayersLiftSpeed2).getFloat());
     }
 
     @Test
@@ -27,7 +27,7 @@ public class DefaultsLoaderTest extends CommonTestRoutines {
         assertEquals("Anycubic Photon M3 Max", defaults.getMachineFullName());
         assertEquals("6480x3600", defaults.getFileProps().get("Resolution").getString());
         assertEquals("34.399998", defaults.getFileProps().get("PixelSize").getString());
-        assertEquals(9, defaults.getFileProps().size());
+        assertEquals(13, defaults.getFileProps().size());
 
         // Check for header options
         var header = new PhotonWorkshopFileHeaderTable.Fields(null);
@@ -43,9 +43,6 @@ public class DefaultsLoaderTest extends CommonTestRoutines {
         var machineOptions = new PhotonWorkshopFileMachineTable.Fields(null);
         defaults.setFields(machineOptions);
         assertEquals("pw0Img", machineOptions.getLayerImageFormat());
-
-        System.out.println(MachineDefaults.getInstance().getMachines(CXDLPFile.class));
-        System.out.println(MachineDefaults.getInstance().getMachines(PhotonWorkshopFile.class));
     }
 
     @Test

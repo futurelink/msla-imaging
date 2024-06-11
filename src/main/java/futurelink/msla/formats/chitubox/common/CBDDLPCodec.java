@@ -45,4 +45,7 @@ public class CBDDLPCodec implements MSLALayerCodec<byte[][]> {
 
         return 0;
     }
+
+    @Override public void setParam(String paramName, Object paramValue) {}
+    @Override public Object getParam(String paramName) { return null; }
 }

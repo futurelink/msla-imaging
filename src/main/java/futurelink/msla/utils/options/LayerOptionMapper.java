@@ -1,7 +1,7 @@
 package futurelink.msla.utils.options;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.MSLAOptionMapper;
+import futurelink.msla.formats.OptionMapper;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.options.MSLAOption;
 import futurelink.msla.formats.iface.options.MSLAOptionContainer;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public class LayerOptionMapper extends MSLAOptionMapper {
+public class LayerOptionMapper extends OptionMapper {
     private final Logger logger = Logger.getLogger(FileOptionMapper.class.getName());
 
     private final MSLAFile<?> file;
@@ -83,7 +83,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
                 var opt = new Option(f.getName(), f.getType(), path);
                 if (defaults != null) {
                     var blockName = path.isEmpty() ? null : path.get(path.size()-1);
-                    opt.setParameters(defaults.getParameters(blockName, f.getName()));
+                    opt.setParameters(defaults.getParameters(blockName, optionName));
                 }
                 optionsMap.put(optionName, opt);
             }
@@ -123,7 +123,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     @Override public Set<MSLAOptionName> available() { return optionsMap.keySet(); }
 
     @Override
-    protected void populateOption(MSLAOptionName optionName, Serializable value) throws MSLAException {
+    public void populateOption(MSLAOptionName optionName, Serializable value) throws MSLAException {
         if (!isEditable()) throw new MSLAException("Options are not editable because defaults were not specified");
         var option = optionsMap.get(optionName);
         var layer = (MSLAFileLayer) file.getLayers().get(layerNumber);
@@ -155,7 +155,7 @@ public class LayerOptionMapper extends MSLAOptionMapper {
     }
 
     @Override
-    protected Serializable fetchOption(MSLAOptionName optionName) throws MSLAException {
+    public Serializable fetchOption(MSLAOptionName optionName) throws MSLAException {
         var option = optionsMap.get(optionName);
         var layer = (MSLAFileLayer) file.getLayers().get(layerNumber);
         try {

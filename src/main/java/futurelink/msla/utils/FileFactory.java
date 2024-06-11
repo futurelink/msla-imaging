@@ -21,7 +21,9 @@ import java.util.logging.Logger;
 public final class FileFactory {
     private static final Logger logger = Logger.getLogger(FileFactory.class.getName());
     private static final ArrayList<MSLAFileFactory> supportedFiles = new ArrayList<>();
-    public static FileFactory instance = new FileFactory();
+    public static FileFactory instance;
+
+    static { if (instance == null) instance = new FileFactory(); }
 
     private FileFactory() {
         addFileTypeFactory(new PhotonWorkshopFileFactory());

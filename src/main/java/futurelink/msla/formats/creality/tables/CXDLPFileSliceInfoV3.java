@@ -34,8 +34,8 @@ public class CXDLPFileSliceInfoV3 extends CXDLPFileTable {
         @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.Antialias) @Setter private Byte AntiAliasEnabled = 1;
         @MSLAFileField(order = 12) private final Byte AntiAliasGreyMinValue = 1;
         @MSLAFileField(order = 13) private final Byte AntiAliasGreyMaxValue = (byte) 0xff;
-        @MSLAFileField(order = 14) @MSLAOption(MSLAOptionName.Blur) @Setter private Byte ImageBlurEnabled = 0;
-        @MSLAFileField(order = 15) @MSLAOption(MSLAOptionName.BlurLevel) @Setter private Byte ImageBlurLevel = 2;
+        @MSLAFileField(order = 14) @MSLAOption(MSLAOptionName.ImageBlur) @Setter private Byte ImageBlurEnabled = 0;
+        @MSLAFileField(order = 15) @MSLAOption(MSLAOptionName.ImageBlurLevel) @Setter private Byte ImageBlurLevel = 2;
         @MSLAFileField(order = 16, length = 2) private final byte[] PageBreak = new byte[]{ 0x0d, 0x0a };
 
         public int getDataLength() { return (SoftwareName.length() + 1) + (MaterialName.length() + 1) + 28; }

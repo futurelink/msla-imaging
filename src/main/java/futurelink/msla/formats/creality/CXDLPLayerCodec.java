@@ -99,4 +99,7 @@ public class CXDLPLayerCodec implements MSLALayerCodec<List<CXDLPFileLayerLine>>
         }
         return pixelsCount;
     }
+
+    @Override public void setParam(String paramName, Object paramValue) {}
+    @Override public Object getParam(String paramName) { return null; }
 }

@@ -1,7 +1,7 @@
 package futurelink.msla.utils.options;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.MSLAOptionMapper;
+import futurelink.msla.formats.OptionMapper;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.options.MSLAOption;
 import futurelink.msla.formats.iface.options.MSLAOptionContainer;
@@ -15,7 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class FileOptionMapper extends MSLAOptionMapper {
+public class FileOptionMapper extends OptionMapper {
     private final Logger logger = Logger.getLogger(FileOptionMapper.class.getName());
 
     private final MSLAFile<?> file;
@@ -66,7 +66,7 @@ public class FileOptionMapper extends MSLAOptionMapper {
                                         var location = List.of(blockPropertyName); // TODO make hierarchy
                                         var opt = new Option(f.getName(), f.getType(), location);
                                         if (defaults != null)
-                                            opt.setParameters(defaults.getParameters(blockPropertyName, f.getName()));
+                                            opt.setParameters(defaults.getParameters(blockPropertyName, optionName));
                                         this.optionsMap.put(optionName, opt);
                                     });
                         } else logger.info("Block '" + blockPropertyName + "' is not defined or created");
@@ -111,7 +111,7 @@ public class FileOptionMapper extends MSLAOptionMapper {
             var fileBlock = getOptionFileBlock(optionName);
             if (fileBlock.getBlockFields() != null) {
                 var fields = fileBlock.getBlockFields();
-                logger.info("Setting '" + option.getName() + "' of " + fields.getClass());
+                logger.fine("Setting '" + option.getName() + "' of " + fields.getClass());
                 try {
                     var setter = fields.getClass().getDeclaredMethod("set" + option.getName(), option.getType());
                     setter.invoke(fields, option.getType().cast(value));

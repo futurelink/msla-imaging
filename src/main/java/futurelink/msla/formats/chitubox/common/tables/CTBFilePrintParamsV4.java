@@ -19,7 +19,7 @@ public class CTBFilePrintParamsV4 extends CTBFileBlock {
     @Getter
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
-        @MSLAFileField private Float BottomRetractSpeed;
+        @MSLAFileField @MSLAOption(MSLAOptionName.BottomLayersRetractSpeed) private Float BottomRetractSpeed;
         @MSLAFileField(order = 1) @MSLAOption(MSLAOptionName.BottomLayersRetractSpeed2) private Float BottomRetractSpeed2;
         @MSLAFileField(order = 2) private final Integer Padding1 = 0;
         @MSLAFileField(order = 3) private final Float Four1 = 4.0F; // 4?

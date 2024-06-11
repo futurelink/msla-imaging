@@ -28,6 +28,8 @@ public class FileOptionMapperTest extends CommonTestRoutines {
         options.set(MSLAOptionName.BottomLayersExposureTime, "12");
         assertEquals(12f, Float.parseFloat(options.get(MSLAOptionName.BottomLayersExposureTime)));
 
+        assertEquals("0.05", options.get(MSLAOptionName.LayerHeight));
+
         // It's necessary to add a layer to access layer options
         var resource = resourceFile("test_data/ChituboxFileTest/ELEGOO_Saturn_Layer_0.png");
         var encoders = file.getEncodersPool();

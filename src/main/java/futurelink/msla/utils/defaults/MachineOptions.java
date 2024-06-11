@@ -1,6 +1,7 @@
 package futurelink.msla.utils.defaults;
 
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.defaults.props.*;
 import org.dom4j.Element;
 
@@ -18,10 +19,10 @@ import java.util.Set;
  * Basically, this class is important for building UI of the application that is
  * supposed to work with this library.
  */
-public class MachineOptionParams {
-    private final HashMap<String, MachineProperty> options = new HashMap<>();
-    public Set<String> getOptionKeys() { return options.keySet(); }
-    public MachineProperty getOption(String option) { return options.get(option); }
+public class MachineOptions {
+    private final HashMap<MSLAOptionName, MachineProperty> options = new HashMap<>();
+    public Set<MSLAOptionName> getOptionKeys() { return options.keySet(); }
+    public MachineProperty getOption(MSLAOptionName option) { return options.get(option); }
     public int size() { return options.size(); }
 
     /**
@@ -57,6 +58,6 @@ public class MachineOptionParams {
         }
         else if ("".equals(type) || type == null) opt = new MachineProperty(value);
         else throw new MSLAException("Option type " + type + " is unknown");
-        options.put(name, opt);
+        options.put(MSLAOptionName.valueOf(name), opt);
     }
 }

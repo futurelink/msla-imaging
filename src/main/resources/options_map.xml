@@ -27,8 +27,8 @@
         <option name="TransitionLayersType"/>
         <option name="Antialias"/>
         <option name="AntialiasLevel"/>
-        <option name="Blur"/>
-        <option name="BlurLevel"/>
+        <option name="ImageBlur"/>
+        <option name="ImageBlurLevel"/>
         <option name="Grey"/>
         <option name="GreyLevel"/>
         <option name="AdvancedMode"/>

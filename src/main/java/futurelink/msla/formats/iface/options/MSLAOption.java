@@ -1,5 +1,7 @@
 package futurelink.msla.formats.iface.options;
 
+import futurelink.msla.formats.OptionMapper;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -7,7 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * Fields in {@link futurelink.msla.formats.iface.MSLAFileBlockFields} that are marked with this annotation are going
- * to be accessible in {@link futurelink.msla.formats.MSLAOptionMapper}.
+ * to be accessible in {@link OptionMapper}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
