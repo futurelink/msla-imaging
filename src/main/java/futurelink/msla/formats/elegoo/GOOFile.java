@@ -6,7 +6,7 @@ import futurelink.msla.formats.elegoo.tables.GOOFileFooter;
 import futurelink.msla.formats.elegoo.tables.GOOFileHeader;
 import futurelink.msla.formats.elegoo.tables.GOOFileLayers;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.iface.options.MSLAOptionContainer;
 import futurelink.msla.utils.Size;
 import lombok.Getter;
 
@@ -21,14 +21,16 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     @Getter private final GOOFileLayers Layers;
     private final GOOFileFooter Footer = new GOOFileFooter();
 
-    public GOOFile() {
-        super();
+    public GOOFile(MSLAFileProps initialProps) {
+        super(initialProps);
         Header = new GOOFileHeader();
         Layers = new GOOFileLayers();
     }
 
     public GOOFile(DataInputStream stream) throws IOException, MSLAException {
-        this();
+        super(null);
+        Header = new GOOFileHeader();
+        Layers = new GOOFileLayers();
         readTables(stream);
     }
 
@@ -62,14 +64,14 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
         return defaults.getFileClass().equals(this.getClass()) &&
-                (getResolution() == null) || defaults.getResolution().equals(getResolution());
+                (getResolution() == null || defaults.getResolution().equals(getResolution()));
     }
 
     @Override
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         super.reset(defaults);
         if (isMachineValid(defaults)) {
-            defaults.setFields(Header.getName(), Header.getFileFields());
+            defaults.setFields(Header.getBlockFields());
             getLayers().setDefaults(defaults.getLayerDefaults());
         } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
     }
@@ -77,7 +79,6 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     @Override public String getMachineName() { return Header.getMachineName(); }
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return Header.getResolution(); }
-    @Override public float getPixelSizeUm() { return Header.getPixelSizeUm(); }
 
     @Override
     public void addLayer(
@@ -89,7 +90,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        var input = new GOOFileCodec.Input(Layers.get(layer).getFileFields().getData());
+        var input = new GOOFileCodec.Input(Layers.get(layer).getBlockFields().getData());
         return getDecodersPool().decode(layer, writer, input, null);
     }
 

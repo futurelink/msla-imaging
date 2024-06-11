@@ -1,6 +1,7 @@
 package futurelink.msla.formats.io;
 
 import com.google.common.io.LittleEndianDataInputStream;
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 
@@ -23,16 +24,28 @@ public class FileFieldsReader {
         this.endianness = endianness;
     }
 
-    private long readField(DataInput dis, MSLAFileBlockFields fields, FileFieldsIO.MSLAField field) throws FileFieldsException {
+    private long readField(FilterInputStream dis, MSLAFileBlockFields fields, FileFieldsIO.MSLAField field) throws FileFieldsException {
         var dataRead = 0L;
         try {
-            var length = !"".equals(field.getLengthAt()) ?
-                    FileFieldsIO.getFieldOrMethodValue(fields, field.getLengthAt()) :
-                    field.getLength();
+            var length = "".equals(field.getLengthAt()) ? field.getLength() :
+                    FileFieldsIO.getFieldOrMethodValue(fields, field.getLengthAt());
+
+            /*
+             * If position offset is specified then go to that location
+             */
+            try {
+                if (!field.getOffsetAt().isEmpty()) {
+                    dis.reset();
+                    dis.skipNBytes(Long.parseLong(FileFieldsIO.getFieldOrMethodValue(fields, field.getOffsetAt()).toString()));
+                }
+            } catch (IOException e) {
+                throw new FileFieldsException("Can't read fields", e);
+            }
+
             if (field.getType() == FileFieldsIO.MSLAField.Type.Field) {
                 var f = fields.getClass().getDeclaredField(field.getName());
                 var type = f.getGenericType();
-                logger.fine("Setting value for " + field + " of " + type + " - " + type.getClass());
+                logger.fine("Setting value for " + field + " of " + type);
 
                 Method m = null;
                 boolean hasSetter = false;
@@ -74,7 +87,7 @@ public class FileFieldsReader {
                     f.setAccessible(false);
                 }
 
-                // Field type is a MSLAFileBlockFields
+                // Field type is a MSLAFileBlock
                 else if (MSLAFileBlock.class.isAssignableFrom((Class<?>) type)) {
                     logger.fine("Reading block of type " + type);
                     f.setAccessible(true);
@@ -86,11 +99,12 @@ public class FileFieldsReader {
                 else {
                     var value = readFieldValue(dis, type, (int) length, field.getCharset());
                     if (hasSetter) {
-                        logger.fine("Calling setter for " + field + " of " + type);
+                        logger.fine("Calling setter for " + field + " of " + type + " value " + value.toString());
                         m.setAccessible(true);
                         m.invoke(fields, value);
                         m.setAccessible(false);
                     } else {
+                        logger.fine("Setting " + field + " of " + type + " value " + value.toString());
                         f.setAccessible(true);
                         f.set(fields, value);
                         f.setAccessible(false);
@@ -140,14 +154,13 @@ public class FileFieldsReader {
         return null;
     }
 
-    private Object readStringOrBytes(DataInput stream, Type type, int length, Charset charset) throws FileFieldsException {
+    private Object readStringOrBytes(FilterInputStream stream, Type type, int length, Charset charset) throws FileFieldsException {
         logger.fine("Reading String or byte[] of " + type + " length " + length);
         if (length <= 0) throw new FileFieldsException("Length is not set for String or byte[] field - don't know how much to read");
         if (length > MAX_LENGTH) throw new FileFieldsException("Field length " + length + " is too large");
-        var data = new byte[length];
-        try {
-            stream.readFully(data, 0, length);
-        } catch (IOException e) { throw new FileFieldsException("Could not read data", e); }
+        byte[] data;
+        try { data = stream.readNBytes(length); }
+        catch (IOException e) { throw new FileFieldsException("Could not read data", e); }
         if (type == String.class) return new String(data, charset).trim();
         else if (type == byte[].class) return data;
         else if (type == Byte[].class) {
@@ -158,7 +171,7 @@ public class FileFieldsReader {
         else throw new FileFieldsException("Could not read String or byte[] data, type is invalid");
     }
 
-    private Object readFieldArray(DataInput stream, Type arrayType, int length) throws FileFieldsException {
+    private Object readFieldArray(FilterInputStream stream, Type arrayType, int length) throws FileFieldsException {
         logger.fine("Reading array of " + arrayType + " length " + length);
         if (length <= 0) throw new FileFieldsException("Length is not set for array field - don't know how much to read");
         if (length > MAX_LENGTH) throw new FileFieldsException("Array field length " + length + " is too large");
@@ -177,7 +190,7 @@ public class FileFieldsReader {
         }
     }
 
-    private Object readFieldValue(DataInput stream, Type type, int length, Charset charset) throws FileFieldsException {
+    private Object readFieldValue(FilterInputStream stream, Type type, int length, Charset charset) throws FileFieldsException {
         var readMethodName = FileFieldsIO.getReadMethodName(type);
         if (readMethodName != null) {
             try {
@@ -191,7 +204,7 @@ public class FileFieldsReader {
         else throw new FileFieldsException("Unknown type " + type);
     }
 
-    private long readFields(DataInput dis, MSLAFileBlockFields fields) throws FileFieldsException {
+    private long readFields(FilterInputStream dis, MSLAFileBlockFields fields) throws FileFieldsException {
         var dataRead = 0L;
         var fieldsList = FileFieldsIO.getFields(fields.getClass());
         logger.fine(fieldsList.toString());
@@ -202,17 +215,28 @@ public class FileFieldsReader {
         return dataRead;
     }
 
-    private long readBlock(DataInput dis, MSLAFileBlock block) throws FileFieldsException {
+    private long readBlock(FilterInputStream dis, MSLAFileBlock block) throws FileFieldsException {
+        long readBytes;
         block.beforeRead();
-        var readBytes = readFields(dis, block.getFileFields());
-        block.afterRead();
+        readBytes = readFields(dis, block.getBlockFields());
+        try {
+            block.afterRead();
+        } catch (MSLAException e) {
+            throw new FileFieldsException("Could not execute after read operations", e);
+        }
         return readBytes;
     }
 
-    public final long read(MSLAFileBlock block) throws FileFieldsException {
+    public final long read(MSLAFileBlock block, Long position) throws FileFieldsException {
         var dis = (endianness == FileFieldsIO.Endianness.BigEndian) ?
                 new DataInputStream(stream) :
                 new LittleEndianDataInputStream(stream);
-        return readBlock(dis, block);
+        try {
+            dis.reset();
+            dis.skipNBytes(position);
+            return readBlock(dis, block);
+        } catch (IOException e) {
+            throw new FileFieldsException("Can't read file contents", e);
+        }
     }
 }

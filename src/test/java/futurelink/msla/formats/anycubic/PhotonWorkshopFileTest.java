@@ -2,11 +2,12 @@ package futurelink.msla.formats.anycubic;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
-import futurelink.msla.utils.FileOptionMapper;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.options.FileOptionMapper;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -52,7 +53,7 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
         });
         file.readLayer(writer, 0);
         file.readLayer(writer, 1);
-        while (file.getDecodersPool().isDecoding()) { Thread.sleep(100); } // Wait while decoding-writing is done
+        while (file.getDecodersPool().isDecoding()) { Thread.sleep(10); } // Wait while decoding-writing is done
         logger.info("Done");
 
         assertEquals(166587, layerPixels[0]);
@@ -72,11 +73,11 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
         delete_file(outFile); // Clean up files just in case
 
         var machine = "Anycubic Photon Mono X 6K";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = (PhotonWorkshopFile) FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
-        options.set("Bottom layers exposure time", "12");
+        options.set(MSLAOptionName.BottomLayersExposureTime, "12");
 
         var pngFileLayers = new String[]{
                 resourceFile("test_data/PhotonFileTest/Layer_1.png"),
@@ -86,7 +87,7 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
             try { file.addLayer(new ImageReader(file, pngFile),  null); }
             catch (IOException e) { throw new MSLAException("Can't read layer image", e); }
         }
-        while (file.getEncodersPool().isEncoding()) { Thread.sleep(100); } // Wait while encoding
+        while (file.getEncodersPool().isEncoding()) { Thread.sleep(10); } // Wait while encoding
         logger.info("Done");
 
         // Write output file

@@ -3,7 +3,7 @@ package futurelink.msla.formats.anycubic.tables;
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.anycubic.PhotonWorkshopCodec;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +21,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         implements MSLAFileLayers<PhotonWorkshopFileLayerDef, byte[]>
 {
     @Setter private MSLALayerDefaults layerDefaults;
-    private final Fields fileFields;
+    private final Fields blockFields;
 
     @SuppressWarnings("unused")
     static class Fields implements MSLAFileBlockFields {
@@ -46,12 +46,12 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
 
     public PhotonWorkshopFileLayerDefTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        this.fileFields = new Fields(this);
-        this.fileFields.LayerCount = 0;
+        this.blockFields = new Fields(this);
+        this.blockFields.LayerCount = 0;
     }
 
     public final byte[] getLayerData(int i) {
-        return fileFields.LayerData.get(i);
+        return blockFields.LayerData.get(i);
     }
 
     /**
@@ -82,19 +82,19 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
 
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) { this.layerDefaults = layerDefaults; }
     @Override public int count() {
-        return fileFields.getLayerCount();
+        return blockFields.getLayerCount();
     }
     @Override public final PhotonWorkshopFileLayerDef get(int i) {
-        return fileFields.Layers.get(i);
+        return blockFields.Layers.get(i);
     }
 
     @Override
     public PhotonWorkshopFileLayerDef allocate() throws MSLAException {
         var layer = new PhotonWorkshopFileLayerDef();
         layer.setDefaults(layerDefaults);
-        fileFields.Layers.add(layer);
-        fileFields.LayerData.add(null);
-        fileFields.LayerCount = fileFields.Layers.size();
+        blockFields.Layers.add(layer);
+        blockFields.LayerData.add(null);
+        blockFields.LayerCount = blockFields.Layers.size();
         return layer;
     }
 
@@ -112,22 +112,22 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
                     Map<String, Object> params,
                     MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
     {
-        var layerNumber = fileFields.Layers.size();
+        var layerNumber = blockFields.Layers.size();
         allocate();
 
         // Encode layer data
         params.put("DecodedDataLength", reader.getSize());
         encoder.encode(layerNumber, reader, params, (layer, data) -> {
-            fileFields.Layers.get(layerNumber).setDataLength(data.sizeInBytes());
-            fileFields.Layers.get(layerNumber).setNonZeroPixelCount(data.pixels());
-            fileFields.LayerData.set(layerNumber, data.data());
+            blockFields.Layers.get(layerNumber).setDataLength(data.sizeInBytes());
+            blockFields.Layers.get(layerNumber).setNonZeroPixelCount(data.pixels());
+            blockFields.LayerData.set(layerNumber, data.data());
             if (callback != null) callback.onFinish(layerNumber, data);
         });
     }
 
     @Override public boolean hasOptions() { return true; }
     @Override public final int calculateTableLength() {
-        return 4 + fileFields.getLayerCount() * 32;
+        return 4 + blockFields.getLayerCount() * 32;
     }
 
     @Override
@@ -151,8 +151,8 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         var b = new StringBuilder();
         b.append("-- Layer definition data --\n");
         b.append("TableLength: ").append(TableLength).append("\n");
-        b.append("Layers count: ").append(fileFields.Layers.size()).append("\n");
-        for (var layer : fileFields.Layers) {
+        b.append("Layers count: ").append(blockFields.Layers.size()).append("\n");
+        for (var layer : blockFields.Layers) {
             b.append("-> ").append(layer).append("\n");
         }
 

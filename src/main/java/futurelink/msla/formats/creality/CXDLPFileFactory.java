@@ -4,10 +4,9 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileFactory;
 import futurelink.msla.formats.iface.MSLAFileProps;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 
 import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Set;
 
@@ -15,15 +14,7 @@ public class CXDLPFileFactory implements MSLAFileFactory {
     @Override public String getName() { return "ChituBox"; }
 
     @Override public MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException {
-        return new CXDLPFile();
-    }
-
-    @Override public MSLAFile<?> load(String fileName) throws MSLAException {
-        try {
-            return new CXDLPFile(new DataInputStream(new FileInputStream(fileName)));
-        } catch (IOException e) {
-            throw new MSLAException("Could not open file " + fileName, e);
-        }
+        return new CXDLPFile(initialProps);
     }
 
     @Override public MSLAFile<?> load(DataInputStream stream) throws MSLAException {
@@ -41,11 +32,11 @@ public class CXDLPFileFactory implements MSLAFileFactory {
         }
     }
 
-    @Override public boolean checkDefaults(String machineName) {
+    @Override public boolean checkDefaults(String machineName) throws MSLAException {
         return getSupportedMachines().contains(machineName);
     }
 
-    @Override public Set<String> getSupportedMachines() {
-        return PrinterDefaults.instance.getSupportedPrinters(CXDLPFile.class);
+    @Override public Set<String> getSupportedMachines() throws MSLAException {
+        return MachineDefaults.getInstance().getMachines(CXDLPFile.class);
     }
 }

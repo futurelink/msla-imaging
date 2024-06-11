@@ -2,10 +2,12 @@ package futurelink.msla.utils;
 
 import lombok.Getter;
 
+import java.util.Objects;
+
 @Getter
 public class Size {
-    int width;
-    int height;
+    private final Integer width;
+    private final Integer height;
     public Size(Size size) {
         this.width = size.width;
         this.height = size.height;
@@ -21,7 +23,9 @@ public class Size {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Size) return this.width == ((Size)obj).width && this.height == ((Size)obj).height;
+        if (obj instanceof Size)
+            return Objects.equals(this.width, ((Size) obj).width) &&
+                    Objects.equals(this.height, ((Size) obj).height);
         return false;
     }
 

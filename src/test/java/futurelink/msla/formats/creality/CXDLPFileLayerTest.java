@@ -43,7 +43,7 @@ class CXDLPFileLayerTest extends CommonTestRoutines {
         // Prepare file
         var file = (CXDLPFile) FileFactory.instance.create("CREALITY HALOT-ONE");
         file.addLayer(new ImageReader(file, img), null);
-        while(file.getEncodersPool().isEncoding())  Thread.sleep(100); // Wait while working
+        while(file.getEncodersPool().isEncoding())  Thread.sleep(10); // Wait while working
 
         // Check layer lines
         var layer = file.getLayer(0);

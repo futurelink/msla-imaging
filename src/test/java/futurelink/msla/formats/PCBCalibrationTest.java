@@ -1,9 +1,10 @@
 package futurelink.msla.formats;
 
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.PCBCalibration;
-import futurelink.msla.utils.FileOptionMapper;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.options.FileOptionMapper;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +20,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
 
         assertFileExactSize(filePath, 3048460);
 
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machineName));
         var file = FileFactory.instance.load(filePath);
         var options = new FileOptionMapper(file, defaults);
@@ -28,9 +29,9 @@ public class PCBCalibrationTest extends CommonTestRoutines {
         assertEquals("224 x 168", file.getPreview((short) 0).getResolution().toString());
         assertEquals("5760 x 3600", file.getResolution().toString());
         assertEquals(10, file.getLayers().count());
-        assertEquals(2.0F, Float.parseFloat(options.get("Normal layers lift speed")));
-        assertEquals(10, Integer.parseInt(options.get("Transition layers count")));
-        assertEquals(1, Integer.parseInt(options.get("Advanced mode")));
+        assertEquals(2.0F, Float.parseFloat(options.get(MSLAOptionName.LiftSpeed)));
+        assertEquals(10, Integer.parseInt(options.get(MSLAOptionName.TransitionLayersCount)));
+        assertEquals(1, Integer.parseInt(options.get(MSLAOptionName.AdvancedMode)));
     }
 
     @Test
@@ -43,7 +44,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
 
         assertFileExactSize(filePath,472231);
 
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machineName));
         var file = FileFactory.instance.load(filePath);
         var options = new FileOptionMapper(file, defaults);
@@ -52,7 +53,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
         assertEquals("116 x 116", file.getPreview((short) 0).getResolution().toString());
         assertEquals("4320 x 2560", file.getResolution().toString());
         assertEquals(10, file.getLayers().count());
-        assertEquals("1", options.get("Normal layers lift speed"));
-        assertEquals("0", options.get("Antialias"));
+        assertEquals("1", options.get(MSLAOptionName.NormalLayersLiftSpeed));
+        assertEquals("0", options.get(MSLAOptionName.Antialias));
     }
 }

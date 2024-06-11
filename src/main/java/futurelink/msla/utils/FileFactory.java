@@ -7,7 +7,7 @@ import futurelink.msla.formats.creality.CXDLPFileFactory;
 import futurelink.msla.formats.elegoo.GOOFileFactory;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileFactory;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -21,7 +21,9 @@ import java.util.logging.Logger;
 public final class FileFactory {
     private static final Logger logger = Logger.getLogger(FileFactory.class.getName());
     private static final ArrayList<MSLAFileFactory> supportedFiles = new ArrayList<>();
-    public static FileFactory instance = new FileFactory();
+    public static FileFactory instance;
+
+    static { if (instance == null) instance = new FileFactory(); }
 
     private FileFactory() {
         addFileTypeFactory(new PhotonWorkshopFileFactory());
@@ -35,7 +37,13 @@ public final class FileFactory {
     }
 
     private Optional<MSLAFileFactory> getMachineFactory(String machineName) {
-        return supportedFiles.stream().filter((f) -> f.checkDefaults(machineName)).findFirst();
+        return supportedFiles.stream().filter((f) -> {
+            try {
+                return f.checkDefaults(machineName);
+            } catch (MSLAException e) {
+                throw new RuntimeException(e);
+            }
+        }).findFirst();
     }
 
     /**
@@ -45,7 +53,7 @@ public final class FileFactory {
      * @return MSLAFile
      */
     public MSLAFile<?> create(String machineName) throws MSLAException {
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var machineFactory = getMachineFactory(machineName).orElseThrow(
                 () -> new MSLAException("Machine '" + machineName + "' is not supported"));
@@ -99,7 +107,13 @@ public final class FileFactory {
      */
     public ArrayList<String> getSupportedMachines() {
         var a = new ArrayList<String>();
-        supportedFiles.forEach((f) -> { if (f.getSupportedMachines() != null) a.addAll(f.getSupportedMachines()); });
+        supportedFiles.forEach((f) -> {
+            try {
+                if (f.getSupportedMachines() != null) a.addAll(f.getSupportedMachines());
+            } catch (MSLAException e) {
+                throw new RuntimeException(e);
+            }
+        });
         return a;
     }
 }

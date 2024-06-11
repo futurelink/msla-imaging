@@ -35,8 +35,12 @@ public abstract class PhotonWorkshopCodec implements MSLALayerCodec<byte[]> {
         @Override public byte[] data() { return stream.toByteArray(); }
     }
 
-    @Override
-    public void setParam(String paramName, Object paramValue) {
+    @Override public void setParam(String paramName, Object paramValue) {
         if ("DecodedDataLength".equals(paramName)) decodedDataLength = (Integer) paramValue;
+    }
+
+    @Override public Object getParam(String paramName) {
+        if ("DecodedDataLength".equals(paramName)) return decodedDataLength;
+        return null;
     }
 }

@@ -26,11 +26,11 @@ public abstract class PhotonWorkshopFilePreview extends PhotonWorkshopFileTable 
         setImage(null);
     }
 
-    @Override public Size getResolution() { return ((Fields) getFileFields()).getResolution(); }
+    @Override public Size getResolution() { return ((Fields) getBlockFields()).getResolution(); }
 
     @Override
     public void afterRead() {
-        var fields = (Fields) getFileFields();
+        var fields = (Fields) getBlockFields();
         this.Image = new BufferedImage(getResolution().getWidth(), getResolution().getHeight(), BufferedImage.TYPE_USHORT_565_RGB);
         var buffer = this.Image.getRaster().getDataBuffer();
         for (int i = 0; i < fields.getImageDataSize(); i+=2) {
@@ -44,12 +44,12 @@ public abstract class PhotonWorkshopFilePreview extends PhotonWorkshopFileTable 
     }
 
     @Override public void beforeWrite() throws MSLAException {
-        var fields = (Fields) getFileFields();
+        var fields = (Fields) getBlockFields();
         var buffer = getImage().getData().getDataBuffer();
         var size = buffer.getSize() * 2;
         if (fields.getImageDataSize() != size)
             throw new MSLAException("Preview size " + size + " does not match resolution size " +
-                    ((Fields) getFileFields()).getImageDataSize());
+                    ((Fields) getBlockFields()).getImageDataSize());
 
         fields.setImageData(new byte[size]);
         for (int i = 0; i < size; i+=2) {

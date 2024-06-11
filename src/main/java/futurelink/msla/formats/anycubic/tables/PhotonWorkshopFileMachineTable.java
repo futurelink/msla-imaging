@@ -2,7 +2,7 @@ package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.formats.io.FileFieldsIO;
 import futurelink.msla.formats.io.FileFieldsReader;
@@ -18,7 +18,7 @@ import java.io.OutputStream;
  */
 @Getter
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
-    @Delegate private final Fields fileFields;
+    @Delegate private final Fields blockFields;
 
     @Getter @Setter
     @SuppressWarnings("unused")
@@ -88,12 +88,12 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
         }
     }
 
-    public String getLayerImageFormat() { return fileFields.getLayerImageFormat(); }
+    public String getLayerImageFormat() { return blockFields.getLayerImageFormat(); }
 
     public PhotonWorkshopFileMachineTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
         Name = "Machine";
-        fileFields = new Fields(this);
+        blockFields = new Fields(this);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     public long read(DataInputStream stream, long position) throws MSLAException {
         try {
             var reader = new FileFieldsReader(stream, FileFieldsIO.Endianness.LittleEndian);
-            var dataRead = reader.read(this);
+            var dataRead = reader.read(this, position);
             if (dataRead != TableLength) throw new MSLAException(
                     "Machine table was not completely read out (" + dataRead + " of " + TableLength +
                             "), some extra data left unread"
@@ -121,5 +121,5 @@ public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     }
 
     @Override
-    public String toString() { return "-- Machine data --\n" + fileFields.fieldsAsString(" = ", "\n"); }
+    public String toString() { return "-- Machine data --\n" + blockFields.fieldsAsString(" = ", "\n"); }
 }

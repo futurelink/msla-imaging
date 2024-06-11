@@ -76,7 +76,7 @@ public class CXDLPFileLayerDef extends CXDLPFileTable implements MSLAFileLayers<
 
     @Override public String getName() { return null; }
     @Override public final int getDataLength() { return 0; }
-    @Override public MSLAFileBlockFields getFileFields() { return null; }
+    @Override public MSLAFileBlockFields getBlockFields() { return null; }
     @Override public final int count() { return Layers.size(); }
     @Override public final CXDLPFileLayer get(int index) { return Layers.get(index); }
     @Override public boolean hasOptions() { return false; }

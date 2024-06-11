@@ -1,12 +1,12 @@
 package futurelink.msla.formats.elegoo.tables;
 
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import lombok.Getter;
 
 @Getter
 public class GOOFileFooter extends GOOFileTable {
-    private final Fields fileFields = new Fields();
+    private final Fields blockFields = new Fields();
 
     @SuppressWarnings("unused")
     static class Fields implements MSLAFileBlockFields {

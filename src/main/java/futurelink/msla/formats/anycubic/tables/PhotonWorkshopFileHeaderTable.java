@@ -2,8 +2,9 @@ package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
-import futurelink.msla.formats.iface.annotations.MSLAOption;
+import futurelink.msla.formats.iface.MSLAFileField;
+import futurelink.msla.formats.iface.options.MSLAOption;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.formats.io.FileFieldsIO;
 import futurelink.msla.formats.io.FileFieldsReader;
@@ -20,7 +21,7 @@ import java.io.OutputStream;
  */
 @Getter
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
-    @Delegate private final Fields fileFields;
+    @Delegate private final Fields blockFields;
 
     @Getter @Setter
     @SuppressWarnings("unused")
@@ -36,40 +37,40 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         }
         @MSLAFileField(order = 1, dontCount = true) private Integer TableLength() { return parent.calculateTableLength(); }
         private void setTableLength(Integer length) { parent.TableLength = length; }
-        @MSLAFileField(order = 2) private Float PixelSizeUm;
-        @MSLAFileField(order = 3) @MSLAOption(MSLAOption.LayerHeight) private Float LayerHeight;
-        @MSLAFileField(order = 4) @MSLAOption(MSLAOption.ExposureTime) private Float ExposureTime;
-        @MSLAFileField(order = 5) @MSLAOption(MSLAOption.WaitBeforeCure) private Float WaitTimeBeforeCure1;
-        @MSLAFileField(order = 6) @MSLAOption(MSLAOption.BottomExposureTime) private Float BottomExposureTime;
-        @MSLAFileField(order = 7) @MSLAOption(MSLAOption.BottomLayersCount) private Float BottomLayersCount;
-        @MSLAFileField(order = 8) @MSLAOption(MSLAOption.LiftHeight) private Float LiftHeight = DefaultLiftHeight;
-        @MSLAFileField(order = 9) @MSLAOption(MSLAOption.LiftSpeed) private Float LiftSpeed;// = SpeedConverter.Convert(DefaultLiftSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
-        @MSLAFileField(order = 10) @MSLAOption(MSLAOption.RetractSpeed) private Float RetractSpeed;// = SpeedConverter.Convert(DefaultRetractSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
-        @MSLAFileField(order = 11) @MSLAOption(MSLAOption.Volume) private Float VolumeMl = 0.0F;
-        @MSLAFileField(order = 12) @MSLAOption(MSLAOption.Antialias) private Integer AntiAliasing = 1;
+        @MSLAFileField(order = 2) private Float PixelSize;
+        @MSLAFileField(order = 3) @MSLAOption(MSLAOptionName.LayerHeight) private Float LayerHeight;
+        @MSLAFileField(order = 4) @MSLAOption(MSLAOptionName.NormalLayersExposureTime) private Float ExposureTime;
+        @MSLAFileField(order = 5) @MSLAOption(MSLAOptionName.WaitBeforeCure) private Float WaitTimeBeforeCure;
+        @MSLAFileField(order = 6) @MSLAOption(MSLAOptionName.BottomLayersExposureTime) private Float BottomExposureTime;
+        @MSLAFileField(order = 7) @MSLAOption(MSLAOptionName.BottomLayersCount) private Float BottomLayersCount;
+        @MSLAFileField(order = 8) @MSLAOption(MSLAOptionName.LiftHeight) private Float LiftHeight;
+        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.LiftSpeed) private Float LiftSpeed;// = SpeedConverter.Convert(DefaultLiftSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
+        @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.RetractSpeed) private Float RetractSpeed;// = SpeedConverter.Convert(DefaultRetractSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
+        @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.Volume) private Float VolumeMl = 0.0F;
+        @MSLAFileField(order = 12) @MSLAOption(MSLAOptionName.Antialias) private Integer AntiAliasing = 1;
         @MSLAFileField(order = 13) private Integer ResolutionX() { return Resolution != null ? Resolution.getWidth() : 0; }
         private void setResolutionX(Integer width) { Resolution = new Size(width, ResolutionY()); }
         @MSLAFileField(order = 14) private Integer ResolutionY() { return Resolution != null ? Resolution.getHeight() : 0; }
         private void setResolutionY(Integer height) { Resolution = new Size(ResolutionX(), height); }
-        @MSLAFileField(order = 15) @MSLAOption(MSLAOption.Weight) private Float WeightG = 0.0F;
-        @MSLAFileField(order = 16) @MSLAOption(MSLAOption.Price) private Float Price = 0.0F;
-        @MSLAFileField(order = 17) @MSLAOption(MSLAOption.Currency) private Integer PriceCurrencySymbol; /// 24 00 00 00 $ or ¥ C2 A5 00 00 or € = E2 82 AC 00
-        @MSLAFileField(order = 18) @MSLAOption(MSLAOption.LayerOverrides) private Integer PerLayerOverride = 0; // boolean (80 - true, 00 - false)
-        @MSLAFileField(order = 19) @MSLAOption("Print time") private Integer PrintTime = 0;
+        @MSLAFileField(order = 15) @MSLAOption(MSLAOptionName.Weight) private Float WeightG;
+        @MSLAFileField(order = 16) @MSLAOption(MSLAOptionName.Price) private Float Price;
+        @MSLAFileField(order = 17) @MSLAOption(MSLAOptionName.Currency) private Integer PriceCurrencySymbol; /// 24 00 00 00 $ or ¥ C2 A5 00 00 or € = E2 82 AC 00
+        @MSLAFileField(order = 18) @MSLAOption(MSLAOptionName.LayerSettings) private Integer PerLayerOverride; // boolean (80 - true, 00 - false)
+        @MSLAFileField(order = 19) @MSLAOption(MSLAOptionName.PrintTime) private Integer PrintTime;
 
         /* Version 2.4 fields */
-        @MSLAFileField(order = 20) @MSLAOption("Transition layers count") private Integer TransitionLayerCount = 0;
-        @MSLAFileField(order = 21) @MSLAOption("Transition layer type") private Integer TransitionLayerType = 0;
-        @MSLAFileField(order = 22) @MSLAOption("Advanced mode") private Integer AdvancedMode = 0; /// 0 = Basic mode | 1 = Advanced mode which allows TSMC
+        @MSLAFileField(order = 20) @MSLAOption(MSLAOptionName.TransitionLayersCount) private Integer TransitionLayerCount;
+        @MSLAFileField(order = 21) @MSLAOption(MSLAOptionName.TransitionLayersType) private Integer TransitionLayerType;
+        @MSLAFileField(order = 22) @MSLAOption(MSLAOptionName.AdvancedMode) private Integer AdvancedMode; /// 0 = Basic mode | 1 = Advanced mode which allows TSMC
 
         /* Version 2.5 fields */
-        @MSLAFileField(order = 23) @MSLAOption(MSLAOption.Grey) private Short Grey = 0;
-        @MSLAFileField(order = 24) @MSLAOption(MSLAOption.BlurLevel) private Short BlurLevel = 0;
-        @MSLAFileField(order = 25) @MSLAOption("Resin type") private Integer ResinType = 0;
+        @MSLAFileField(order = 23) @MSLAOption(MSLAOptionName.Grey) private Short Grey;
+        @MSLAFileField(order = 24) @MSLAOption(MSLAOptionName.ImageBlurLevel) private Short BlurLevel;
+        @MSLAFileField(order = 25) @MSLAOption(MSLAOptionName.ResinType) private Integer ResinType;
 
         /* Version 2.6 fields */
         // boolean, when true, normal exposure time will be auto set, use false for traditional way
-        @MSLAFileField(order = 26) @MSLAOption("Intelligent mode") private Integer IntelligentMode = 0;
+        @MSLAFileField(order = 26) @MSLAOption(MSLAOptionName.IntelligentMode) private Integer IntelligentMode;
 
         public Fields(PhotonWorkshopFileHeaderTable parent) { this.parent = parent; }
 
@@ -94,14 +95,14 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     public PhotonWorkshopFileHeaderTable(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
         this.Name = "Header";
-        this.fileFields = new Fields(this);
+        this.blockFields = new Fields(this);
     }
 
     @Override
     public long read(DataInputStream stream, long position) throws MSLAException {
         try {
             var reader = new FileFieldsReader(stream, FileFieldsIO.Endianness.LittleEndian);
-            var dataRead = reader.read(this);
+            var dataRead = reader.read(this, position);
             if (dataRead != TableLength) throw new MSLAException(
                 "Header was not completely read out (" + dataRead + " of " + TableLength + "), some extra data left unread"
             );
@@ -127,5 +128,5 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         super.write(stream);
     }
 
-    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 }

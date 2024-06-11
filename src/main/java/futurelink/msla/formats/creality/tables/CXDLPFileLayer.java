@@ -30,7 +30,7 @@ public class CXDLPFileLayer implements MSLAFileLayer {
     }
 
     /* CXDLP does not support layer settings */
-    @Override public MSLAFileBlockFields getFileFields() { return null; }
+    @Override public MSLAFileBlockFields getBlockFields() { return null; }
 
     /* CXDLP does not support layer settings */
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {}

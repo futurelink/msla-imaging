@@ -1,9 +1,10 @@
 package futurelink.msla.tools;
 
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
-import futurelink.msla.utils.FileOptionMapper;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.options.FileOptionMapper;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -32,7 +33,7 @@ public class ImageTools {
 
     public static void createFromSVG(String machineName, String svgFileName, String outputFileName)
             throws IOException, MSLAException {
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         try (var stream = new FileInputStream(svgFileName)) {
             var reader = new BufferedReader(new InputStreamReader(stream));
@@ -42,7 +43,7 @@ public class ImageTools {
             var transcoderOutput = new TranscoderOutput(resultByteStream);
 
             var pngTranscoder = new PNGTranscoder();
-            pngTranscoder.addTranscodingHint(PNGTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, defaults.getPixelSizeUm() / 1000);
+            pngTranscoder.addTranscodingHint(PNGTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, defaults.getPixelSize() / 1000);
             pngTranscoder.transcode(svgImage, transcoderOutput);
 
             var image = ImageIO.read(new ByteArrayInputStream(resultByteStream.toByteArray()));
@@ -60,15 +61,14 @@ public class ImageTools {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static void createFromBufferedImage(String machineName, BufferedImage image, String outputFileName)
             throws MSLAException  {
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var wsFile = FileFactory.instance.create(machineName);
         if (!wsFile.isValid()) throw new MSLAException("File header has no resolution info");
         var options = new FileOptionMapper(wsFile, defaults);
-        options.set("BottomExposureTime", "12");
+        options.set(MSLAOptionName.BottomLayersExposureTime, "12");
         wsFile.addLayer(new ImageReader(wsFile, image), null);
     }
 }

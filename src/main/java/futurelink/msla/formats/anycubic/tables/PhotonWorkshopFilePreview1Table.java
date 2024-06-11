@@ -1,7 +1,7 @@
 package futurelink.msla.formats.anycubic.tables;
 
 import futurelink.msla.formats.MSLAException;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.utils.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage;
  */
 @Getter
 public class PhotonWorkshopFilePreview1Table extends PhotonWorkshopFilePreview  {
-    private final Fields fileFields;
+    private final Fields blockFields;
 
     @Getter
     @SuppressWarnings("unused")
@@ -53,7 +53,7 @@ public class PhotonWorkshopFilePreview1Table extends PhotonWorkshopFilePreview  
 
     public PhotonWorkshopFilePreview1Table(byte versionMajor, byte versionMinor) {
         super(versionMajor, versionMinor);
-        fileFields = new Fields(this);
+        blockFields = new Fields(this);
         setImage(null);
     }
 
@@ -63,7 +63,7 @@ public class PhotonWorkshopFilePreview1Table extends PhotonWorkshopFilePreview  
         if (image != null) Image.getGraphics().drawImage(image, 0, 0, null);
     }
 
-    @Override int calculateTableLength() { return 12 + 12 + fileFields.ImageDataSize; }
+    @Override int calculateTableLength() { return 12 + 12 + blockFields.ImageDataSize; }
 
-    public String toString() { return "-- Preview --\n" + fileFields.fieldsAsString(" = ", "\n"); }
+    public String toString() { return "-- Preview --\n" + blockFields.fieldsAsString(" = ", "\n"); }
 }

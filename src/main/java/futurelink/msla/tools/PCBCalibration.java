@@ -4,10 +4,11 @@ import futurelink.msla.formats.*;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLALayerEncodeOutput;
 import futurelink.msla.formats.iface.MSLALayerEncodeReader;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
-import futurelink.msla.utils.FileOptionMapper;
+import futurelink.msla.utils.options.FileOptionMapper;
 import futurelink.msla.utils.Size;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import lombok.Setter;
 
 import java.awt.*;
@@ -61,7 +62,6 @@ public class PCBCalibration {
      * @param interval curing time interval
      * @param repetitions number of samples or intervals
      */
-    @SuppressWarnings("unchecked")
     public static String generateTestPattern(
             String machineName,
             String filePath,
@@ -69,7 +69,7 @@ public class PCBCalibration {
             int interval,
             int repetitions) throws MSLAException
     {
-        var defaults = PrinterDefaults.instance.getPrinter(machineName)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var wsFile = FileFactory.instance.create(machineName);
         var options = new FileOptionMapper(wsFile, defaults);
@@ -79,10 +79,11 @@ public class PCBCalibration {
                 filePath + "." + defaults.getFileExtension();
         try (var fos = new FileOutputStream(filePath)) {
             // Set options
-            options.set("Bottom layers count", "1");
-            options.set("Bottom layers exposure time", String.valueOf(startTime));
-            options.set("Normal layers exposure time", String.valueOf(interval));
-            options.set("Normal layers lift height", "1");
+            options.set(MSLAOptionName.BottomLayersCount, 1);
+            options.set(MSLAOptionName.BottomLayersExposureTime, startTime);
+            options.set(MSLAOptionName.NormalLayersExposureTime, interval);
+            if (options.hasOption(MSLAOptionName.LiftHeight)) options.set(MSLAOptionName.LiftHeight, 1);
+            if (options.hasOption(MSLAOptionName.NormalLayersLiftHeight)) options.set(MSLAOptionName.NormalLayersLiftHeight, 1);
 
             //wsFile.setOption("PerLayerOverride", 0);
             //wsFile.setOption("TransitionLayerCount", 0);
@@ -98,14 +99,14 @@ public class PCBCalibration {
             createPreview(wsFile);
 
             // Generate pattern layers
-            var pattern = new PCBCalibrationPattern(wsFile.getResolution(), wsFile.getPixelSizeUm());
+            var pattern = new PCBCalibrationPattern(wsFile.getResolution(), wsFile.getPixelSize());
             pattern.setStartTime(startTime);
             var reader = new EncodeReader(wsFile, pattern, repetitions);
             for (int i = 0; i < repetitions; i++)
                 wsFile.addLayer(reader, null);
             try {
                 // Wait until all layers are encoded
-                while (wsFile.getEncodersPool().isEncoding()) Thread.sleep(100);
+                while (wsFile.getEncodersPool().isEncoding()) Thread.sleep(10);
             } catch (InterruptedException ignored) {}
             logger.info("Encoding done, writing a file");
 

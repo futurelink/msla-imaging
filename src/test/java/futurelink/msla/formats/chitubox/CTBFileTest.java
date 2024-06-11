@@ -2,11 +2,13 @@ package futurelink.msla.formats.chitubox;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.chitubox.common.CTBCommonFile;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
 import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
-import futurelink.msla.utils.FileOptionMapper;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.options.FileOptionMapper;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -18,52 +20,90 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CTBFileTest extends CommonTestRoutines {
+
     @Test
-    void ReadTestFile() throws IOException, InterruptedException {
+    void ReadChituboxFileTest() throws MSLAException, IOException, InterruptedException {
         logger.info("Temporary dir: " + temp_dir);
-        try {
-            var file = (CTBFile) FileFactory.instance.load(
-                    resourceFile("test_data/ChituboxFileTest/Example_ELEGOO_SATURN.ctb")
-            );
-            assertTrue(file.isValid());
-            assertEquals("3840 x 2400", file.getResolution().toString());
+        var file = FileFactory.instance.load(
+                resourceFile("test_data/ChituboxFileTest/Example_Chitubox_Slices.ctb")
+        );
+        assertTrue(file.isValid());
+        assertEquals("ELEGOO JUPITER", file.getMachineName());
 
-            ImageIO.write(file.getPreview((short) 0).getImage(), "png", new File(temp_dir + "ctb_preview.png"));
-            assertFileExactSize(temp_dir + "ctb_preview.png", 6924);
+        ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "encrypted_file_small_preview.png"));
+        ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "encrypted_file_large_preview.png"));
 
-            // Asynchronously extract image files
-            var layerPixels = new int[3];
-            var layerFiles = new String[3];
-            var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
-                layerPixels[layerNumber] = pixels;
-                layerFiles[layerNumber] = fileName;
-            });
-            file.readLayer(writer, 0);
-            file.readLayer(writer, 1);
-            file.readLayer(writer, 2);
-            while (file.getDecodersPool().isDecoding()) Thread.sleep(100); // Wait while decoding-writing is done
+        assertFileExactSize(temp_dir + "encrypted_file_small_preview.png", 4612);
+        assertFileExactSize(temp_dir + "encrypted_file_large_preview.png", 14994);
 
-            // Check pixels were written
-            assertEquals(82031, layerPixels[0]);
-            assertEquals(83634, layerPixels[1]);
-            assertEquals(85202, layerPixels[2]);
+        // Asynchronously extract image files
+        var layerPixels = new int[3];
+        var layerFiles = new String[3];
+        var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
+            layerPixels[layerNumber] = pixels;
+            layerFiles[layerNumber] = fileName;
+        });
+        file.readLayer(writer, 0);
+        file.readLayer(writer, 1);
+        file.readLayer(writer, 2);
+        while (file.getDecodersPool().isDecoding()) Thread.sleep(10); // Wait while decoding-writing is done
 
-            // Check files exist
-            assertFileExactSize(layerFiles[0], 10841);
-            assertFileExactSize(layerFiles[1], 10852);
-            assertFileExactSize(layerFiles[2], 10869);
+        // Assert all pixels were decoded properly
+        assertEquals(72849, layerPixels[0]);
+        assertEquals(74830, layerPixels[1]);
+        assertEquals(76499, layerPixels[2]);
 
-            ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "large_preview.png"));
-            ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "small_preview.png"));
-        } catch (MSLAException e) {
-            throw new RuntimeException(e);
-        }
+        // Check files exist
+        assertFileExactSize(layerFiles[0], 17987);
+        assertFileExactSize(layerFiles[1], 18021);
+        assertFileExactSize(layerFiles[2], 18044);
+    }
+
+    @Test
+    void ReadELEGOOFileTest() throws IOException, InterruptedException, MSLAException {
+        logger.info("Temporary dir: " + temp_dir);
+        var file = (CTBCommonFile) FileFactory.instance.load(
+                resourceFile("test_data/ChituboxFileTest/Example_ELEGOO_SATURN.ctb")
+        );
+        assertTrue(file.isValid());
+        assertEquals("3840 x 2400", file.getResolution().toString());
+
+        ImageIO.write(file.getPreview((short) 0).getImage(), "png", new File(temp_dir + "ctb_preview.png"));
+        assertFileExactSize(temp_dir + "ctb_preview.png", 6924);
+
+        // Asynchronously extract image files
+        var layerPixels = new int[3];
+        var layerFiles = new String[3];
+        var writer = new ImageWriter(file, temp_dir, "png", (layerNumber, fileName, pixels) -> {
+            layerPixels[layerNumber] = pixels;
+            layerFiles[layerNumber] = fileName;
+        });
+        file.readLayer(writer, 0);
+        file.readLayer(writer, 1);
+        file.readLayer(writer, 2);
+        while (file.getDecodersPool().isDecoding()) Thread.sleep(10); // Wait while decoding-writing is done
+
+        // Check pixels were written
+        assertEquals(82031, layerPixels[0]);
+        assertEquals(83634, layerPixels[1]);
+        assertEquals(85202, layerPixels[2]);
+
+        // Check files exist
+        assertFileExactSize(layerFiles[0], 10841);
+        assertFileExactSize(layerFiles[1], 10852);
+        assertFileExactSize(layerFiles[2], 10869);
+
+        ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "elegoo_large_preview.png"));
+        ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "elegoo_small_preview.png"));
+
+        assertFileExactSize(temp_dir + "elegoo_large_preview.png", 6924);
+        assertFileExactSize(temp_dir + "elegoo_small_preview.png", 3789);
     }
 
     @Test
     void CreateTestFile() throws MSLAException, InterruptedException, IOException {
         var outFile = temp_dir + "chitubox_file_test.ctb";
-        var file = (CTBFile) FileFactory.instance.create("ELEGOO SATURN");
+        var file = FileFactory.instance.create("ELEGOO SATURN");
         assertTrue(file.isValid());
 
         var files = new String[]{
@@ -77,7 +117,7 @@ public class CTBFileTest extends CommonTestRoutines {
             for (var f : files) {
                 file.addLayer(new ImageReader(file, resourceFile(f)), (layer, data) -> layerBytes[layer] = data.size());
             }
-            while (encoders.isEncoding()) Thread.sleep(100); // Wait while reading-encoding is done
+            while (encoders.isEncoding()) Thread.sleep(10); // Wait while reading-encoding is done
         } catch (IOException e) {
             throw new MSLAException("Error adding layers", e);
         }
@@ -97,7 +137,7 @@ public class CTBFileTest extends CommonTestRoutines {
         writeMSLAFile(outFile, file);
 
         // Read exported file and do checks
-        file = (CTBFile) FileFactory.instance.load(outFile);
+        file = FileFactory.instance.load(outFile);
         assertTrue(file.isValid());
 
         // Asynchronously extract image files
@@ -110,7 +150,7 @@ public class CTBFileTest extends CommonTestRoutines {
         file.readLayer(writer, 0);
         file.readLayer(writer, 1);
         file.readLayer(writer, 2);
-        while (file.getDecodersPool().isDecoding()) Thread.sleep(100); // Wait while decoding-writing is done
+        while (file.getDecodersPool().isDecoding()) Thread.sleep(10); // Wait while decoding-writing is done
 
         // Check pixels were written
         assertEquals(82031, layerPixels[0]);
@@ -129,16 +169,16 @@ public class CTBFileTest extends CommonTestRoutines {
     @Test
     void OptionsTest() throws MSLAException {
         var machine = "ELEGOO SATURN";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
-        var file = (CTBFile) FileFactory.instance.create(machine);
+        var file = (CTBCommonFile) FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
         assertTrue(file.isValid());
 
-        assertEquals(70.0, Float.parseFloat(options.get("Normal layers lift speed")));
-        assertEquals(0.0, Float.parseFloat(options.get("Bottom layers light off delay")));
+        assertEquals(70.0, Float.parseFloat(options.get(MSLAOptionName.NormalLayersLiftSpeed)));
+        assertEquals(0.0, Float.parseFloat(options.get(MSLAOptionName.BottomLayersLightOffDelay)));
 
-        options.set("Bottom layers light off delay", "1.0");
-        assertEquals(1.0, Float.parseFloat(options.get("Bottom layers light off delay")));
+        options.set(MSLAOptionName.BottomLayersLightOffDelay, "1.0");
+        assertEquals(1.0, Float.parseFloat(options.get(MSLAOptionName.BottomLayersLightOffDelay)));
     }
 }

@@ -2,39 +2,39 @@ package futurelink.msla.formats.anycubic;
 
 import futurelink.msla.formats.CommonTestRoutines;
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.FileFactory;
-import futurelink.msla.utils.FileOptionMapper;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.options.FileOptionMapper;
+import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PhotonWorkshopOptionsTest extends CommonTestRoutines {
     @Test
     void AvailableOptionsTest() throws MSLAException {
         var machine = "Anycubic Photon Mono X 6K";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
         var optionsAvailable = options.available();
+        assertTrue(optionsAvailable.contains(MSLAOptionName.TransitionLayersType));
         logger.info(optionsAvailable.toString());
-        assertEquals("Transition layer type", optionsAvailable.toArray()[4]);
     }
 
     @Test
     void SetOptionTest() throws MSLAException {
         var machine = "Anycubic Photon Mono X 6K";
-        var defaults = PrinterDefaults.instance.getPrinter(machine)
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
-        options.set("Advanced mode", "1");
-        var option = options.get("Advanced mode");
+        options.set(MSLAOptionName.AdvancedMode, "1");
+        var option = options.get(MSLAOptionName.AdvancedMode);
         assertEquals(1, Integer.parseInt(option));
-        assertThrows(NumberFormatException.class, () -> options.set("Advanced mode", "string"));
-        assertThrows(MSLAException.class, () -> options.set("UnavailableOption", "true"));
+        assertThrows(NumberFormatException.class, () -> options.set(MSLAOptionName.AdvancedMode, "string"));
+        assertThrows(NumberFormatException.class, () -> options.set(MSLAOptionName.AdvancedMode, "true"));
     }
 
     @Test

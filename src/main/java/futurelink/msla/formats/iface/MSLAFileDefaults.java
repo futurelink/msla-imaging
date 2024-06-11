@@ -1,5 +1,6 @@
 package futurelink.msla.formats.iface;
 
+import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.Size;
 
 @SuppressWarnings("unused")
@@ -13,7 +14,8 @@ public interface MSLAFileDefaults extends MSLADefaults {
     Class<? extends MSLAFile<?>> getFileClass();
 
     Size getResolution();
-    float getPixelSizeUm();
+    float getPixelSize();
 
+    MSLADefaultsParams getFileOption(MSLAOptionName name);
     MSLAFileProps getFileProps();
 }

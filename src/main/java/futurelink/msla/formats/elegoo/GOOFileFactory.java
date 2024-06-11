@@ -4,10 +4,9 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileFactory;
 import futurelink.msla.formats.iface.MSLAFileProps;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 
 import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Set;
 
@@ -17,15 +16,7 @@ public class GOOFileFactory implements MSLAFileFactory {
 
     @Override
     public MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException {
-        return new GOOFile();
-    }
-
-    @Override public MSLAFile<?> load(String fileName) throws MSLAException {
-        try {
-            return new GOOFile(new DataInputStream(new FileInputStream(fileName)));
-        } catch (IOException e) {
-            throw new MSLAException("Can't load a file " + fileName, e);
-        }
+        return new GOOFile(initialProps);
     }
 
     @Override public MSLAFile<?> load(DataInputStream stream) throws MSLAException {
@@ -45,11 +36,11 @@ public class GOOFileFactory implements MSLAFileFactory {
         }
     }
 
-    @Override public boolean checkDefaults(String machineName) {
+    @Override public boolean checkDefaults(String machineName) throws MSLAException {
         return getSupportedMachines().contains(machineName);
     }
 
-    @Override public Set<String> getSupportedMachines() {
-        return PrinterDefaults.instance.getSupportedPrinters(GOOFile.class);
+    @Override public Set<String> getSupportedMachines() throws MSLAException {
+        return MachineDefaults.getInstance().getMachines(GOOFile.class);
     }
 }

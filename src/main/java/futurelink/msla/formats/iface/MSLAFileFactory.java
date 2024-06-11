@@ -8,9 +8,13 @@ import java.util.Set;
 public interface MSLAFileFactory {
     String getName();
     MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException;
-    MSLAFile<?> load(String fileName) throws MSLAException;
-    MSLAFile<?> load(DataInputStream stream) throws MSLAException;
     boolean checkType(DataInputStream stream) throws MSLAException;
-    boolean checkDefaults(String machineName);
-    Set<String> getSupportedMachines();
+    boolean checkDefaults(String machineName) throws MSLAException;
+    Set<String> getSupportedMachines() throws MSLAException;
+
+    /**
+     * Implement this to load mSLA file data from stream.
+     * @param stream input data stream
+     */
+    MSLAFile<?> load(DataInputStream stream) throws MSLAException;
 }

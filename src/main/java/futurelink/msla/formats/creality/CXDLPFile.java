@@ -3,7 +3,7 @@ package futurelink.msla.formats.creality;
 import futurelink.msla.formats.*;
 import futurelink.msla.formats.creality.tables.*;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.formats.iface.annotations.MSLAOptionContainer;
+import futurelink.msla.formats.iface.options.MSLAOptionContainer;
 import futurelink.msla.utils.Size;
 import lombok.Getter;
 
@@ -22,22 +22,22 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     private final CXDLPFilePreviews Previews = new CXDLPFilePreviews();
     @Getter private final CXDLPFileLayerDef Layers = new CXDLPFileLayerDef();
 
-    public CXDLPFile() {
-        super();
+    public CXDLPFile(MSLAFileProps initialProps) {
+        super(initialProps);
         iStream = null;
-        Header = new CXDLPFileHeader();
-        SliceInfo = new CXDLPFileSliceInfo();
+        Header = new CXDLPFileHeader(initialProps);
+        SliceInfo = new CXDLPFileSliceInfo(initialProps);
         SliceInfoV3 = new CXDLPFileSliceInfoV3();
     }
 
     public CXDLPFile(DataInputStream stream) throws MSLAException {
-        super();
+        super(null);
         var position = 0;
         try {
             stream.reset();
             iStream = stream;
-            Header = new CXDLPFileHeader();
-            SliceInfo = new CXDLPFileSliceInfo();
+            Header = new CXDLPFileHeader(null);
+            SliceInfo = new CXDLPFileSliceInfo(null);
             SliceInfoV3 = new CXDLPFileSliceInfoV3();
             Header.read(iStream, position); position += Header.getDataLength();
             Previews.read(iStream, position); position += Previews.getDataLength();
@@ -83,15 +83,14 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         super.reset(defaults);
         if (isMachineValid(defaults)) {
-            defaults.setFields(Header.getName(), Header.getFileFields());
-            defaults.setFields(SliceInfo.getName(), SliceInfo.getFileFields());
-            defaults.setFields(SliceInfoV3.getName(), SliceInfoV3.getFileFields());
+            defaults.setFields(Header.getBlockFields());
+            defaults.setFields(SliceInfo.getBlockFields());
+            defaults.setFields(SliceInfoV3.getBlockFields());
             getLayers().setDefaults(defaults.getLayerDefaults());
         } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
     }
 
     @Override public float getDPI() { return 0; }
-    @Override public float getPixelSizeUm() { return Header.getPixelSizeUm(); }
 
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {

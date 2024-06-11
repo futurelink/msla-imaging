@@ -2,7 +2,7 @@ package futurelink.msla.formats.io;
 
 import futurelink.msla.formats.iface.MSLAFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import lombok.Getter;
 
 import java.lang.reflect.*;
@@ -22,6 +22,7 @@ public class FileFieldsIO {
         private final int length;
         private final boolean dontCount;
         private final String lengthAt;
+        private final String offsetAt;
         private final Charset charset;
         private MSLAField(Field field, MSLAFileField anno) {
             this.name = field.getName();
@@ -30,6 +31,7 @@ public class FileFieldsIO {
             this.order = anno.order();
             this.dontCount = anno.dontCount();
             this.lengthAt = anno.lengthAt();
+            this.offsetAt = anno.offsetAt();
             this.charset = Charset.forName(anno.charset());
         }
         private MSLAField(Method field, MSLAFileField anno) {
@@ -39,6 +41,7 @@ public class FileFieldsIO {
             this.length = anno.length();
             this.dontCount = anno.dontCount();
             this.lengthAt = anno.lengthAt();
+            this.offsetAt = anno.offsetAt();
             this.charset = Charset.forName(anno.charset());
         }
         @Override public String toString() { return name + ":" + length; }
@@ -220,7 +223,7 @@ public class FileFieldsIO {
      * @param lastFieldName calculate length of a block up to this field
      */
     public static Integer getBlockLength(MSLAFileBlock block, String lastFieldName) throws FileFieldsException {
-        return getBlockLength(block.getFileFields(), lastFieldName);
+        return getBlockLength(block.getBlockFields(), lastFieldName);
     }
 
     /**
@@ -228,6 +231,6 @@ public class FileFieldsIO {
      * @param block file data block object to calculate length
      */
     public static Integer getBlockLength(MSLAFileBlock block) throws FileFieldsException {
-        return getBlockLength(block.getFileFields(), null);
+        return getBlockLength(block.getBlockFields(), null);
     }
 }

@@ -2,14 +2,14 @@ package futurelink.msla.formats.creality.tables;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
-import futurelink.msla.formats.iface.annotations.MSLAFileField;
+import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.iface.MSLAPreview;
 import futurelink.msla.utils.Size;
 import lombok.Getter;
 
 @Getter
 public class CXDLPFilePreviews extends CXDLPFileTable {
-    private final Fields fileFields = new Fields();
+    private final Fields blockFields = new Fields();
 
     @SuppressWarnings("unused")
     static class Fields implements MSLAFileBlockFields {
@@ -20,18 +20,18 @@ public class CXDLPFilePreviews extends CXDLPFileTable {
 
     public final MSLAPreview getPreview(int index) throws MSLAException {
         return switch (index) {
-            case 0 -> fileFields.Preview1;
-            case 1 -> fileFields.Preview2;
-            case 2 -> fileFields.Preview3;
+            case 0 -> blockFields.Preview1;
+            case 1 -> blockFields.Preview2;
+            case 2 -> blockFields.Preview3;
             default -> throw new MSLAException("Preview is not available");
         };
     }
 
     @Override public String getName() { return null; }
     @Override public int getDataLength() {
-        return (fileFields.Preview1.getResolution().length() +
-                fileFields.Preview2.getResolution().length() +
-                fileFields.Preview3.getResolution().length()) * 2 + 6;
+        return (blockFields.Preview1.getResolution().length() +
+                blockFields.Preview2.getResolution().length() +
+                blockFields.Preview3.getResolution().length()) * 2 + 6;
     }
-    @Override public String toString() { return fileFields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 }

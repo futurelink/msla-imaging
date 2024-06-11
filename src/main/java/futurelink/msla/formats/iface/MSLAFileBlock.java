@@ -20,23 +20,33 @@ public interface MSLAFileBlock {
      * @return block length in bytes.
      */
     int getDataLength() throws FileFieldsException;
+
+    /**
+     * Gets field offset based on field name and block length.
+     * @param fieldName a field that offset is required
+     */
     int getDataFieldOffset(String fieldName) throws FileFieldsException;
 
-    MSLAFileBlockFields getFileFields();
+    /**
+     * Gets block fields object.
+     */
+    MSLAFileBlockFields getBlockFields();
 
+    /**
+     * Should return endianness of the data either LittleEndian or BigEndian.
+     * It's a BigEndian by default.
+     */
     default FileFieldsIO.Endianness getEndianness() { return FileFieldsIO.Endianness.BigEndian; }
 
     default void beforeRead() {}
-    default void afterRead() {}
+    default void afterRead() throws MSLAException {}
     default void beforeWrite() throws MSLAException {}
 
     default long read(DataInputStream input, long position) throws MSLAException {
         try {
-            input.reset();
-            input.skipBytes((int) position);
             var reader = new FileFieldsReader(input, getEndianness());
-            return reader.read(this);
-        } catch (IOException | FileFieldsException e) {
+            return reader.read(this, position);
+        } catch (FileFieldsException e) {
             throw new MSLAException("Error reading " + this.getClass().getName() + " table", e);
         }
     }

@@ -4,10 +4,9 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLAFile;
 import futurelink.msla.formats.iface.MSLAFileFactory;
 import futurelink.msla.formats.iface.MSLAFileProps;
-import futurelink.msla.utils.defaults.PrinterDefaults;
+import futurelink.msla.utils.defaults.MachineDefaults;
 
 import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Set;
 
@@ -15,17 +14,7 @@ public class PhotonWorkshopFileFactory implements MSLAFileFactory {
     @Override public String getName() { return "Anycubic"; }
 
     @Override public MSLAFile<?> create(MSLAFileProps initialProps) throws MSLAException {
-        var VersionMajor = initialProps.getByte("VersionMajor");
-        var VersionMinor = initialProps.getByte("VersionMinor");
-        return new PhotonWorkshopFile(VersionMajor, VersionMinor);
-    }
-
-    @Override public MSLAFile<?> load(String fileName) throws MSLAException {
-        try {
-            return new PhotonWorkshopFile(new DataInputStream(new FileInputStream(fileName)));
-        } catch (IOException e) {
-            throw new MSLAException("Can't load a file " + fileName, e);
-        }
+        return new PhotonWorkshopFile(initialProps);
     }
 
     @Override public MSLAFile<?> load(DataInputStream stream) throws MSLAException {
@@ -46,12 +35,12 @@ public class PhotonWorkshopFileFactory implements MSLAFileFactory {
         }
     }
 
-    @Override public boolean checkDefaults(String machineName) {
+    @Override public boolean checkDefaults(String machineName) throws MSLAException {
         return getSupportedMachines().contains(machineName);
     }
 
     @Override
-    public Set<String> getSupportedMachines() {
-        return PrinterDefaults.instance.getSupportedPrinters(PhotonWorkshopFile.class);
+    public Set<String> getSupportedMachines() throws MSLAException {
+        return MachineDefaults.getInstance().getMachines(PhotonWorkshopFile.class);
     }
 }
