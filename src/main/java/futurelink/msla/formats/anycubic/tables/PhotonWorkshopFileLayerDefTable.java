@@ -95,6 +95,7 @@ public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         blockFields.Layers.add(layer);
         blockFields.LayerData.add(null);
         blockFields.LayerCount = blockFields.Layers.size();
+        if (layerDefaults != null) layerDefaults.setFields(blockFields);
         return layer;
     }
 

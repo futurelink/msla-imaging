@@ -33,6 +33,78 @@ public class MachineDefaults {
         return instance;
     }
 
+    private HashMap<MSLAOptionName, String> getBlockFieldsOptions(MSLAFileBlockFields fields) {
+        var ret = new HashMap<MSLAOptionName, String>();
+        var props = fields.getClass().getDeclaredFields();
+        for (var prop : props)
+            if (prop.isAnnotationPresent(MSLAOption.class))
+                ret.put(prop.getAnnotation(MSLAOption.class).value(), prop.getName());
+        return ret;
+    }
+
+    private void setFieldDefault(MSLAFileBlockFields fields, String fieldName, MSLADefaultsParams defaultOption)
+            throws MSLAException
+    {
+        if (defaultOption == null) {
+            logger.warning("Can't set option to '" + fieldName + "' as its value is null");
+            return;
+        }
+        try {
+            Field field = null;
+            Class<?> type = null;
+            boolean hasField = false;
+            boolean hasProperty = false;
+            try {
+                field = fields.getClass().getDeclaredField(fieldName);
+                type = field.getType();
+                hasField = true;
+                hasProperty = true;
+            } catch (NoSuchFieldException ignored) {}
+
+            Method method;
+            try {
+                if (!hasField) {
+                    method = fields.getClass().getDeclaredMethod(fieldName);
+                    type = method.getReturnType();
+                    hasProperty = true;
+                }
+            } catch (NoSuchMethodException ignored) {}
+
+            if (hasProperty) {
+                Method setter = null;
+                try {
+                    setter = fields.getClass().getDeclaredMethod("set" + fieldName, type);
+                } catch (NoSuchMethodException ignored) {}
+
+                if (setter != null) {
+                    logger.fine("Calling setter for default '" + defaultOption.getString() + "' " + fieldName + " of type " + type.getSimpleName());
+                    try {
+                        setter.setAccessible(true);
+                        setter.invoke(fields, defaultOption.getAsType(type.getSimpleName()));
+                    } catch (Exception e) {
+                        throw new MSLAException("Option '" + fieldName + "' can't be set", e);
+                    } finally {
+                        setter.setAccessible(false);
+                    }
+                } else {
+                    if (hasField) {
+                        logger.fine("Setting default '" + defaultOption.getString() + "' " + fieldName + " of type " + type.getSimpleName());
+                        try {
+                            field.setAccessible(true);
+                            field.set(fields, defaultOption.getAsType(type.getSimpleName()));
+                        } catch (Exception e) {
+                            throw new MSLAException("Option '" + fieldName + "' can't be set", e);
+                        } finally {
+                            field.setAccessible(false);
+                        }
+                    } else logger.warning("Field '" + fieldName + " can't be set as it is method without setter");
+                }
+            } else throw new MSLAException("Option '" + fieldName + "' has no associated property or method");
+        } catch (SecurityException e) {
+            throw new MSLAException("Option '" + fieldName + "' can not be set", e);
+        }
+    }
+
     /**
      * Internal machine defaults class.
      */
@@ -75,92 +147,22 @@ public class MachineDefaults {
             return ret;
         }
 
-        private HashMap<MSLAOptionName, String> getBlockFieldsOptions(MSLAFileBlockFields fields) {
-            var ret = new HashMap<MSLAOptionName, String>();
-            var props = fields.getClass().getDeclaredFields();
-            for (var prop : props)
-                if (prop.isAnnotationPresent(MSLAOption.class))
-                    ret.put(prop.getAnnotation(MSLAOption.class).value(), prop.getName());
-            return ret;
-        }
-
-        private void setFieldDefault(MSLAFileBlockFields fields, String fieldName, MSLADefaultsParams defaultOption) throws MSLAException {
-            if (defaultOption == null) {
-                logger.warning("Can't set option to '" + fieldName + "' as its value is null");
-                return;
-            }
-            try {
-                    Field field = null;
-                    Class<?> type = null;
-                    boolean hasField = false;
-                    boolean hasProperty = false;
-                    try {
-                        field = fields.getClass().getDeclaredField(fieldName);
-                        type = field.getType();
-                        hasField = true;
-                        hasProperty = true;
-                    } catch (NoSuchFieldException ignored) {}
-
-                    Method method;
-                    try {
-                        if (!hasField) {
-                            method = fields.getClass().getDeclaredMethod(fieldName);
-                            type = method.getReturnType();
-                            hasProperty = true;
-                        }
-                    } catch (NoSuchMethodException ignored) {}
-
-                    if (hasProperty) {
-                        Method setter = null;
-                        try {
-                            setter = fields.getClass().getDeclaredMethod("set" + fieldName, type);
-                        } catch (NoSuchMethodException ignored) {}
-
-                        if (setter != null) {
-                            logger.fine("Calling setter for default '" + defaultOption.getString() + "' " + fieldName + " of type " + type.getSimpleName());
-                            try {
-                                setter.setAccessible(true);
-                                setter.invoke(fields, defaultOption.getAsType(type.getSimpleName()));
-                            } catch (Exception e) {
-                                throw new MSLAException("Option '" + fieldName + "' can't be set", e);
-                            } finally {
-                                setter.setAccessible(false);
-                            }
-                        } else {
-                            if (hasField) {
-                                logger.fine("Setting default '" + defaultOption.getString() + "' " + fieldName + " of type " + type.getSimpleName());
-                                try {
-                                    field.setAccessible(true);
-                                    field.set(fields, defaultOption.getAsType(type.getSimpleName()));
-                                } catch (Exception e) {
-                                    throw new MSLAException("Option '" + fieldName + "' can't be set", e);
-                                } finally {
-                                    field.setAccessible(false);
-                                }
-                            } else logger.warning("Field '" + fieldName + " can't be set as it is method without setter");
-                        }
-                    } else throw new MSLAException("Option '" + fieldName + "' has no associated property or method");
-            } catch (SecurityException e) {
-                throw new MSLAException("Option '" + fieldName + "' can not be set", e);
-            }
-        }
-
         public final void setFields(MSLAFileBlockFields fields) throws MSLAException {
             // Set properties
             var blockProps = getBlockFieldsProperties(fields);
             for (var prop : blockProps) {
                 if (fileProps.containsKey(prop) || "ResolutionX".equals(prop) || "ResolutionY".equals(prop)) {
-                    setFieldDefault(fields, prop, fileProps.get(prop));
+                    instance.setFieldDefault(fields, prop, fileProps.get(prop));
                 }
             }
 
             // Set options
-            var blockOptions = getBlockFieldsOptions(fields);
+            var blockOptions = instance.getBlockFieldsOptions(fields);
             for (var option : blockOptions.keySet()) {
                 var defaultOption = fileOptions.getOption(option);
                 if (defaultOption != null) {
                     logger.fine("Setting default option '" + option.getName() + "' to " + defaultOption);
-                    setFieldDefault(fields, blockOptions.get(option), defaultOption);
+                    instance.setFieldDefault(fields, blockOptions.get(option), defaultOption);
                 }
             }
         }
@@ -179,7 +181,14 @@ public class MachineDefaults {
 
         @Override
         public void setFields(MSLAFileBlockFields fields) throws MSLAException {
-            // TODO implement this
+            var blockOptions = instance.getBlockFieldsOptions(fields);
+            for (var option : blockOptions.keySet()) {
+                var defaultOption = options.getOption(option);
+                if (defaultOption != null) {
+                    logger.fine("Setting layer default option '" + option.getName() + "' to " + defaultOption);
+                    instance.setFieldDefault(fields, blockOptions.get(option), defaultOption);
+                }
+            }
         }
 
         @Override

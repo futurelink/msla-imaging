@@ -67,7 +67,7 @@ public class CTBEncryptedFileSlicerSettings extends CTBFileBlock {
         @MSLAFileField(order = 43) final private Short Padding = 0;
         @MSLAFileField(order = 44) @MSLAOption(MSLAOptionName.LayerSettings) @Getter private Byte PerLayerSettings; // Not totally understood. 0 to not support, 0x40 to 0x50 to allow per layer parameters
         @MSLAFileField(order = 45) final private Integer Unknown4 = 0;
-        @MSLAFileField(order = 46) final private Integer Unknown5 = 8; // Also 1
+        @MSLAFileField(order = 46) @MSLAOption(MSLAOptionName.AntialiasLevel) private Integer AntialiasLevel; // Also 1
         @MSLAFileField(order = 47) @MSLAOption(MSLAOptionName.NormalLayersWaitAfterCure) @Getter private Float RestTimeAfterRetract;
         @MSLAFileField(order = 48) @MSLAOption(MSLAOptionName.WaitAfterLift2) @Getter private Float RestTimeAfterLift2;
         @MSLAFileField(order = 49) @MSLAOption(MSLAOptionName.TransitionLayersCount) @Getter private Integer TransitionLayerCount;

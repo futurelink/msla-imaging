@@ -27,11 +27,11 @@ public class CTBFileSlicerInfo extends CTBFileBlock {
         @MSLAFileField(order = 6) @MSLAOption(MSLAOptionName.WaitAfterLift) private Float RestTimeAfterLift;
         @MSLAFileField(order = 7) @Setter private Integer MachineNameOffset;
         @MSLAFileField(order = 8) @Setter private Integer MachineNameSize;
-        @MSLAFileField(order = 9) private final Byte AntiAliasFlag = 0x0F;
+        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.Antialias) private Byte AntiAliasFlag;
         @MSLAFileField(order = 10) private final Short Padding = 0;
         @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.LayerSettings) private Byte PerLayerSettings;
         @MSLAFileField(order = 12) private final Integer ModifiedTimestampMinutes = 0; // TODO fill in with current time
-        @MSLAFileField(order = 13) private final Integer AntiAliasLevel = 1;
+        @MSLAFileField(order = 13) @MSLAOption(MSLAOptionName.AntialiasLevel) private Integer AntiAliasLevel = 1;
         @MSLAFileField(order = 14) private Integer SoftwareVersion;
         @MSLAFileField(order = 15) @MSLAOption(MSLAOptionName.WaitAfterRetract) private Float RestTimeAfterRetract;
         @MSLAFileField(order = 16) @MSLAOption(MSLAOptionName.WaitAfterLift2) private Float RestTimeAfterLift2;
