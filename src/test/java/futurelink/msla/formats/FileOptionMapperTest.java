@@ -48,6 +48,13 @@ public class FileOptionMapperTest extends CommonTestRoutines {
         layerOptions.setLayerNumber(0);
         layerOptions.set(MSLAOptionName.LayerLightPWM, "128");
         assertEquals(128f, Float.parseFloat(layerOptions.get(MSLAOptionName.LayerLightPWM)));
+
+        System.out.println(layerOptions.available());
+        for (var option : layerOptions.available()) {
+            System.out.print(option);
+            System.out.println(" = " + layerOptions.get(option));
+        }
+
     }
 
     @Test

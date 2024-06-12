@@ -157,11 +157,12 @@ public class LayerOptionMapper extends OptionMapper {
         var option = optionsMap.get(optionName);
         var layer = (MSLAFileLayer) file.getLayers().get(layerNumber);
         try {
-            if ("".equals(option.getLocation().get(0))) {
+            if (option.getLocation().isEmpty() || "".equals(option.getLocation().get(0))) {
                 // Option is in root layer definition object
-                var optionField = layer.getClass().getDeclaredField(option.getName());
+                var fields = layer.getBlockFields();
+                var optionField = fields.getClass().getDeclaredField(option.getName());
                 optionField.setAccessible(true);
-                var value = optionField.get(layer);
+                var value = optionField.get(fields);
                 optionField.setAccessible(false);
                 return (Serializable) value;
             } else {
@@ -177,11 +178,11 @@ public class LayerOptionMapper extends OptionMapper {
                     optionField.setAccessible(false);
                     return (Serializable) value;
                 } else {
-                    throw new MSLAException("Option can't be set");
+                    throw new MSLAException("Option can't be fetched");
                 }
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new MSLAException("Can't set option", e);
+            throw new MSLAException("Can't fetch option", e);
         }
     }
 

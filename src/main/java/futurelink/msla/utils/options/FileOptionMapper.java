@@ -47,7 +47,7 @@ public class FileOptionMapper extends OptionMapper {
      * is considered to be MSLAFileBlock or MSLAFileBlockFields that have
      * option fields inside.
      */
-    public void enumerateOptions() throws MSLAException {
+    private void enumerateOptions() throws MSLAException {
         var fileClass = file.getClass();
         var fields = fileClass.getDeclaredFields();
         this.optionsMap.clear();

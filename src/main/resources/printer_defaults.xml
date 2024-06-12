@@ -572,6 +572,7 @@
             <option name="LayerWaitAfterLift" type="float" value="0.0" minValue="0" maxValue="100.0"/>
             <option name="LayerWaitAfterRetract" type="float" value="0.0" minValue="0" maxValue="100.0"/>
             <option name="LayerLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="LightOffTime" type="float" value="0.0" minValue="0.0" maxValue="100.0"/>
         </layer_options>
         <file_options>
             <option name="Weight" type="float" value="0" minValue="0" maxValue="99999.99"/>
