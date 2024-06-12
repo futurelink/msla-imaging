@@ -98,6 +98,17 @@ public class FileOptionMapper extends OptionMapper {
     }
 
     @Override
+    public List<MSLAOptionGroup> getGroups() {
+        if (this.optionGroupsMapper == null) return null;
+        var groups = new ArrayList<MSLAOptionGroup>();
+        for (var option : optionsMap.keySet()) {
+            var grp = this.optionGroupsMapper.getGroup(option);
+            if (!groups.contains(grp)) groups.add(grp);
+        }
+        return groups;
+    }
+
+    @Override
     public boolean hasOption(MSLAOptionName option) {
         return this.optionsMap.containsKey(option);
     }

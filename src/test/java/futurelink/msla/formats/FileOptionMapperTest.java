@@ -72,4 +72,14 @@ public class FileOptionMapperTest extends CommonTestRoutines {
         assertThrows(MSLAException.class, () -> options.set(MSLAOptionName.BottomLayersExposureTime, "121"));
         assertThrows(MSLAException.class, () -> options.set(MSLAOptionName.BottomLayersExposureTime, "-1"));
     }
+
+    @Test
+    void GetOptionGroupsTest() throws MSLAException {
+        var machine = "Anycubic Photon M3 Max";
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
+                .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machine));
+        var file = FileFactory.instance.create(machine);
+        var options = new FileOptionMapper(file, defaults);
+        assertEquals(5, options.getGroups().size()); // We expect 5 option groups for this machine
+    }
 }

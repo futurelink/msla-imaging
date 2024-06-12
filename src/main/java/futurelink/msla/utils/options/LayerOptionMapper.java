@@ -109,13 +109,11 @@ public class LayerOptionMapper extends OptionMapper {
         return this.optionsMap.get(option).getParameters();
     }
 
-    @Override
-    public MSLAOptionGroup getGroup(MSLAOptionName option) {
+    @Override public MSLAOptionGroup getGroup(MSLAOptionName option) {
         return null;
     }
-
-    @Override
-    public boolean hasOption(MSLAOptionName optionName) {
+    @Override public List<MSLAOptionGroup> getGroups() { return List.of(); }
+    @Override public boolean hasOption(MSLAOptionName optionName) {
         return this.optionsMap.containsKey(optionName);
     }
 

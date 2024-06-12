@@ -5,6 +5,7 @@ import futurelink.msla.formats.iface.MSLADefaults;
 import futurelink.msla.formats.iface.MSLADefaultsParams;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 public interface MSLAOptionMapper {
@@ -48,6 +49,11 @@ public interface MSLAOptionMapper {
      * @param option option name
      */
     MSLAOptionGroup getGroup(MSLAOptionName option);
+
+    /**
+     * Returns all groups for all options available in a file.
+     */
+    List<MSLAOptionGroup> getGroups();
 
     /**
      * Returns true if mapper has option with specified name.
