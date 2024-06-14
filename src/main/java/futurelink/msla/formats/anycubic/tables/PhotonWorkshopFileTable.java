@@ -8,21 +8,22 @@ import lombok.Getter;
 /**
  * Common class for section representation.
  */
+@Getter
 abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {
     public static final int MarkLength = 12;
 
-    @Getter protected String Name;
-    @Getter protected int TableLength;
-    protected byte versionMajor;
-    protected byte versionMinor;
+    protected String Name;
+    protected int TableLength;
+    protected byte VersionMajor;
+    protected byte VersionMinor;
 
     public PhotonWorkshopFileTable(byte versionMajor, byte versionMinor) {
         setVersion(versionMajor, versionMinor);
     }
 
     public void setVersion(byte versionMajor, byte versionMinor) {
-        this.versionMajor = versionMajor;
-        this.versionMinor = versionMinor;
+        this.VersionMajor = versionMajor;
+        this.VersionMinor = versionMinor;
     }
 
     abstract int calculateTableLength();
