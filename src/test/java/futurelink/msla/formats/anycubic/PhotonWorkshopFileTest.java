@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,19 +21,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PhotonWorkshopFileTest extends CommonTestRoutines {
 
     @Test
-    void TestFileRead() throws MSLAException {
+    void TestBasicFileRead() throws MSLAException {
         String[] testFiles = {
                 "test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma",
                 "test_data/PhotonFileTest/Example_Photon_Mono.pwmo"
         };
-        for (var testFile : testFiles) {
-            var file = FileFactory.instance.load(resourceFile(testFile));
+        Integer[] fileOptionsCount = {32, 17};
+        for (int i = 0; i < fileOptionsCount.length; i++) {
+            var file = (PhotonWorkshopFile) FileFactory.instance.load(resourceFile(testFiles[i]));
             assertTrue(file.isValid());
-
+            assertEquals(426, file.getLayers().count());
             var optionMapper = new FileOptionMapper(file, null);
+            LinkedList<String> options = new LinkedList<>();
             for (var option : optionMapper.available()) {
-                System.out.println(option + " in " + optionMapper.getGroup(option) + " = " + optionMapper.get(option));
+                options.add(option + " in " + optionMapper.getGroup(option) + " = " + optionMapper.get(option));
             }
+            assertEquals(fileOptionsCount[i], options.size());
         }
     }
 
