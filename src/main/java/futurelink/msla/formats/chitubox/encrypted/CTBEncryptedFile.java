@@ -173,8 +173,12 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
         if (index == 0) PreviewSmall.setImage(image); else PreviewLarge.setImage(image);
     }
     @Override public boolean isMachineValid(MSLAFileDefaults defaults) {
-        return defaults.getFileClass().equals(this.getClass()) &&
-                ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+        try {
+            return defaults.getFileClass().equals(this.getClass()) &&
+                    ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+        } catch (MSLAException e) {
+            return false;
+        }
     }
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return SlicerSettings.getBlockFields().getResolution(); }

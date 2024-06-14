@@ -105,8 +105,10 @@
         <option name="NormalLayersLiftSpeed"/>
         <option name="NormalLayersLiftSpeed1"/>
         <option name="NormalLayersLiftSpeed2"/>
+        <option name="NormalLayersRetractSpeed"/>
         <option name="NormalLayersRetractSpeed1"/>
         <option name="NormalLayersRetractSpeed2"/>
+        <option name="NormalLayersRetractHeight"/>
         <option name="NormalLayersRetractHeight2"/>
         <option name="NormalLayersWaitAfterCure"/>
         <option name="NormalLayersWaitBeforeCure"/>

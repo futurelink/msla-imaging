@@ -7,6 +7,7 @@ import futurelink.msla.tools.BufferedImageInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class GOOFileCodec implements MSLALayerCodec<byte[]> {
@@ -42,46 +43,49 @@ public class GOOFileCodec implements MSLALayerCodec<byte[]> {
         @Override public byte[] data() { return stream.toByteArray(); }
     }
 
-    private void GOOFileCodecAddRep(LinkedList<Byte> rle, int stride, int currentColor, int previousColor) {
+    private void GOOFileCodecAddRep(List<Byte> rle, int stride, int currentColor, int previousColor) {
         if (stride == 0) return;
         int lastByteIndex = rle.size();
-        var lastValue = rle.getLast();
         rle.add((byte) 0);
 
         // Difference mode
         var colorDifference = (byte) Math.abs(currentColor - previousColor);
-        if (useColorDifferenceCompression && colorDifference <= 0xF && stride <= 255 && (currentColor > 0 && currentColor < 255)) {
+        if (useColorDifferenceCompression &&
+                (colorDifference <= 0xF) &&
+                (stride <= 255) &&
+                (currentColor > 0 && currentColor < 255))
+        {
             rle.set(lastByteIndex, (byte) (0b10 << 6 | (colorDifference & 0x0F)));
             if (stride > 1) {
                 rle.set(lastByteIndex, (byte) (0x1 << 4));
-                rle.add((byte) stride);
+                rle.add((byte) (stride & 0xff));
             }
 
-            if (currentColor < previousColor) rle.set(lastByteIndex, (byte) (lastValue | 0x01 << 5));
+            if (currentColor < previousColor) rle.set(lastByteIndex, (byte) (rle.get(lastByteIndex) | 0x01 << 5));
         } else {
             // 1 1 This chunk contain all 0xff pixels
-            if (currentColor == 255) rle.set(lastByteIndex, (byte) ((lastValue | 0b11 << 6) & 0xff));
+            if (currentColor == 255) rle.set(lastByteIndex, (byte) ((rle.get(lastByteIndex) | 0b11 << 6) & 0xff));
 
             // 0 1 This chunk contain the value of gray between 0x1 to 0xfe. The gray value is after byte0.
             else if (currentColor > 0) {
-                rle.set(lastByteIndex, (byte) (lastValue | 0b01 << 6));
-                rle.add((byte) currentColor);
+                rle.set(lastByteIndex, (byte) (rle.get(lastByteIndex) | 0b01 << 6));
+                rle.add((byte) (currentColor & 0xff));
             }
 
-            rle.set(lastByteIndex, (byte) (lastValue | stride & 0x0F));
+            rle.set(lastByteIndex, (byte) (rle.get(lastByteIndex) | stride & 0x0F));
             if (stride > 0x0F) {
                 if (stride <= 0xFFF) {
-                    rle.set(lastByteIndex, (byte) ((lastValue | 0b01 << 4) & 0xff));
-                    rle.add((byte) (stride >> 4));
+                    rle.set(lastByteIndex, (byte) ((rle.get(lastByteIndex) | 0b01 << 4) & 0xff));
+                    rle.add((byte) ((stride >> 4) & 0xff));
                 } else if (stride <= 0xFFFFF) {
-                    rle.set(lastByteIndex, (byte) ((lastValue | 0b10 << 4) & 0xff));
-                    rle.add((byte) (stride >> 12));
-                    rle.add((byte) (stride >> 4));
+                    rle.set(lastByteIndex, (byte) ((rle.get(lastByteIndex) | 0b10 << 4) & 0xff));
+                    rle.add((byte) ((stride >> 12) & 0xff));
+                    rle.add((byte) ((stride >> 4) & 0xff));
                 } else if (stride <= 0xFFFFFFF) {
-                    rle.set(lastByteIndex, (byte) ((lastValue | 0b11 << 4) & 0xff));
-                    rle.add((byte) (stride >> 20));
-                    rle.add((byte) (stride >> 12));
-                    rle.add((byte) (stride >> 4));
+                    rle.set(lastByteIndex, (byte) ((rle.get(lastByteIndex) | 0b11 << 4) & 0xff));
+                    rle.add((byte) ((stride >> 20) & 0xff));
+                    rle.add((byte) ((stride >> 12) & 0xff));
+                    rle.add((byte) ((stride >> 4) & 0xff));
                 }
             }
         }
@@ -89,13 +93,13 @@ public class GOOFileCodec implements MSLALayerCodec<byte[]> {
 
     @Override
     public MSLALayerEncodeOutput<byte[]> Encode(int layerNumber, MSLALayerEncodeReader reader) throws MSLAException {
-        var rle = new LinkedList<Byte>();
+        var RLEData = new LinkedList<Byte>();
         int previousColor = 0;
         int currentColor = 0;
         int stride = 0;
         byte checkSum = 0;
 
-        rle.add(LAYER_MAGIC);
+        RLEData.add(LAYER_MAGIC);
         try (var input = new BufferedImageInputStream(
                 reader.read(layerNumber),
                 MSLALayerEncodeReader.ReadDirection.READ_ROW)
@@ -104,20 +108,20 @@ public class GOOFileCodec implements MSLALayerCodec<byte[]> {
                 var color = input.read();
                 if (currentColor == color) stride++;
                 else {
-                    GOOFileCodecAddRep(rle, stride, currentColor, previousColor);
+                    GOOFileCodecAddRep(RLEData, stride, currentColor, previousColor);
                     stride = 1;
                     previousColor = currentColor;
                     currentColor = color;
                 }
             }
 
-            GOOFileCodecAddRep(rle, stride, currentColor, previousColor);
+            GOOFileCodecAddRep(RLEData, stride, currentColor, previousColor);
 
             // Calculate checksum
-            for (int i = 1; i < rle.size(); i++) checkSum += rle.get(i);
-            rle.add((byte) (~checkSum & 0xff));
+            for (int i = 1; i < RLEData.size(); i++) checkSum += RLEData.get(i);
+            RLEData.add((byte) (~checkSum & 0xff));
 
-            return new Output(rle);
+            return new Output(RLEData);
         } catch (IOException e) {
             throw new MSLAException("Can't encode layer data", e);
         }

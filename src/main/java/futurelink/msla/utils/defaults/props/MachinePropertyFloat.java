@@ -3,6 +3,8 @@ package futurelink.msla.utils.defaults.props;
 import futurelink.msla.formats.MSLAException;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 @Getter
 public class MachinePropertyFloat extends MachineProperty {
     private final Float minValue;
@@ -14,11 +16,17 @@ public class MachinePropertyFloat extends MachineProperty {
     }
 
     @Override public String getType() { return "float"; }
-    @Override public Byte getByte() { return null; }
-    @Override public Short getShort() { return null; }
-    @Override public Integer getInt() { return null; }
-    @Override public Long getLong() { return null; }
-    @Override public String getString() { return String.valueOf(getValue()); }
+
+    protected Serializable valueToType(String type, Object value) throws MSLAException {
+        var strValue = String.valueOf(value);
+        return switch (type) {
+            case "float", "Float" -> Float.parseFloat(strValue);
+            case "double", "Double" -> Double.parseDouble(strValue);
+            case "int", "Integer" -> Integer.parseInt(strValue);
+            case "String" -> strValue;
+            default -> throw new MSLAException("Value '" + value + "' of type '" + type + "' can't be converted to Float");
+        };
+    }
 
     @Override
     public void checkValue(String value) throws MSLAException {

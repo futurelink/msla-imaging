@@ -1,5 +1,6 @@
 package futurelink.msla.formats.iface;
 
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.options.MSLAOptionName;
 import futurelink.msla.utils.Size;
 
@@ -13,9 +14,10 @@ public interface MSLAFileDefaults extends MSLADefaults {
     String getFileExtension();
     Class<? extends MSLAFile<?>> getFileClass();
 
-    Size getResolution();
-    float getPixelSize();
+    Size getResolution() throws MSLAException;
+    float getPixelSize() throws MSLAException;
 
     MSLADefaultsParams getFileOption(MSLAOptionName name);
     MSLAFileProps getFileProps();
+    boolean hasFileOption(MSLAOptionName name);
 }

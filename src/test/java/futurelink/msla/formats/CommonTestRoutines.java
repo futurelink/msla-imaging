@@ -55,4 +55,10 @@ public class CommonTestRoutines {
         assertTrue(outFile2.exists());
         assertEquals(size, outFile2.length());
     }
+
+    protected void assertFileExactSizeNoDelete(String fileName, int size) {
+        var outFile2 = new File(fileName);
+        assertTrue(outFile2.exists());
+        assertEquals(size, outFile2.length());
+    }
 }

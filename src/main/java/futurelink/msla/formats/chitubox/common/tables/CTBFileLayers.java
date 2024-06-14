@@ -102,6 +102,7 @@ public class CTBFileLayers extends CTBFileBlock implements MSLAFileLayers<CTBFil
                     throw new MSLAException("Error reading brief layer definition for layer " + i + ": data size mismatch");
                 position += layerDef.getBlockFields().getParent().getDataLength();
                 bytesRead += len;
+                layerDef.getBlockFields().getParent().setBriefMode(false);
             }
         } catch (FileFieldsException e) {
             throw new MSLAException("Error reading brief layer definition", e);

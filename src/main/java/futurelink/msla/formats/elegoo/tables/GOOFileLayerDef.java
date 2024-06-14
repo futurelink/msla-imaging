@@ -8,6 +8,7 @@ import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.iface.options.MSLAOption;
 import futurelink.msla.formats.iface.options.MSLAOptionName;
 import lombok.Getter;
+import lombok.Setter;
 
 
 @Getter
@@ -16,27 +17,27 @@ public class GOOFileLayerDef extends GOOFileTable implements MSLAFileLayer {
 
     @SuppressWarnings("unused")
     static public class Fields implements MSLAFileBlockFields {
-        @MSLAFileField short Pause;
-        @MSLAFileField(order = 1) float PausePositionZ;
-        @MSLAFileField(order = 2) float PositionZ;
-        @MSLAFileField(order = 3) @MSLAOption(MSLAOptionName.NormalLayersExposureTime) float ExposureTime;
-        @MSLAFileField(order = 4) @MSLAOption(MSLAOptionName.LightOffTime) float LightOffDelay;
-        @MSLAFileField(order = 5) @MSLAOption(MSLAOptionName.NormalLayersWaitAfterCure) float WaitTimeAfterCure;
-        @MSLAFileField(order = 6) @MSLAOption(MSLAOptionName.NormalLayersWaitAfterLift) float WaitTimeAfterLift;
-        @MSLAFileField(order = 7) @MSLAOption(MSLAOptionName.NormalLayersWaitBeforeCure) float WaitTimeBeforeCure;
-        @MSLAFileField(order = 8) @MSLAOption(MSLAOptionName.NormalLayersLiftHeight) float LiftHeight;
-        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.NormalLayersLiftSpeed) float LiftSpeed;
-        @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.LiftHeight2) float LiftHeight2;
-        @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.LiftSpeed2) float LiftSpeed2;
-        @MSLAFileField(order = 12) @MSLAOption(MSLAOptionName.RetractHeight) float RetractHeight;
-        @MSLAFileField(order = 13) @MSLAOption(MSLAOptionName.RetractSpeed) float RetractSpeed;
-        @MSLAFileField(order = 14) @MSLAOption(MSLAOptionName.RetractHeight2) float RetractHeight2;
-        @MSLAFileField(order = 15) @MSLAOption(MSLAOptionName.RetractSpeed2) float RetractSpeed2;
-        @MSLAFileField(order = 16) @MSLAOption(MSLAOptionName.LightPWM) short LightPWM;
-        @MSLAFileField(order = 17, length = 2) public byte[] Delimiter1 = new byte[]{ 0x0d, 0x0a };
-        @MSLAFileField(order = 18) int DataLength = 0;
-        @MSLAFileField(order = 19, lengthAt = "DataLength") @Getter byte[] Data;
-        @MSLAFileField(order = 20, length = 2) public byte[] Delimiter2 = new byte[]{ 0x0d, 0x0a };
+        @MSLAFileField @Getter private Short Pause = 0;
+        @MSLAFileField(order = 1) @Getter private Float PausePositionZ = 0.0f;
+        @MSLAFileField(order = 2) @Getter private Float PositionZ = 0.0f;
+        @MSLAFileField(order = 3) @MSLAOption(MSLAOptionName.LayerExposureTime) @Getter private Float ExposureTime;
+        @MSLAFileField(order = 4) @MSLAOption(MSLAOptionName.LayerLightOffDelay) @Getter private Float LightOffDelay;
+        @MSLAFileField(order = 5) @MSLAOption(MSLAOptionName.LayerWaitAfterCure) @Getter private Float WaitTimeAfterCure;
+        @MSLAFileField(order = 6) @MSLAOption(MSLAOptionName.LayerWaitAfterLift) @Getter private Float WaitTimeAfterLift;
+        @MSLAFileField(order = 7) @MSLAOption(MSLAOptionName.LayerWaitBeforeCure) @Getter private Float WaitTimeBeforeCure;
+        @MSLAFileField(order = 8) @MSLAOption(MSLAOptionName.LayerLiftHeight) @Getter private Float LiftHeight;
+        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.LayerLiftSpeed) @Getter private Float LiftSpeed;
+        @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.LayerLiftHeight2) @Getter private Float LiftHeight2;
+        @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.LayerLiftSpeed2) @Getter private Float LiftSpeed2;
+        @MSLAFileField(order = 12) @MSLAOption(MSLAOptionName.LayerRetractHeight) @Getter private Float RetractHeight;
+        @MSLAFileField(order = 13) @MSLAOption(MSLAOptionName.LayerRetractSpeed) @Getter private Float RetractSpeed;
+        @MSLAFileField(order = 14) @MSLAOption(MSLAOptionName.LayerRetractHeight2) @Getter private Float RetractHeight2;
+        @MSLAFileField(order = 15) @MSLAOption(MSLAOptionName.LayerRetractSpeed2) @Getter private Float RetractSpeed2;
+        @MSLAFileField(order = 16) @MSLAOption(MSLAOptionName.LayerLightPWM) @Getter private Short LightPWM;
+        @MSLAFileField(order = 17, length = 2) private final byte[] Delimiter1 = new byte[] { 0x0d, 0x0a };
+        @MSLAFileField(order = 18) @Setter @Getter private Integer DataLength = 0;
+        @MSLAFileField(order = 19, lengthAt = "DataLength") @Getter @Setter private byte[] Data;
+        @MSLAFileField(order = 20, length = 2) private final byte[] Delimiter2 = new byte[] { 0x0d, 0x0a };
     }
 
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
@@ -44,7 +45,6 @@ public class GOOFileLayerDef extends GOOFileTable implements MSLAFileLayer {
     }
 
     @Override public String getName() { return null; }
-    @Override public int getDataLength() { return 72 + blockFields.DataLength; }
     @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 
 }

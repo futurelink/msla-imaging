@@ -7,6 +7,10 @@ import futurelink.msla.formats.io.FileFieldsIO;
 public abstract class GOOFileTable implements MSLAFileBlock {
     @Override
     public int getDataFieldOffset(String fieldName) throws FileFieldsException {
-        return FileFieldsIO.getBlockLength(this.getBlockFields(), fieldName);
+        return FileFieldsIO.getBlockLength(this, fieldName);
+    }
+
+    @Override public int getDataLength() throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(this);
     }
 }

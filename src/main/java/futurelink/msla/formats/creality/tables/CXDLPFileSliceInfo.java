@@ -1,5 +1,6 @@
 package futurelink.msla.formats.creality.tables;
 
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.iface.options.MSLAOption;
@@ -55,7 +56,7 @@ public class CXDLPFileSliceInfo extends CXDLPFileTable {
         }
     }
 
-    public CXDLPFileSliceInfo(MSLAFileProps initialProps) {
+    public CXDLPFileSliceInfo(MSLAFileProps initialProps) throws MSLAException {
         if (initialProps != null) {
             blockFields.setDisplayWidth(initialProps.getFloat("DisplayWidth").toString());
             blockFields.setDisplayHeight(initialProps.getFloat("DisplayHeight").toString());

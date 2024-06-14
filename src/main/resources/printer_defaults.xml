@@ -85,7 +85,7 @@
             <option name="Weight" type="float" value="0" minValue="0" maxValue="99999.99"/>
             <option name="Price" type="float" value="0" minValue="0" maxValue="99999.99"/>
             <option name="Volume" type="float" value="0" minValue="0" maxValue="99999.99"/>
-            <option name="PrintTime" value="0"/>
+            <option name="PrintTime" type="int" value="0" minValue="0" maxValue="999999"/>
             <option name="Currency" type="char" value="$"/>
             <option name="LayerSettings" type="boolean" value="0" trueValue="80" falseValue="0"/>
 
@@ -100,7 +100,8 @@
             <option name="Antialias" value="2"/>
             <option name="TransitionLayersCount" value="10"/>
             <option name="TransitionLayersType" value="0"/>
-            <option name="AdvancedMode" value="1"/>
+            <option name="AdvancedMode" type="boolean" value="1" trueValue="1" falseValue="0"/>
+            <option name="IntelligentMode" type="boolean" value="1" trueValue="1" falseValue="0"/>
 
             <option name="BottomLayersGradient" type="int" value="2" minValue="1" maxValue="2"/>
             <option name="BottomLayersLiftHeight1" type="float" value="2.0" minValue="1.0" maxValue="100.0"/>
@@ -459,18 +460,21 @@
             <property name="AntiAliasGreyMaxValue" value="0" />
         </file_properties>
         <file_options>
-            <option name="WaitBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
             <option name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
             <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+
             <option name="NormalLayersExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
-            <option name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="NormalLayersWaitBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
+            <option name="NormalLayersLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option name="NormalLayersLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="NormalLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+
             <option name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
             <option name="BottomLayersExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
             <option name="BottomLayersLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
             <option name="BottomLayersLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
             <option name="BottomLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+
             <option name="DistortionCompensation" type="boolean" value="0" trueValue="1" falseValue="0"/>
             <option name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
             <option name="DistortionCompensationLength" type="int" value="0" minValue="0" maxValue="1000000"/>
@@ -478,6 +482,7 @@
             <option name="XYAxisProfileCompensationValue" type="int" value="0" minValue="0" maxValue="1000000"/>
             <option name="ZPenetrationCompensation" type="boolean" value="0" trueValue="1" falseValue="0"/>
             <option name="ZPenetrationCompensationLevel" type="int" value="0" minValue="0" maxValue="1000000"/>
+
             <option name="Antialias" type="boolean" value="0" trueValue="1" falseValue="0"/>
             <option name="ImageBlur" type="boolean" value="0" trueValue="1" falseValue="0"/>
             <option name="ImageBlurLevel" type="int" value="0" minValue="1" maxValue="255"/>
@@ -496,54 +501,74 @@
             file="futurelink.msla.formats.elegoo.GOOFile"
     >
         <file_properties>
-            <property name="MachineName" value="DEFAULT"/>
+            <property name="MachineName" value="ELEGOO Mars 4 Max"/>
             <property name="MachineType" value="DLP"/>
             <property name="ProfileName" value="DEFAULT"/>
         </file_properties>
         <file_options>
-            <option name="AntialiasLevel" type="int" value="8" minValue="0" maxValue="100"/>;
-            <option name="GreyLevel" type="int" value="1" minValue="0" maxValue="100"/>
-            <option name="ImageBlurLevel" type="int" value="0" minValue="0" maxValue="100"/>
-            <option name="MirrorX" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option name="MirrorY" type="boolean" value="0" trueValue="1" falseValue="0"/>
-            <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
-            <option name="NormalLayersLightOffDelay" type="float" value="0" minValue="0" maxValue="100"/>
-            <option name="NormalLayersExposureTime" type="float" value="10" minValue="1" maxValue="120"/>
-            <option name="BottomLayersWaitAfterCure" type="float" value="0" minValue="0" maxValue="100"/>
-            <option name="BottomLayersWaitAfterLift" type="float" value="0" minValue="0" maxValue="100"/>
-            <option name="BottomLayersWaitBeforeCure" type="float" value="0" minValue="0" maxValue="100"/>
-            <option name="NormalLayersWaitAfterCure" type="float" value="0" minValue="0" maxValue="100"/>
-            <option name="NormalLayersWaitAfterLift" type="float" value="0" minValue="0" maxValue="100"/>
-            <option name="NormalLayersWaitBeforeCure" type="float" value="0" minValue="0" maxValue="100"/>
-            <option name="BottomLayersExposureTime" type="float" value="0" minValue="0" maxValue="100"/>
-            <option name="BottomLayersCount" type="int" value="6" minValue="0" maxValue="99999"/>
-            <option name="BottomLayersLiftHeight" type="float" value="10" minValue="1" maxValue="100"/>
-            <option name="BottomLayersLiftSpeed" type="float" value="10" minValue="1" maxValue="100"/>
-            <option name="LiftHeight" type="float" value="10" minValue="1" maxValue="100"/>
-            <option name="LiftSpeed" type="float" value="10" minValue="1" maxValue="100"/>
-            <option name="BottomLayersRetractHeight" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="BottomLayersRetractSpeed" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="RetractHeight" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="RetractSpeed" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="BottomLayersLiftHeight2" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="BottomLayersLiftSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="LiftHeight2" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="LiftSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="BottomLayersRetractHeight2" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="BottomLayersRetractSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="RetractHeight2" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="RetractSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
-            <option name="BottomLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-            <option name="LayerSettings" type="boolean" value="0" trueValue="1" falseValue="0"/>
             <option name="PrintTime" type="int" value="0" minValue="0" maxValue="9999999"/>
             <option name="Volume" type="float" value="0" minValue="0" maxValue="9999999"/>
             <option name="Weight" type="float" value="0" minValue="0" maxValue="9999999"/>
             <option name="Price" type="float" value="0" minValue="0" maxValue="9999999"/>
             <option name="Currency" value="$"/>
-            <option name="GreyLevel" type="int" value="1" minValue="0" maxValue="255"/>
+
+            <option name="AntialiasLevel" type="int" value="8" minValue="0" maxValue="100"/>;
+            <option name="GreyLevel" type="int" value="1" minValue="0" maxValue="100"/>
+            <option name="ImageBlurLevel" type="int" value="0" minValue="0" maxValue="100"/>
+            <option name="MirrorX" type="boolean" value="false" trueValue="true" falseValue="false"/>
+            <option name="MirrorY" type="boolean" value="false" trueValue="true" falseValue="false"/>
+            <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option name="LightOffTime" type="float" value="0.0" minValue="0.0" maxValue="100.0"/>
+
+            <option name="LayerSettings" type="boolean" value="false" trueValue="true" falseValue="false"/>
             <option name="TransitionLayersCount" type="int" value="6" minValue="0" maxValue="255"/>
+
+            <option name="NormalLayersExposureTime" type="float" value="10" minValue="1" maxValue="120"/>
+            <option name="NormalLayersLightOffDelay" type="float" value="0" minValue="0" maxValue="100"/>
+            <option name="NormalLayersLiftHeight" type="float" value="10" minValue="1" maxValue="100"/>
+            <option name="NormalLayersLiftHeight2" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="NormalLayersLiftSpeed" type="float" value="10" minValue="1" maxValue="100"/>
+            <option name="NormalLayersLiftSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="NormalLayersRetractHeight" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="NormalLayersRetractSpeed" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="NormalLayersRetractHeight2" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="NormalLayersRetractSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="NormalLayersWaitAfterCure" type="float" value="0" minValue="0" maxValue="100"/>
+            <option name="NormalLayersWaitAfterLift" type="float" value="0" minValue="0" maxValue="100"/>
+            <option name="NormalLayersWaitBeforeCure" type="float" value="0" minValue="0" maxValue="100"/>
+            <option name="NormalLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+
+            <option name="BottomLayersCount" type="int" value="6" minValue="0" maxValue="99999"/>
+            <option name="BottomLayersWaitAfterCure" type="float" value="0" minValue="0" maxValue="100"/>
+            <option name="BottomLayersWaitAfterLift" type="float" value="0" minValue="0" maxValue="100"/>
+            <option name="BottomLayersWaitBeforeCure" type="float" value="0" minValue="0" maxValue="100"/>
+            <option name="BottomLayersExposureTime" type="float" value="0" minValue="0" maxValue="100"/>
+            <option name="BottomLayersLiftHeight" type="float" value="10" minValue="1" maxValue="100"/>
+            <option name="BottomLayersLiftHeight2" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="BottomLayersLiftSpeed" type="float" value="10" minValue="1" maxValue="100"/>
+            <option name="BottomLayersLiftSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="BottomLayersRetractHeight" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="BottomLayersRetractHeight2" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="BottomLayersRetractSpeed" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="BottomLayersRetractSpeed2" type="float" value="10" minValue="0" maxValue="100"/>
+            <option name="BottomLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
         </file_options>
+        <layer_options>
+            <option name="LayerExposureTime" value="0.0"/>
+            <option name="LayerLightOffDelay" value="0.0"/>
+            <option name="LayerWaitAfterCure" value="0.0"/>
+            <option name="LayerWaitAfterLift" value="0.0"/>
+            <option name="LayerWaitBeforeCure" value="0.0"/>
+            <option name="LayerLiftHeight" value="0.0"/>
+            <option name="LayerLiftSpeed" value="0.0"/>
+            <option name="LayerLiftHeight2" value="0.0"/>
+            <option name="LayerLiftSpeed2" value="0.0"/>
+            <option name="LayerRetractHeight" value="0.0"/>
+            <option name="LayerRetractSpeed" value="0.0"/>
+            <option name="LayerRetractHeight2" value="0.0"/>
+            <option name="LayerRetractSpeed2" value="0.0"/>
+            <option name="LayerLightPWM" value="255"/>
+        </layer_options>
     </printer>
 
     <printer
@@ -579,11 +604,11 @@
             <option name="Price" type="float" value="0" minValue="0" maxValue="99999.99"/>
             <option name="Volume" type="float" value="0" minValue="0" maxValue="99999.99"/>
             <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
-            <option name="LayerSettings" value="0"/>
+            <option name="LayerSettings" type="boolean" value="0" trueValue="0x40" falseValue="0"/>
 
-            <option name="Antialias" value="15"/>
+            <option name="Antialias" type="boolean" value="15" falseValue="7" trueValue="15"/>
             <option name="AntialiasLevel" value="4"/>
-            <option name="TransitionLayersCount" value="10"/>
+            <option name="TransitionLayersCount" type="int" value="10" minValue="0" maxValue="999999"/>
             <option name="WaitAfterLift" value="0.0"/>
             <option name="WaitAfterRetract" value="0.5"/>
             <option name="WaitAfterLift2" value="0.0"/>
@@ -601,8 +626,8 @@
             <option name="NormalLayersRetractSpeed2" value="0.0"/>
             <option name="NormalLayersRetractHeight2" value="0.0"/>
 
-            <option name="BottomLayersCount" value="5"/>
-            <option name="BottomLayersLightPWM" value="255"/>
+            <option name="BottomLayersCount" type="int" value="5" minValue="0" maxValue="999999"/>
+            <option name="BottomLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
             <option name="BottomLayersLightOffDelay" value="0"/>
             <option name="BottomLayersExposureTime" value="30"/>
             <option name="BottomLayersLiftHeight" value="7"/>
@@ -648,7 +673,7 @@
             <option name="Price" type="float" value="0" minValue="0" maxValue="99999.99"/>
             <option name="Volume" type="float" value="0" minValue="0" maxValue="99999.99"/>
             <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
-            <option name="LayerSettings" value="0"/>
+            <option name="LayerSettings" type="boolean" value="0" trueValue="0x40" falseValue="0"/>
 
             <option name="Antialias" value="15"/>
             <option name="AntialiasLevel" value="4"/>

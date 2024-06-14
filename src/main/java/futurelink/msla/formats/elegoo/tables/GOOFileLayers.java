@@ -35,10 +35,14 @@ public class GOOFileLayers implements MSLAFileLayers<GOOFileLayerDef, byte[]> {
                               Map<String, Object> params,
                               MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
     {
-        var layer = new GOOFileLayerDef();
+        var newLayer = new GOOFileLayerDef();
         var layerNumber = count();
-        layer.setDefaults(layerDefaults);
-        Layers.add(layer);
-        encoder.encode(layerNumber, reader, params, callback);
+        newLayer.setDefaults(layerDefaults);
+        Layers.add(newLayer);
+        encoder.encode(layerNumber, reader, params, (lay, data) -> {
+            Layers.get(layerNumber).getBlockFields().setDataLength(data.sizeInBytes());
+            Layers.get(layerNumber).getBlockFields().setData(data.data());
+            if (callback != null) callback.onFinish(layerNumber, data);
+        });
     }
 }

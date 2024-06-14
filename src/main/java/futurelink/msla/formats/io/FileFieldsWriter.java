@@ -105,7 +105,7 @@ public class FileFieldsWriter {
                     m.setAccessible(true); value = m.invoke(fields); m.setAccessible(false);
                     if (value == null) throw new IOException("Can't write null value of " + field);
                 }
-                if (value == null) throw new IOException("Can't write null value of " + field);
+                if (value == null) throw new IOException("Can't write null value of " + field + " in " + fields.getClass());
                 logger.fine("Write field " + field + " of " + type + " - " + type.getClass());
                 writeField(dos, type, value, (Integer) length, field.getCharset());
             }

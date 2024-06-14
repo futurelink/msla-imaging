@@ -92,8 +92,10 @@ public enum MSLAOptionName {
     NormalLayersLiftSpeed("Normal layers lift speed"),
     NormalLayersLiftSpeed1("Normal layers lift speed 1"),
     NormalLayersLiftSpeed2("Normal layers lift speed 2"),
+    NormalLayersRetractSpeed("Normal layers retract speed"),
     NormalLayersRetractSpeed1("Normal layers retract speed 1"),
     NormalLayersRetractSpeed2("Normal layers retract speed 2"),
+    NormalLayersRetractHeight("Normal layers retract height"),
     NormalLayersRetractHeight2("Normal layers retract height 2"),
     NormalLayersWaitAfterCure("Normal layers wait after cure"),
     NormalLayersWaitBeforeCure("Normal layers wait before cure"),
@@ -123,6 +125,7 @@ public enum MSLAOptionName {
     LayerLiftSpeed2("Layer lift speed 2"),
     LayerRetractSpeed("Layer retract speed"),
     LayerRetractSpeed2("Layer retract speed 2"),
+    LayerRetractHeight("Layer retract height"),
     LayerRetractHeight2("Layer retract height 2"),
     LayerLightPWM("Layer light PWM");
 

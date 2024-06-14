@@ -30,7 +30,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     @Getter @MSLAOptionContainer private PhotonWorkshopFileExtraTable Extra;
     @Getter @MSLAOptionContainer private PhotonWorkshopFileMachineTable Machine;
 
-    public PhotonWorkshopFile(MSLAFileProps initialProps) {
+    public PhotonWorkshopFile(MSLAFileProps initialProps) throws MSLAException {
         super(initialProps);
         var versionMajor = initialProps.getByte("VersionMajor");
         var versionMinor = initialProps.getByte("VersionMinor");
@@ -158,8 +158,12 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
-        return defaults.getFileClass().equals(this.getClass()) &&
-                ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+        try {
+            return defaults.getFileClass().equals(this.getClass()) &&
+                    ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+        } catch (MSLAException e) {
+            return false;
+        }
     }
 
     @Override public MSLAPreview getLargePreview() { return Preview; }

@@ -22,7 +22,7 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
      * work with just a part of all available fields.
      * Flag is true by default.
      */
-    @Setter private boolean isBriefMode = true;
+    @Setter private boolean isBriefMode = false;
 
 
     @SuppressWarnings("unused")
