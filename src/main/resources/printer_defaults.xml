@@ -3,7 +3,7 @@
     <printer
             manufacturer="Anycubic"
             name="Photon Mono"
-            resolution="2560x1620"
+            resolution="1620x2560"
             pixelSize="51.0"
             displayWidth="130.0"
             displayHeight="80.0"

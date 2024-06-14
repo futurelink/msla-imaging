@@ -17,6 +17,8 @@ import java.util.LinkedList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class PhotonWorkshopFileTest extends CommonTestRoutines {
 
@@ -30,7 +32,15 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
         for (int i = 0; i < fileOptionsCount.length; i++) {
             var file = (PhotonWorkshopFile) FileFactory.instance.load(resourceFile(testFiles[i]));
             assertTrue(file.isValid());
+
+            // Check defaults can be found for a file
+            var defaults = MachineDefaults.getInstance().getMachineDefaults(file);
+            assertFalse(defaults.isEmpty());
+
+            // Check layers count
             assertEquals(426, file.getLayers().count());
+
+            // Check options are there
             var optionMapper = new FileOptionMapper(file, null);
             LinkedList<String> options = new LinkedList<>();
             for (var option : optionMapper.available()) {

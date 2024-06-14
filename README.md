@@ -15,11 +15,12 @@ Supported mSLA file formats:
 - Elegoo GOO files
 
 Pre-configured devices with defaults:
-- Anycubic Photon M3 Max
-- Anycubic Photon Mono X 6K
-- Anycubic Photon Mono 4K
+- Anycubic Photon Mono
 - Anycubic Photon Mono X
+- Anycubic Photon Mono 4K
+- Anycubic Photon Mono X 6K
 - Anycubic Photon M3
+- Anycubic Photon M3 Max
 - Creality HALOT-ONE PLUS
 - Creality HALOT-ONE PRO
 - Creality HALOT-ONE
