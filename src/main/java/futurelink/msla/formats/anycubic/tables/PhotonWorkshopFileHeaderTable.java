@@ -76,17 +76,17 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
 
         @Override
         public boolean isFieldExcluded(String fieldName) {
-            if (parent.versionMajor < 2) {
+            if (parent.VersionMajor < 2) {
                 return "IntelligentMode".equals(fieldName) || "ResinType".equals(fieldName) ||
                         "BlurLevel".equals(fieldName) || "Grey".equals(fieldName) ||
                         "AdvancedMode".equals(fieldName);
             } else {
-                if (parent.versionMinor < 6 && "IntelligentMode".equals(fieldName)) return true;
-                if (parent.versionMinor < 5) {
+                if (parent.VersionMinor < 6 && "IntelligentMode".equals(fieldName)) return true;
+                if (parent.VersionMinor < 5) {
                     if ("ResinType".equals(fieldName) || "BlurLevel".equals(fieldName) || "Grey".equals(fieldName))
                         return true;
                 }
-                if (parent.versionMinor < 4 && "AdvancedMode".equals(fieldName)) return true;
+                if (parent.VersionMinor < 4 && "AdvancedMode".equals(fieldName)) return true;
             }
             return false;
         }
@@ -111,8 +111,8 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     }
 
     public int calculateTableLength() {
-        if (versionMajor >= 2) {
-            return switch (versionMinor) {
+        if (VersionMajor >= 2) {
+            return switch (VersionMinor) {
                 case 4 -> 84;
                 case 5 -> 92;
                 case 6 -> 96;

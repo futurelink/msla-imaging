@@ -165,12 +165,12 @@ public class FileOptionMapper extends OptionMapper {
                     rawValue = f.get(fields);
                     f.setAccessible(false);
                 }
-                if (defaults.hasFileOption(optionName)) {
+                if (defaults != null && defaults.hasFileOption(optionName)) {
                     var value = defaults.rawToDisplay(optionName, (Serializable) rawValue); // Gets RAW option value
                     logger.fine("Raw option value '" + rawValue + "' is displayed as '" + value + "'");
                     return value;
                 } else {
-                    logger.warning("Raw option value '" + rawValue + "' is displayed it is, no opting params defined");
+                    logger.warning("Raw option value '" + rawValue + "' is displayed it is, no option params defined");
                     return String.valueOf(rawValue);
                 }
             } else throw new MSLAException("Can't fetch option, no file block fields instantiated");
