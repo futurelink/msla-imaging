@@ -38,12 +38,14 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
         Header = new PhotonWorkshopFileHeaderTable(versionMajor, versionMinor);
         Header.setPixelSize(initialProps.getFloat("PixelSize"));
         Header.setResolution(Size.parseSize(initialProps.get("Resolution").getString()));
-        Machine = new PhotonWorkshopFileMachineTable(versionMajor, versionMinor);
         Preview = new PhotonWorkshopFilePreview1Table(versionMajor, versionMinor);
         Software = new PhotonWorkshopFileSoftwareTable(versionMajor, versionMinor);
         Layers = new PhotonWorkshopFileLayerDefTable(versionMajor, versionMinor);
         if ((versionMajor >= 2) && (versionMinor >= 4)) {
             Extra = new PhotonWorkshopFileExtraTable(versionMajor, versionMinor);
+        }
+        if ((versionMajor >= 2) && (versionMinor >= 3)) {
+            Machine = new PhotonWorkshopFileMachineTable(versionMajor, versionMinor);
         }
     }
 
@@ -75,8 +77,12 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
     }
 
     private void initCodec() throws MSLAException {
-        if (Machine == null) throw new MSLAException("Machine section was not initialized properly");
-        var imageFormat = Machine.getLayerImageFormat();
+        var imageFormat = "pw0Img";
+        // For version >= 2.4 machine section is mandatory
+        if (Header.getVersionMajor() >= 2 && Header.getVersionMinor() >= 4) {
+            if (Machine == null) throw new MSLAException("Machine section was not initialized properly");
+            imageFormat = Machine.getLayerImageFormat();
+        }
         if ("pw0Img".equals(imageFormat)) {
             codec = PhotonWorkshopCodecPW0.class;
         } else if ("pwsImg".equals(imageFormat)) {

@@ -20,14 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PhotonWorkshopFileTest extends CommonTestRoutines {
 
     @Test
-    void TestFileRead() {
-        try {
-            var file = FileFactory.instance.load(
-                    resourceFile("test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma")
-            );
+    void TestFileRead() throws MSLAException {
+        String[] testFiles = {
+                "test_data/PhotonFileTest/Example_Photon_Mono_4K.pwma",
+                "test_data/PhotonFileTest/Example_Photon_Mono.pwmo"
+        };
+        for (var testFile : testFiles) {
+            var file = FileFactory.instance.load(resourceFile(testFile));
             assertTrue(file.isValid());
-        } catch (MSLAException e) {
-            throw new RuntimeException(e);
         }
     }
 
