@@ -14,29 +14,28 @@ public class CTBFileSlicerInfo extends CTBFileBlock {
     private final String OPTIONS_SECTION_NAME = "SlicerInfo";
     private final Fields blockFields;
 
-    @Getter
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
         private final CTBFileBlock parent;
-        @MSLAFileField @MSLAOption(MSLAOptionName.BottomLayersLiftHeight2) private Float BottomLiftHeight2;
-        @MSLAFileField(order = 1) @MSLAOption(MSLAOptionName.BottomLayersLiftSpeed2) private Float BottomLiftSpeed2;
-        @MSLAFileField(order = 2) @MSLAOption(MSLAOptionName.NormalLayersLiftHeight2) private Float LiftHeight2;
-        @MSLAFileField(order = 3) @MSLAOption(MSLAOptionName.NormalLayersLiftSpeed2) private Float LiftSpeed2;
-        @MSLAFileField(order = 4) @MSLAOption(MSLAOptionName.NormalLayersRetractHeight2) private Float RetractHeight2;
-        @MSLAFileField(order = 5) @MSLAOption(MSLAOptionName.NormalLayersRetractSpeed2) private Float RetractSpeed2;
-        @MSLAFileField(order = 6) @MSLAOption(MSLAOptionName.WaitAfterLift) private Float RestTimeAfterLift;
-        @MSLAFileField(order = 7) @Setter private Integer MachineNameOffset;
-        @MSLAFileField(order = 8) @Setter private Integer MachineNameSize;
-        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.Antialias) private Byte AntiAliasFlag;
+        @MSLAFileField @MSLAOption(MSLAOptionName.BottomLayersLiftHeight2) @Getter private Float BottomLiftHeight2;
+        @MSLAFileField(order = 1) @MSLAOption(MSLAOptionName.BottomLayersLiftSpeed2) @Getter private Float BottomLiftSpeed2;
+        @MSLAFileField(order = 2) @MSLAOption(MSLAOptionName.NormalLayersLiftHeight2) @Getter private Float LiftHeight2;
+        @MSLAFileField(order = 3) @MSLAOption(MSLAOptionName.NormalLayersLiftSpeed2) @Getter private Float LiftSpeed2;
+        @MSLAFileField(order = 4) @MSLAOption(MSLAOptionName.NormalLayersRetractHeight2) @Getter private Float RetractHeight2;
+        @MSLAFileField(order = 5) @MSLAOption(MSLAOptionName.NormalLayersRetractSpeed2) @Getter private Float RetractSpeed2;
+        @MSLAFileField(order = 6) @MSLAOption(MSLAOptionName.WaitAfterLift) @Getter private Float RestTimeAfterLift;
+        @MSLAFileField(order = 7) @Setter @Getter private Integer MachineNameOffset;
+        @MSLAFileField(order = 8) @Setter @Getter private Integer MachineNameSize;
+        @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.Antialias) @Getter private Byte AntiAliasFlag;
         @MSLAFileField(order = 10) private final Short Padding = 0;
-        @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.LayerSettings) private Byte PerLayerSettings;
+        @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.LayerSettings) @Getter private Byte PerLayerSettings;
         @MSLAFileField(order = 12) private final Integer ModifiedTimestampMinutes = 0; // TODO fill in with current time
-        @MSLAFileField(order = 13) @MSLAOption(MSLAOptionName.AntialiasLevel) private Integer AntiAliasLevel = 1;
-        @MSLAFileField(order = 14) private Integer SoftwareVersion;
-        @MSLAFileField(order = 15) @MSLAOption(MSLAOptionName.WaitAfterRetract) private Float RestTimeAfterRetract;
-        @MSLAFileField(order = 16) @MSLAOption(MSLAOptionName.WaitAfterLift2) private Float RestTimeAfterLift2;
-        @MSLAFileField(order = 17) @MSLAOption(MSLAOptionName.TransitionLayersCount) @Setter private Integer TransitionLayerCount; // CTB not all printers
-        @MSLAFileField(order = 18) @Setter private Integer PrintParametersV4Offset; // V4 Only
+        @MSLAFileField(order = 13) @MSLAOption(MSLAOptionName.AntialiasLevel) @Getter private Integer AntiAliasLevel = 1;
+        @MSLAFileField(order = 14) @Getter private Integer SoftwareVersion;
+        @MSLAFileField(order = 15) @MSLAOption(MSLAOptionName.WaitAfterRetract) @Getter private Float RestTimeAfterRetract;
+        @MSLAFileField(order = 16) @MSLAOption(MSLAOptionName.WaitAfterLift2) @Getter private Float RestTimeAfterLift2;
+        @MSLAFileField(order = 17) @MSLAOption(MSLAOptionName.TransitionLayersCount) @Getter @Setter private Integer TransitionLayerCount; // CTB not all printers
+        @MSLAFileField(order = 18) @Getter @Setter private Integer PrintParametersV4Offset; // V4 Only
         @MSLAFileField(order = 19) private final Integer Padding2 = 0;
         @MSLAFileField(order = 20) private final Integer Padding3 = 0;
 

@@ -13,6 +13,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -77,7 +78,7 @@ public class MachineDefaults {
                 } catch (NoSuchMethodException ignored) {}
 
                 if (setter != null) {
-                    logger.fine("Calling setter for default '" + defaultOption.getString() + "' " + fieldName + " of type " + type.getSimpleName());
+                    logger.info("Calling setter for default '" + defaultOption.getString() + "' " + fieldName + " of type " + type.getSimpleName());
                     try {
                         setter.setAccessible(true);
                         setter.invoke(fields, defaultOption.getAsType(type.getSimpleName()));
@@ -125,10 +126,30 @@ public class MachineDefaults {
             this.fileProps.put("MachineName", new MachineProperty(manufacturer + " " + name));
         }
 
-        @Override public final float getPixelSize() { return fileProps.getFloat("PixelSize"); }
-        @Override public final Size getResolution() { return Size.parseSize(fileProps.getString("Resolution")); }
+        @Override public final float getPixelSize() throws MSLAException { return fileProps.getFloat("PixelSize"); }
+        @Override public final Size getResolution() throws MSLAException { return Size.parseSize(fileProps.getString("Resolution")); }
         @Override public final String getMachineFullName() { return getMachineManufacturer() + " " + getMachineName(); }
         @Override public MSLADefaultsParams getFileOption(MSLAOptionName name) { return fileOptions.getOption(name); }
+        @Override public boolean hasFileOption(MSLAOptionName name) { return fileOptions.getOption(name) != null; }
+
+        @Override
+        public <T extends Serializable> Serializable displayToRaw(
+                MSLAOptionName name,
+                T optionValue,
+                Class<? extends T> rawType) throws MSLAException
+        {
+            if (optionValue == null) return null;
+            if (rawType == null) return optionValue;
+            if (!hasFileOption(name)) throw new MSLAException("No defaults defined for option '" + name + "', can't set value");
+            return fileOptions.getOption(name).displayToRaw(rawType, optionValue);
+        }
+
+        @Override
+        public <T> String rawToDisplay(MSLAOptionName name, Serializable optionValue) throws MSLAException {
+            if (optionValue == null) return null;
+            if (!hasFileOption(name)) throw new MSLAException("No defaults defined for option '" + name + "', can't get display value");
+            return fileOptions.getOption(name).rawToDisplay(optionValue.getClass(), optionValue);
+        }
 
         /**
          * Gets set of all fields in MSLAFileBlockFields marked as MSLAFileField
@@ -194,6 +215,23 @@ public class MachineDefaults {
         @Override
         public MSLADefaultsParams getParameters(String blockName, MSLAOptionName optionName) {
             return options.getOption(optionName);
+        }
+
+        @Override
+        public <T extends Serializable> Serializable displayToRaw(
+                MSLAOptionName name,
+                T optionValue,
+                Class<? extends T> rawType) throws MSLAException
+        {
+            if (optionValue == null) return null;
+            if (rawType == null) return optionValue;
+            return options.getOption(name).displayToRaw(rawType, optionValue);
+        }
+
+        @Override
+        public <T> String rawToDisplay(MSLAOptionName name, Serializable optionValue) throws MSLAException {
+            if (optionValue == null) return null;
+            return options.getOption(name).rawToDisplay(optionValue.getClass(), optionValue);
         }
     }
 

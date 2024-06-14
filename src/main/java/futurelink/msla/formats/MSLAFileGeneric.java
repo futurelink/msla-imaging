@@ -8,7 +8,7 @@ public abstract class MSLAFileGeneric<T> implements MSLAFile<T> {
     private final java.util.UUID UUID;
     @Getter private Float PixelSize;
 
-    protected MSLAFileGeneric(MSLAFileProps initialProps) {
+    protected MSLAFileGeneric(MSLAFileProps initialProps) throws MSLAException {
         if (initialProps != null) this.PixelSize = initialProps.getFloat("PixelSize");
         this.UUID = java.util.UUID.randomUUID();
     }

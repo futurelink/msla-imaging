@@ -28,10 +28,6 @@ public class CTBCrypto {
     private static final String Secret1 = "0FuOM3HePRrlTyLd31v9lKtdZDqdfr+vQgPzENhSKuo=";
     private static final String Secret2 = "DwEKBQULBgcIBgoMDA0JDw==";
 
-    // Encoded using XOR key 'UVtools'
-    // private final String Secret1 = "hQ36XB6yTk+zO02ysyiowt8yC1buK+nbLWyfY40EXoU=";
-    // private final String Secret2 = "Wld+ampndVJecmVjYH5cWQ==";
-
     public static byte[] XORCipher(byte[] text, byte[] key) {
         var output = new byte[text.length];
         for (int i = 0; i < text.length; i++) output[i] = (byte)(text[i] ^ key[i % key.length]);

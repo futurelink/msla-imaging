@@ -1,5 +1,6 @@
 package futurelink.msla.formats.chitubox.encrypted.tables;
 
+import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.chitubox.common.tables.CTBFileBlock;
 import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileProps;
@@ -97,7 +98,7 @@ public class CTBEncryptedFileSlicerSettings extends CTBFileBlock {
         @MSLAFileField(order = 73) final private Integer Padding9 = 0;
     }
 
-    public CTBEncryptedFileSlicerSettings(Integer version, MSLAFileProps initialProps) {
+    public CTBEncryptedFileSlicerSettings(Integer version, MSLAFileProps initialProps) throws MSLAException {
         super(version);
         blockFields = new Fields();
         if (initialProps != null) {

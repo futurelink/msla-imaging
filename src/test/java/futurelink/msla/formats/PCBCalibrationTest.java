@@ -8,6 +8,8 @@ import futurelink.msla.utils.defaults.MachineDefaults;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PCBCalibrationTest extends CommonTestRoutines {
     @Test
@@ -31,7 +33,7 @@ public class PCBCalibrationTest extends CommonTestRoutines {
         assertEquals(10, file.getLayers().count());
         assertEquals(2.0F, Float.parseFloat(options.get(MSLAOptionName.LiftSpeed)));
         assertEquals(10, Integer.parseInt(options.get(MSLAOptionName.TransitionLayersCount)));
-        assertEquals(1, Integer.parseInt(options.get(MSLAOptionName.AdvancedMode)));
+        assertTrue(Boolean.parseBoolean(options.get(MSLAOptionName.AdvancedMode)));
     }
 
     @Test
@@ -54,6 +56,6 @@ public class PCBCalibrationTest extends CommonTestRoutines {
         assertEquals("4320 x 2560", file.getResolution().toString());
         assertEquals(10, file.getLayers().count());
         assertEquals("1", options.get(MSLAOptionName.NormalLayersLiftSpeed));
-        assertEquals("0", options.get(MSLAOptionName.Antialias));
+        assertFalse(Boolean.parseBoolean(options.get(MSLAOptionName.Antialias)));
     }
 }

@@ -30,11 +30,11 @@ public class PhotonWorkshopOptionsTest extends CommonTestRoutines {
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
-        options.set(MSLAOptionName.AdvancedMode, "1");
+        options.set(MSLAOptionName.AdvancedMode, "true");
         var option = options.get(MSLAOptionName.AdvancedMode);
-        assertEquals(1, Integer.parseInt(option));
-        assertThrows(NumberFormatException.class, () -> options.set(MSLAOptionName.AdvancedMode, "string"));
-        assertThrows(NumberFormatException.class, () -> options.set(MSLAOptionName.AdvancedMode, "true"));
+        assertTrue(Boolean.parseBoolean(option));
+        assertThrows(MSLAException.class, () -> options.set(MSLAOptionName.AdvancedMode, "string"));
+        assertThrows(MSLAException.class, () -> options.set(MSLAOptionName.AdvancedMode, "cool"));
     }
 
     @Test

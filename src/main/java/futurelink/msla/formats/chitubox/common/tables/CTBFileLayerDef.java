@@ -22,23 +22,23 @@ public class CTBFileLayerDef extends CTBFileBlock implements MSLAFileLayer {
      * work with just a part of all available fields.
      * Flag is true by default.
      */
-    @Setter private boolean isBriefMode = true;
+    @Setter private boolean isBriefMode = false;
 
-    @Getter
+
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
-        private final CTBFileLayerDef parent;
-        @MSLAFileField @Setter private Float PositionZ;
-        @MSLAFileField(order = 1) @MSLAOption(MSLAOptionName.NormalLayersExposureTime) @Setter private Float ExposureTime;
-        @MSLAFileField(order = 2) @MSLAOption(MSLAOptionName.LightOffTime) @Setter private Float LightOffSeconds;
-        @MSLAFileField(order = 3) @Setter private Integer DataAddress;
-        @MSLAFileField(order = 4) @Setter private Integer DataSize;
-        @MSLAFileField(order = 5) private final Integer PageNumber = 0; // For files larger than 4Gb
-        @MSLAFileField(order = 6) private Integer TableSize;
+        private final @Getter CTBFileLayerDef parent;
+        @MSLAFileField @Getter @Setter private Float PositionZ;
+        @MSLAFileField(order = 1) @MSLAOption(MSLAOptionName.NormalLayersExposureTime) @Getter @Setter private Float ExposureTime;
+        @MSLAFileField(order = 2) @MSLAOption(MSLAOptionName.LightOffTime) @Getter @Setter private Float LightOffSeconds;
+        @MSLAFileField(order = 3) @Setter @Getter private Integer DataAddress;
+        @MSLAFileField(order = 4) @Setter @Getter private Integer DataSize;
+        @MSLAFileField(order = 5) @Getter private  final Integer PageNumber = 0; // For files larger than 4Gb
+        @MSLAFileField(order = 6) @Getter private Integer TableSize;
         @MSLAFileField(order = 7) private final Integer Unknown3 = 0;
         @MSLAFileField(order = 8) private final Integer Unknown4 = 0;
-        @MSLAFileField(order = 9) @MSLAOptionContainer private CTBFileLayerDefExtra Extra = null;
-        @MSLAFileField(order = 10, lengthAt = "DataSize") @Setter private byte[] Data = new byte[0];
+        @MSLAFileField(order = 9) @MSLAOptionContainer @Getter private CTBFileLayerDefExtra Extra = null;
+        @MSLAFileField(order = 10, lengthAt = "DataSize") @Setter @Getter private byte[] Data = new byte[0];
 
         public Fields(CTBFileLayerDef parent) {
             this.parent = parent;

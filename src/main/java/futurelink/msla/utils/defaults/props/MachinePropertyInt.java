@@ -14,7 +14,6 @@ public class MachinePropertyInt extends MachineProperty {
     }
 
     @Override public String getType() { return "integer"; }
-    @Override public String getString() { return String.valueOf(getValue()); }
 
     @Override
     public void checkValue(String value) throws MSLAException {

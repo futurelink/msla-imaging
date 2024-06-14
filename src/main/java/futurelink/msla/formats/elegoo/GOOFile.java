@@ -7,6 +7,7 @@ import futurelink.msla.formats.elegoo.tables.GOOFileHeader;
 import futurelink.msla.formats.elegoo.tables.GOOFileLayers;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.options.MSLAOptionContainer;
+import futurelink.msla.formats.io.FileFieldsException;
 import futurelink.msla.utils.Size;
 import lombok.Getter;
 
@@ -21,7 +22,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     @Getter private final GOOFileLayers Layers;
     private final GOOFileFooter Footer = new GOOFileFooter();
 
-    public GOOFile(MSLAFileProps initialProps) {
+    public GOOFile(MSLAFileProps initialProps) throws MSLAException {
         super(initialProps);
         Header = new GOOFileHeader();
         Layers = new GOOFileLayers();
@@ -38,14 +39,18 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
         var pos = Header.read(input, 0);
         if (pos != Header.getLayerDefAddress()) throw new MSLAException("Invalid layer definition at position " + pos);
 
-        var layerOffset = 0L;
-        for (var i = 0; i < Header.getLayerCount(); i++) {
-            var layer = Layers.allocate();
-            pos += layer.read(input, pos);
-            layerOffset += layer.getDataLength();
-            // Check if stream position is still ok while reading layers
-            if (Header.getLayerDefAddress() + layerOffset != pos)
-                throw new MSLAException("Invalid layer " + layer + " definition at position " + pos);
+        try {
+            var layerOffset = 0L;
+            for (var i = 0; i < Header.getLayerCount(); i++) {
+                var layer = Layers.allocate();
+                pos += layer.read(input, pos);
+                layerOffset += layer.getDataLength();
+                // Check if stream position is still ok while reading layers
+                if (Header.getLayerDefAddress() + layerOffset != pos)
+                    throw new MSLAException("Invalid layer " + layer + " definition at position " + pos);
+            }
+        } catch (FileFieldsException e) {
+            throw new MSLAException("Can't read block", e);
         }
     }
 
@@ -63,8 +68,12 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
-        return defaults.getFileClass().equals(this.getClass()) &&
-                (getResolution() == null || defaults.getResolution().equals(getResolution()));
+        try {
+            return defaults.getFileClass().equals(this.getClass()) &&
+                    ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+        } catch (MSLAException e) {
+            return false;
+        }
     }
 
     @Override
@@ -86,6 +95,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
             MSLALayerEncoder.Callback<byte[]> callback) throws MSLAException
     {
         Layers.add(getEncodersPool(), reader, new HashMap<>(), callback);
+        Header.setLayerCount(Layers.count());
     }
 
     @Override

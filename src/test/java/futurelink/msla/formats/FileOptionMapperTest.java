@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class FileOptionMapperTest extends CommonTestRoutines {
     @Test
@@ -27,8 +28,8 @@ public class FileOptionMapperTest extends CommonTestRoutines {
 
         options.set(MSLAOptionName.BottomLayersExposureTime, "12");
         assertEquals(12f, Float.parseFloat(options.get(MSLAOptionName.BottomLayersExposureTime)));
-
         assertEquals("0.05", options.get(MSLAOptionName.LayerHeight));
+        assertFalse(Boolean.parseBoolean(options.get(MSLAOptionName.LayerSettings)));
 
         // It's necessary to add a layer to access layer options
         var resource = resourceFile("test_data/ChituboxFileTest/ELEGOO_Saturn_Layer_0.png");
@@ -48,6 +49,13 @@ public class FileOptionMapperTest extends CommonTestRoutines {
         layerOptions.setLayerNumber(0);
         layerOptions.set(MSLAOptionName.LayerLightPWM, "128");
         assertEquals(128f, Float.parseFloat(layerOptions.get(MSLAOptionName.LayerLightPWM)));
+
+        System.out.println(layerOptions.available());
+        for (var option : layerOptions.available()) {
+            System.out.print(option);
+            System.out.println(" = " + layerOptions.get(option));
+        }
+
     }
 
     @Test
@@ -67,9 +75,23 @@ public class FileOptionMapperTest extends CommonTestRoutines {
         // Check valid value is processed properly
         options.set(MSLAOptionName.BottomLayersExposureTime, "50");
         assertEquals(50.0f, Float.parseFloat(options.get(MSLAOptionName.BottomLayersExposureTime)));
+        assertEquals("$", options.get(MSLAOptionName.Currency));
+
+        options.set(MSLAOptionName.Currency, "%");
+        assertEquals("%", options.get(MSLAOptionName.Currency));
 
         // Check min and max values are processed properly
         assertThrows(MSLAException.class, () -> options.set(MSLAOptionName.BottomLayersExposureTime, "121"));
         assertThrows(MSLAException.class, () -> options.set(MSLAOptionName.BottomLayersExposureTime, "-1"));
+    }
+
+    @Test
+    void GetOptionGroupsTest() throws MSLAException {
+        var machine = "Anycubic Photon M3 Max";
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machine)
+                .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machine));
+        var file = FileFactory.instance.create(machine);
+        var options = new FileOptionMapper(file, defaults);
+        assertEquals(5, options.getGroups().size()); // We expect 5 option groups for this machine
     }
 }

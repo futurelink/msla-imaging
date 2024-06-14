@@ -72,8 +72,12 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
-        return defaults.getFileClass().equals(this.getClass()) &&
-                ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+        try {
+            return defaults.getFileClass().equals(this.getClass()) &&
+                    ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+        } catch (MSLAException e) {
+            return false;
+        }
     }
 
     @Override

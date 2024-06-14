@@ -29,8 +29,8 @@ public class CXDLPFileTest extends CommonTestRoutines {
                 .orElseThrow(() -> new MSLAException("Machine has not defaults: " + machine));
         var file = (CXDLPFile) FileFactory.instance.create(machine);
         var options = new FileOptionMapper(file, defaults);
-        options.set(MSLAOptionName.BottomLayersExposureTime, "12");
-        options.set(MSLAOptionName.LayerHeight, "0.1");
+        options.set(MSLAOptionName.BottomLayersExposureTime, 12);
+        options.set(MSLAOptionName.LayerHeight, 0.1);
 
         var pngFileLayers = new String[]{
                 resourceFile("test_data/CXDLPFileTest/Layer_1.png"),
@@ -52,7 +52,7 @@ public class CXDLPFileTest extends CommonTestRoutines {
         // Write output file
         writeMSLAFile(outFile, file);
 
-        assertFileExactSize(outFile, 441597);
+        assertFileExactSize(outFile, 441595);
     }
 
     @Test

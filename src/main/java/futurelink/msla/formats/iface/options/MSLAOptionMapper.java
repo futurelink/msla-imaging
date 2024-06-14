@@ -4,7 +4,7 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.MSLADefaults;
 import futurelink.msla.formats.iface.MSLADefaultsParams;
 
-import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 public interface MSLAOptionMapper {
@@ -50,26 +50,18 @@ public interface MSLAOptionMapper {
     MSLAOptionGroup getGroup(MSLAOptionName option);
 
     /**
+     * Returns all groups for all options available in a file.
+     */
+    List<MSLAOptionGroup> getGroups();
+
+    /**
      * Returns true if mapper has option with specified name.
      * @param option option name
      * @return true if option was mapped, otherwise false
      */
     boolean hasOption(MSLAOptionName option);
 
-    /**
-     * Must be implemented in order to be able to populate option value.
-     * @param option option name
-     * @param value option value
-     */
-    void populateOption(MSLAOptionName option, Serializable value) throws MSLAException;
-
-    /**
-     * Must be implemented in order to be able to get option value by name.
-     * @param option option name
-     */
-    Serializable fetchOption(MSLAOptionName option) throws MSLAException;
-
-    /**
+   /**
      * Returns true if options are editable, otherwise false.
      */
     Boolean isEditable();
@@ -80,14 +72,22 @@ public interface MSLAOptionMapper {
     Set<MSLAOptionName> available();
 
     /**
-     * Gets option value as String.
+     * Must be implemented in order to be able to get option value by name.
      * @param option option name
      */
     String get(MSLAOptionName option) throws MSLAException;
 
+    /**
+     * Must be implemented in order to be able to populate option value.
+     * @param option option name
+     * @param value option value
+     */
     void set(MSLAOptionName option, String value) throws MSLAException;
+
+    // Helper methods for convenience
     void set(MSLAOptionName option, Float value) throws MSLAException;
     void set(MSLAOptionName option, Integer value) throws MSLAException;
+    void set(MSLAOptionName option, Boolean value) throws MSLAException;
     void set(MSLAOptionName option, Long value) throws MSLAException;
     void set(MSLAOptionName option, Double value) throws MSLAException;
     void set(MSLAOptionName option, Short value) throws MSLAException;

@@ -47,11 +47,13 @@ public class FileOptionMapper extends OptionMapper {
      * is considered to be MSLAFileBlock or MSLAFileBlockFields that have
      * option fields inside.
      */
-    public void enumerateOptions() throws MSLAException {
+    @SuppressWarnings("unchecked")
+    private void enumerateOptions() throws MSLAException {
         var fileClass = file.getClass();
         var fields = fileClass.getDeclaredFields();
         this.optionsMap.clear();
         try {
+
             for (var field : fields) {
                 if (MSLAFileBlock.class.isAssignableFrom(field.getType())) {
                     if (field.getAnnotation(MSLAOptionContainer.class) != null) {
@@ -59,15 +61,19 @@ public class FileOptionMapper extends OptionMapper {
                         var getterMethod = fileClass.getDeclaredMethod("get" + blockPropertyName);
                         var fileBlock = ((MSLAFileBlock) getterMethod.invoke(file));
                         if (fileBlock != null) {
-                            Arrays.stream(fileBlock.getBlockFields().getClass().getDeclaredFields())
+                            var blockFields = fileBlock.getBlockFields();
+                            Arrays.stream(blockFields.getClass().getDeclaredFields())
                                     .filter((f) -> f.getAnnotation(MSLAOption.class) != null)
+                                    .filter((f) -> !blockFields.isFieldExcluded(f.getName()))
                                     .forEach((f) -> {
                                         var optionName = f.getAnnotation(MSLAOption.class).value();
                                         var location = List.of(blockPropertyName); // TODO make hierarchy
-                                        var opt = new Option(f.getName(), f.getType(), location);
-                                        if (defaults != null)
-                                            opt.setParameters(defaults.getParameters(blockPropertyName, optionName));
-                                        this.optionsMap.put(optionName, opt);
+                                        if (Serializable.class.isAssignableFrom(f.getType())) {
+                                            var opt = new Option(f.getName(), (Class<? extends Serializable>) f.getType(), location);
+                                            if (defaults != null)
+                                                opt.setParameters(defaults.getParameters(blockPropertyName, optionName));
+                                            this.optionsMap.put(optionName, opt);
+                                        } else logger.warning("Option '" + optionName + "' is not Serializable");
                                     });
                         } else logger.info("Block '" + blockPropertyName + "' is not defined or created");
                     }
@@ -98,27 +104,39 @@ public class FileOptionMapper extends OptionMapper {
     }
 
     @Override
+    public List<MSLAOptionGroup> getGroups() {
+        if (this.optionGroupsMapper == null) return null;
+        var groups = new ArrayList<MSLAOptionGroup>();
+        for (var option : optionsMap.keySet()) {
+            var grp = this.optionGroupsMapper.getGroup(option);
+            if (!groups.contains(grp)) groups.add(grp);
+        }
+        return groups;
+    }
+
+    @Override
     public boolean hasOption(MSLAOptionName option) {
         return this.optionsMap.containsKey(option);
     }
 
     @Override
-    public void populateOption(MSLAOptionName optionName, Serializable value) throws MSLAException {
-        if (!isEditable()) throw new MSLAException("Options are not editable because defaults were not specified");
-        getParameters(optionName).checkValue(value.toString());
+    public void set(MSLAOptionName optionName, String value) throws MSLAException {
+        super.set(optionName, value);
         try {
             var option = this.optionsMap.get(optionName);
             var fileBlock = getOptionFileBlock(optionName);
             if (fileBlock.getBlockFields() != null) {
                 var fields = fileBlock.getBlockFields();
-                logger.fine("Setting '" + option.getName() + "' of " + fields.getClass());
+                logger.info("Setting '" + option.getName() + "' in " + fields.getClass() + " of type " + option.getType());
                 try {
                     var setter = fields.getClass().getDeclaredMethod("set" + option.getName(), option.getType());
-                    setter.invoke(fields, option.getType().cast(value));
+                    var rawValue = defaults.displayToRaw(optionName, value, option.getType());
+                    logger.info("Raw value is '" + rawValue + "' of " + rawValue.getClass());
+                    setter.invoke(fields, rawValue);
                 } catch (NoSuchMethodException ignored) {
                     var f = fields.getClass().getDeclaredField(option.getName());
                     f.setAccessible(true);
-                    f.set(fields, value);
+                    f.set(fields, defaults.displayToRaw(optionName, value, option.getType()));
                     f.setAccessible(false);
                 }
             } else throw new MSLAException("Can't fetch option, no file block fields instantiated");
@@ -128,23 +146,32 @@ public class FileOptionMapper extends OptionMapper {
     }
 
     @Override
-    public Serializable fetchOption(MSLAOptionName optionName) throws MSLAException {
+    public String get(MSLAOptionName optionName) throws MSLAException {
+        super.get(optionName); // Return value is ignored
         try {
             if (!this.optionsMap.containsKey(optionName)) throw new MSLAException("Option '" + optionName + "' is not known");
             var option = this.optionsMap.get(optionName);
             var fileBlock = getOptionFileBlock(optionName);
+            Object rawValue;
             if (fileBlock.getBlockFields() != null) {
                 var fields = fileBlock.getBlockFields();
                 logger.info("Getting '" + option.getName() + "' in '" + fileBlock.getClass().getSimpleName() +"' of " + option.getType());
                 try {
                     var getter = fields.getClass().getDeclaredMethod("get" + option.getName());
-                    return (Serializable) getter.invoke(fields);
+                    rawValue =  getter.invoke(fields);
                 } catch (NoSuchMethodException ignored) {
                     var f = fields.getClass().getDeclaredField(option.getName());
                     f.setAccessible(true);
-                    var value = f.get(fields);
+                    rawValue = f.get(fields);
                     f.setAccessible(false);
-                    return (Serializable) value;
+                }
+                if (defaults.hasFileOption(optionName)) {
+                    var value = defaults.rawToDisplay(optionName, (Serializable) rawValue); // Gets RAW option value
+                    logger.fine("Raw option value '" + rawValue + "' is displayed as '" + value + "'");
+                    return value;
+                } else {
+                    logger.warning("Raw option value '" + rawValue + "' is displayed it is, no opting params defined");
+                    return String.valueOf(rawValue);
                 }
             } else throw new MSLAException("Can't fetch option, no file block fields instantiated");
         } catch (NoSuchFieldException | InvocationTargetException | IllegalAccessException | ClassCastException e) {

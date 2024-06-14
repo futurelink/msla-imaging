@@ -2,10 +2,11 @@ package futurelink.msla.utils;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Getter
-public class Size {
+public class Size implements Serializable {
     private final Integer width;
     private final Integer height;
     public Size(Size size) {

@@ -22,7 +22,7 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
     private final CXDLPFilePreviews Previews = new CXDLPFilePreviews();
     @Getter private final CXDLPFileLayerDef Layers = new CXDLPFileLayerDef();
 
-    public CXDLPFile(MSLAFileProps initialProps) {
+    public CXDLPFile(MSLAFileProps initialProps) throws MSLAException {
         super(initialProps);
         iStream = null;
         Header = new CXDLPFileHeader(initialProps);
@@ -94,8 +94,12 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
 
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
-        return defaults.getFileClass().equals(this.getClass()) &&
-                ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+        try {
+            return defaults.getFileClass().equals(this.getClass()) &&
+                    ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
+        } catch (MSLAException e) {
+            return false;
+        }
     }
 
     @Override
