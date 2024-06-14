@@ -2,6 +2,45 @@
 <printers>
     <printer
             manufacturer="Anycubic"
+            name="Photon Mono"
+            resolution="2560x1620"
+            pixelSize="51.0"
+            displayWidth="130.0"
+            displayHeight="80.0"
+            machineZ="165.0"
+            extension="pwmo"
+            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+    >
+        <file_properties>
+            <property name="VersionMajor" value="2"/>
+            <property name="VersionMinor" value="3"/>
+            <property name="LayerImageFormat" value="pw0Img"/>
+        </file_properties>
+        <file_options>
+            <option name="Weight" type="float" value="0" minValue="0" maxValue="99999.99"/>
+            <option name="Price" type="float" value="0" minValue="0" maxValue="99999.99"/>
+            <option name="Volume" type="float" value="0" minValue="0" maxValue="99999.99"/>
+            <option name="PrintTime" value="0"/>
+            <option name="Currency" type="char" value="$"/>
+
+            <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
+            <option name="LayerSettings" type="boolean" value="0" trueValue="80" falseValue="0"/>
+            <option name="LiftHeight" type="float" value="6.0" minValue="1.0" maxValue="50.0"/>
+            <option name="LiftSpeed" type="float" value="4.0" minValue="0.1" maxValue="10.0"/>
+            <option name="RetractSpeed" type="float" value="6.0" minValue="0.1" maxValue="10.0"/>
+            <option name="WaitBeforeCure" type="float" value="0.5" minValue="0.0" maxValue="120.0"/>
+            <option name="TransitionLayersCount" type="int" value="0" minValue="0" maxValue="99999"/>
+            <option name="TransitionLayersType" value="0"/>
+            <option name="Antialias" type="float" value="1" minValue="0" maxValue="16"/>
+
+            <option name="NormalLayersExposureTime" type="float" value="3.0" minValue="0.5" maxValue="30.0"/>
+            <option name="BottomLayersCount" type="int" value="6" minValue="0" maxValue="99999"/>
+            <option name="BottomLayersExposureTime" type="float" value="30.0" minValue="0.5" maxValue="120.0"/>
+        </file_options>
+    </printer>
+
+    <printer
+            manufacturer="Anycubic"
             name="Photon M3 Max"
             resolution="6480x3600"
             pixelSize="34.399998"
