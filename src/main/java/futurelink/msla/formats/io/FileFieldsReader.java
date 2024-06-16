@@ -196,7 +196,7 @@ public class FileFieldsReader {
             try {
                 return stream.getClass().getDeclaredMethod(readMethodName).invoke(stream);
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                throw new FileFieldsException("Can't read value", e);
+                throw new FileFieldsException("Can't read value using '" + readMethodName + "'", e);
             }
         }
         else if (FileFieldsIO.isStringOrByteArray(type)) return readStringOrBytes(stream, type, length, charset);

@@ -7,7 +7,7 @@ import futurelink.msla.tools.BufferedImageInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -89,7 +89,7 @@ public class CTBCommonFileCodec implements MSLALayerCodec<byte[]> {
                 reader.read(layerNumber),
                 MSLALayerEncodeReader.ReadDirection.READ_ROW)
         ) {
-            List<Byte> data = new LinkedList<>();
+            List<Byte> data = new ArrayList<>();
             byte color = 0xff >> 1;
             int stride = 0;
             while (input.available() > 0) {

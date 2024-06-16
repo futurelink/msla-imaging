@@ -27,6 +27,7 @@ public class CTBFilePreview extends CTBFileBlock implements MSLAPreview {
 
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
+        @Setter private boolean encryptedVersion = false;
         @Getter Size Resolution = new Size(0,0);
         @MSLAFileField private Integer ResolutionX() { return Resolution.getWidth(); }
         void setResolutionX(Integer value) { Resolution = new Size(value, Resolution.getHeight()); }
@@ -39,10 +40,19 @@ public class CTBFilePreview extends CTBFileBlock implements MSLAPreview {
         @MSLAFileField(order = 6) private final Integer Unknown3 = 0;
         @MSLAFileField(order = 7) private final Integer Unknown4 = 0;
         @MSLAFileField(order = 8, lengthAt = "ImageLength") private Byte[] ImageData;
+
+        @Override
+        public boolean isFieldExcluded(String fieldName) {
+            return encryptedVersion && (fieldName.equals("Unknown1") ||
+                    fieldName.equals("Unknown2") ||
+                    fieldName.equals("Unknown3") ||
+                    fieldName.equals("Unknown4"));
+        }
     }
 
-    public CTBFilePreview(int version, Type previewType) {
+    public CTBFilePreview(int version, Type previewType, boolean encryptedVersion) {
         super(version);
+        blockFields.setEncryptedVersion(encryptedVersion);
         blockFields.Resolution = switch (previewType) {
             case Small -> new Size(200, 125);
             case Large -> new Size(400, 300);

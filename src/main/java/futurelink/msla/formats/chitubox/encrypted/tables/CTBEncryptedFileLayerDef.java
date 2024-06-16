@@ -32,9 +32,9 @@ public class CTBEncryptedFileLayerDef extends CTBFileBlock implements MSLAFileLa
         @MSLAFileField(order = 4) @Getter @Setter private Integer DataAddress;
         @MSLAFileField(order = 5) @Getter @Setter private Integer PageNumber;
         @MSLAFileField(order = 6) @Getter @Setter private Integer DataSize;
-        @MSLAFileField(order = 7) private Integer Unknown3;
-        @MSLAFileField(order = 8) @Getter @Setter private Integer EncryptedDataOffset;
-        @MSLAFileField(order = 9) @Getter @Setter private Integer EncryptedDataLength;
+        @MSLAFileField(order = 7) private Integer Unknown = 0;
+        @MSLAFileField(order = 8) @Getter @Setter private Integer EncryptedDataOffset = 0;
+        @MSLAFileField(order = 9) @Getter @Setter private Integer EncryptedDataLength = 0;
 
         /* Same as 'Extra' in non-encrypted file format */
         @MSLAFileField(order = 10) @Getter @Setter @MSLAOption(MSLAOptionName.LayerLiftHeight) private Float LiftHeight;
@@ -48,8 +48,12 @@ public class CTBEncryptedFileLayerDef extends CTBFileBlock implements MSLAFileLa
         @MSLAFileField(order = 18) @Getter @Setter @MSLAOption(MSLAOptionName.LayerWaitAfterLift) private Float RestTimeAfterLift;
         @MSLAFileField(order = 19) @Getter @Setter @MSLAOption(MSLAOptionName.LayerWaitAfterRetract) private Float RestTimeAfterRetract;
         @MSLAFileField(order = 20) @Getter @Setter @MSLAOption(MSLAOptionName.LayerLightPWM) private Float LightPWM;
-        @MSLAFileField(order = 21) private final Integer Unknown = 0;
-        @MSLAFileField(order = 22, lengthAt = "DataSize", offsetAt = "DataAddress") @Getter @Setter private byte[] Data;
+        @MSLAFileField(order = 21) private final Integer Unknown2 = 0;
+        @MSLAFileField(order = 22, lengthAt = "DataSize", offsetAt = "DataAddress") @Getter private byte[] Data;
+        public void setData(byte[] data) {
+            this.Data = data;
+            this.DataSize = data.length;
+        }
     }
 
     public CTBEncryptedFileLayerDef() { super(0); blockFields = new Fields(); }
@@ -65,6 +69,7 @@ public class CTBEncryptedFileLayerDef extends CTBFileBlock implements MSLAFileLa
     }
 
     @Override public void setDefaults(MSLALayerDefaults layerDefaults) throws MSLAException {
+        if (layerDefaults == null) return;
         layerDefaults.setFields(getBlockFields());
     }
 

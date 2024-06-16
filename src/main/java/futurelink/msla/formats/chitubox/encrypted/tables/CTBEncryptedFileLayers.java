@@ -6,6 +6,7 @@ import futurelink.msla.formats.chitubox.common.tables.CTBFileBlock;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,8 +24,8 @@ public class CTBEncryptedFileLayers extends CTBFileBlock implements MSLAFileLaye
 
     @SuppressWarnings("unused")
     public static class LayerPointerEntry implements MSLAFileBlockFields {
-        @MSLAFileField @Getter private Integer LayerOffset;
-        @MSLAFileField(order = 1) @Getter private Integer PageNumber;
+        @MSLAFileField @Getter @Setter private Integer LayerOffset;
+        @MSLAFileField(order = 1) @Getter @Setter private Integer PageNumber;
         @MSLAFileField(order = 2) @Getter private final Integer LayerTableSize = 88; // always 0x58
         @MSLAFileField(order = 3) private final Integer Padding2 = 0; // 0
 
@@ -35,8 +36,12 @@ public class CTBEncryptedFileLayers extends CTBFileBlock implements MSLAFileLaye
     @Getter
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
-        @Getter private Integer LayersCount;
-        @MSLAFileField(lengthAt = "LayersCount") private ArrayList<LayerPointerEntry> LayerPointers;
+        private Integer LayersCount; // Need to promote number of layers from SlicerSettings
+        @MSLAFileField(lengthAt = "LayersCount") @Getter private ArrayList<LayerPointerEntry> LayerPointers;
+
+        public Fields() {
+            this.LayerPointers = new ArrayList<>();
+        }
     }
 
     public CTBEncryptedFileLayers(CTBEncryptedFile parent) {
@@ -47,8 +52,14 @@ public class CTBEncryptedFileLayers extends CTBFileBlock implements MSLAFileLaye
     }
 
     @Override public String getName() { return "Layers"; }
-    @Override public int getDataLength() throws FileFieldsException { return 0; }
-    @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException { return 0; }
+
+    @Override public int getDataLength() throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(getBlockFields());
+    }
+
+    @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(getBlockFields(), fieldName);
+    }
 
     @Override public int count() { return getBlockFields().LayersCount; }
     @Override public CTBEncryptedFileLayerDef get(int index) {
@@ -76,21 +87,24 @@ public class CTBEncryptedFileLayers extends CTBFileBlock implements MSLAFileLaye
 
         // Fill in layer overrides with defaults
         var layer = layerDef.getBlockFields();
-        layer.setPositionZ((layerNumber + 1) * parent.getSlicerSettings().getBlockFields().getLayerHeight());
-        layer.setExposureTime(parent.getSlicerSettings().getBlockFields().getExposureTime());
-        layer.setLightOffDelay(parent.getSlicerSettings().getBlockFields().getLightOffDelay());
-        layer.setLiftHeight(parent.getSlicerSettings().getBlockFields().getLiftHeight());
-        layer.setLiftSpeed(parent.getSlicerSettings().getBlockFields().getLiftSpeed());
-        layer.setLiftHeight2(parent.getSlicerSettings().getBlockFields().getLiftHeight2());
-        layer.setLiftSpeed2(parent.getSlicerSettings().getBlockFields().getLiftSpeed2());
-        layer.setRetractSpeed(parent.getSlicerSettings().getBlockFields().getRetractSpeed());
-        layer.setRetractHeight2(parent.getSlicerSettings().getBlockFields().getRetractHeight2());
-        layer.setRetractSpeed2(parent.getSlicerSettings().getBlockFields().getRetractSpeed2());
-        layer.setRestTimeBeforeLift(parent.getSlicerSettings().getBlockFields().getRestTimeBeforeLift());
-        layer.setRestTimeAfterLift(parent.getSlicerSettings().getBlockFields().getRestTimeAfterLift());
-        layer.setRestTimeAfterRetract(parent.getSlicerSettings().getBlockFields().getRestTimeAfterRetract());
-        layer.setLightPWM(parent.getSlicerSettings().getBlockFields().getLightPWM().floatValue());
-
+        if (layerDefaults == null) {
+            layer.setPositionZ((layerNumber + 1) * parent.getSlicerSettings().getBlockFields().getLayerHeight());
+            layer.setExposureTime(parent.getSlicerSettings().getBlockFields().getExposureTime());
+            layer.setLightOffDelay(parent.getSlicerSettings().getBlockFields().getLightOffDelay());
+            layer.setLiftHeight(parent.getSlicerSettings().getBlockFields().getLiftHeight());
+            layer.setLiftSpeed(parent.getSlicerSettings().getBlockFields().getLiftSpeed());
+            layer.setLiftHeight2(parent.getSlicerSettings().getBlockFields().getLiftHeight2());
+            layer.setLiftSpeed2(parent.getSlicerSettings().getBlockFields().getLiftSpeed2());
+            layer.setRetractSpeed(parent.getSlicerSettings().getBlockFields().getRetractSpeed());
+            layer.setRetractHeight2(parent.getSlicerSettings().getBlockFields().getRetractHeight2());
+            layer.setRetractSpeed2(parent.getSlicerSettings().getBlockFields().getRetractSpeed2());
+            layer.setRestTimeBeforeLift(parent.getSlicerSettings().getBlockFields().getRestTimeBeforeLift());
+            layer.setRestTimeAfterLift(parent.getSlicerSettings().getBlockFields().getRestTimeAfterLift());
+            layer.setRestTimeAfterRetract(parent.getSlicerSettings().getBlockFields().getRestTimeAfterRetract());
+            layer.setLightPWM(parent.getSlicerSettings().getBlockFields().getLightPWM().floatValue());
+        } else {
+            layerDef.setDefaults(layerDefaults);
+        }
         encoder.encode(layerNumber, reader, params, (ln, data) -> {
             layer.setData(data.data());
             if (callback != null) callback.onFinish(ln, data);

@@ -148,7 +148,7 @@ public class FileFieldsIO {
     private static Integer getBlockFieldLength(MSLAFileBlockFields blockFields, MSLAField field, Object value)
             throws FileFieldsException
     {
-        var len = 0;
+        Integer len = 0;
         try {
             // Get field / method type
             var type = switch (field.getType()) {
@@ -180,14 +180,19 @@ public class FileFieldsIO {
             // Field is a string or array of bytes
             else if (isStringOrByteArray(type)) {
                 len = field.length;
-                if (len == 0) len = (int) getFieldOrMethodValue(blockFields, field.lengthAt);
+                if (len == 0) len = (Integer) getFieldOrMethodValue(blockFields, field.lengthAt);
             }
             // Any other type either primitive or primitive wrapper (int, double, long etc.)
             else len = getTypeSize(type);
 
-        } catch (NoSuchFieldException | NoSuchMethodException e) {
-            throw new FileFieldsException("No such field " + field.getName());
+        } catch (NoSuchFieldException e) {
+            throw new FileFieldsException("Field '" + field.getName() + "' doesn't exist in " + blockFields.getClass());
+        } catch (NoSuchMethodException e) {
+            throw new FileFieldsException("Method '" + field.getName() + "' doesn't exist in " + blockFields.getClass());
         }
+
+        if (len == null)
+            throw new FileFieldsException("Can't calculate block field '" + field.getName() + "' length, it is null");
 
         return len;
     }
@@ -211,14 +216,16 @@ public class FileFieldsIO {
         return length;
     }
 
-    public static Integer getBlockLength(MSLAFileBlockFields block)
-            throws FileFieldsException
-    {
+    /**
+     * Calculates file fields block length.
+     * @param block file data block object to calculate length
+     */
+    public static Integer getBlockLength(MSLAFileBlockFields block) throws FileFieldsException {
         return getBlockLength(block, null);
     }
 
     /**
-     * Calculates file fields block length.
+     * Calculates file fields block partial length up to specific field.
      * @param block file data block object to calculate length
      * @param lastFieldName calculate length of a block up to this field
      */

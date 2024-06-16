@@ -155,7 +155,7 @@ public class FileOptionMapper extends OptionMapper {
             Object rawValue;
             if (fileBlock.getBlockFields() != null) {
                 var fields = fileBlock.getBlockFields();
-                logger.info("Getting '" + option.getName() + "' in '" + fileBlock.getClass().getSimpleName() +"' of " + option.getType());
+                logger.fine("Getting '" + option.getName() + "' in '" + fileBlock.getClass().getSimpleName() +"' of " + option.getType());
                 try {
                     var getter = fields.getClass().getDeclaredMethod("get" + option.getName());
                     rawValue =  getter.invoke(fields);

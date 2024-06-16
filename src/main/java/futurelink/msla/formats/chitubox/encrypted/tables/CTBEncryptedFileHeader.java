@@ -6,7 +6,9 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileProps;
 import futurelink.msla.formats.iface.MSLAFileField;
 import futurelink.msla.formats.io.FileFieldsException;
+import futurelink.msla.formats.io.FileFieldsIO;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -19,10 +21,10 @@ public class CTBEncryptedFileHeader extends CTBFileBlock {
     @SuppressWarnings("unused")
     public static class Fields implements MSLAFileBlockFields {
         @MSLAFileField private Integer Magic;
-        @MSLAFileField(order = 1) @Getter private Integer SettingsSize;
-        @MSLAFileField(order = 2) @Getter private final Integer SettingsOffset = 48;
+        @MSLAFileField(order = 1) @Getter @Setter private Integer SettingsSize;
+        @MSLAFileField(order = 2) @Getter @Setter private Integer SettingsOffset = 48;
         @MSLAFileField(order = 3) private final Integer Unknown1 = 0; // set to 0
-        @MSLAFileField(order = 4) @Getter private Integer Version = 5;
+        @MSLAFileField(order = 4) @Getter private Integer Version;
         public void setVersion(Integer version) throws MSLAException {
             // When file is being read - Magic is set first, so version should match,
             // oppositely, when file is created then version defines Magic.
@@ -33,8 +35,8 @@ public class CTBEncryptedFileHeader extends CTBFileBlock {
                 Magic = MAGIC_CTBv4_ENCRYPTED;
             }
         }
-        @MSLAFileField(order = 5) @Getter private Integer SignatureSize;
-        @MSLAFileField(order = 6) @Getter private Integer SignatureOffset;
+        @MSLAFileField(order = 5) @Getter @Setter private Integer SignatureSize;
+        @MSLAFileField(order = 6) @Getter @Setter private Integer SignatureOffset;
         @MSLAFileField(order = 7) private final Integer Unknown = 0;  //set to 0
         @MSLAFileField(order = 8) private final Short Unknown4 = 1; // set to 1
         @MSLAFileField(order = 9) private final Short Unknown5 = 1; // set to 1
@@ -50,7 +52,14 @@ public class CTBEncryptedFileHeader extends CTBFileBlock {
     }
 
     @Override public String getName() { return "Header"; }
-    @Override public int getDataLength() throws FileFieldsException { return 0; }
-    @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException { return 0; }
+
+    @Override public int getDataLength() throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(getBlockFields());
+    }
+
+    @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException {
+        return FileFieldsIO.getBlockLength(getBlockFields(), fieldName);
+    }
+
     @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
 }

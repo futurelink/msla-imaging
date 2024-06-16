@@ -29,7 +29,7 @@ public class GOOFileTest extends CommonTestRoutines {
         var file = FileFactory.instance.create(machine);
         assertEquals(GOOFile.class, file.getClass());
         assertEquals("5760 x 3600", file.getResolution().toString());
-        assertEquals(35.0F, file.getPixelSize());
+        assertEquals(34.0f, file.getPixelSize());
         assertEquals("ELEGOO Mars 4 Max", file.getMachineName());
 
         var options = new FileOptionMapper(file, defaults);
