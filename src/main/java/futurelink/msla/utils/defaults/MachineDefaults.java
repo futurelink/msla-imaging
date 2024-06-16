@@ -78,7 +78,7 @@ public class MachineDefaults {
                 } catch (NoSuchMethodException ignored) {}
 
                 if (setter != null) {
-                    logger.info("Calling setter for default '" + defaultOption.getString() + "' " + fieldName + " of type " + type.getSimpleName());
+                    logger.fine("Calling setter for default '" + defaultOption.getString() + "' " + fieldName + " of type " + type.getSimpleName());
                     try {
                         setter.setAccessible(true);
                         setter.invoke(fields, defaultOption.getAsType(type.getSimpleName()));

@@ -20,9 +20,14 @@ public class CTBFileTableLengthTest extends CommonTestRoutines {
 
     @Test
     void CTBFilePreviewTest() throws FileFieldsException {
-        var block = new CTBFilePreview(4, CTBFilePreview.Type.Large);
+        var block = new CTBFilePreview(4, CTBFilePreview.Type.Large, false);
         var length = FileFieldsIO.getBlockLength(block);
         assertEquals(152, length);
+
+        // Encrypted version has no extra 4 Integer fields, so size is different
+        var block2 = new CTBFilePreview(4, CTBFilePreview.Type.Large, true);
+        var length2 = FileFieldsIO.getBlockLength(block2);
+        assertEquals(136, length2);
     }
 
     @Test

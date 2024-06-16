@@ -79,10 +79,8 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
     @Override
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         super.reset(defaults);
-        if (isMachineValid(defaults)) {
-            defaults.setFields(Header.getBlockFields());
-            getLayers().setDefaults(defaults.getLayerDefaults());
-        } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
+        defaults.setFields(Header.getBlockFields());
+        getLayers().setDefaults(defaults.getLayerDefaults());
     }
 
     @Override public String getMachineName() { return Header.getMachineName(); }

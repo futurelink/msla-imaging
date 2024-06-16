@@ -47,7 +47,7 @@ public interface MSLAFileBlock {
             var reader = new FileFieldsReader(input, getEndianness());
             return reader.read(this, position);
         } catch (FileFieldsException e) {
-            throw new MSLAException("Error reading " + this.getClass().getName() + " table", e);
+            throw new MSLAException("Error reading '" + this.getClass().getSimpleName() + "' table", e);
         }
     }
 

@@ -37,8 +37,8 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
         if (Version <= 0) throw new MSLAException("File defaults do not have a version number.");
         Header = new CTBFileHeader(Version, initialProps);
 
-        PreviewLarge = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Large);
-        PreviewSmall = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Small);
+        PreviewLarge = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Large, false);
+        PreviewSmall = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Small, false);
 
         MachineName = new CTBFileMachineName();
         PrintParams = new CTBFilePrintParams(Version);
@@ -148,7 +148,7 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
         // Read large preview
         if (Header.getBlockFields().getPreviewLargeOffset() > 0) {
             logger.info("Reading large preview");
-            PreviewLarge = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Large);
+            PreviewLarge = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Large, false);
             PreviewLarge.read(stream, Header.getBlockFields().getPreviewLargeOffset());
             var pixels = PreviewLarge.readImage(stream);
         }
@@ -156,7 +156,7 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
         // Read small preview
         if (Header.getBlockFields().getPreviewSmallOffset() > 0) {
             logger.info("Reading small preview");
-            PreviewSmall = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Small);
+            PreviewSmall = new CTBFilePreview(Header.getBlockFields().getVersion(), CTBFilePreview.Type.Small, false);
             PreviewSmall.read(stream, Header.getBlockFields().getPreviewSmallOffset());
             var pixels = PreviewSmall.readImage(stream);
         }
@@ -274,14 +274,12 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     @Override
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         super.reset(defaults);
-        if (isMachineValid(defaults)) {
-            defaults.setFields(Header.getBlockFields());
-            defaults.setFields(SlicerInfo.getBlockFields());
-            defaults.setFields(MachineName.getBlockFields());
-            defaults.setFields(PrintParams.getBlockFields());
-            defaults.setFields(PrintParamsV4.getBlockFields());
-            getLayers().setDefaults(defaults.getLayerDefaults());
-        } else throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
+        defaults.setFields(Header.getBlockFields());
+        defaults.setFields(SlicerInfo.getBlockFields());
+        defaults.setFields(MachineName.getBlockFields());
+        defaults.setFields(PrintParams.getBlockFields());
+        defaults.setFields(PrintParamsV4.getBlockFields());
+        getLayers().setDefaults(defaults.getLayerDefaults());
     }
 
     @Override

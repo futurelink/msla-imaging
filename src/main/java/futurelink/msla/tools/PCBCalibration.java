@@ -62,9 +62,39 @@ public class PCBCalibration {
      * @param interval curing time interval
      * @param repetitions number of samples or intervals
      */
-    public static String generateTestPattern(
+    public static String generateTestFile(
             String machineName,
             String filePath,
+            int startTime,
+            int interval,
+            int repetitions) throws MSLAException {
+
+        var defaults = MachineDefaults.getInstance().getMachineDefaults(machineName)
+                .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
+
+
+        filePath = filePath.endsWith(defaults.getFileExtension()) ?
+                filePath :
+                filePath + "." + defaults.getFileExtension();
+        try (var fos = new FileOutputStream(filePath)) {
+            var wsFile = generateTestPattern(machineName, startTime, interval, repetitions);
+            wsFile.write(fos);
+            fos.flush();
+            return filePath;
+        } catch (IOException e) {
+            throw new MSLAException("Error writing PCBCalibration image", e);
+        }
+    }
+    /**
+     * Creates a PCB photo resistive film calibration pattern.
+     *
+     * @param machineName model of a mSLA 3D printing machine
+     * @param startTime initial curing time
+     * @param interval curing time interval
+     * @param repetitions number of samples or intervals
+     */
+    public static MSLAFile<?> generateTestPattern(
+            String machineName,
             int startTime,
             int interval,
             int repetitions) throws MSLAException
@@ -74,51 +104,31 @@ public class PCBCalibration {
         var wsFile = FileFactory.instance.create(machineName);
         var options = new FileOptionMapper(wsFile, defaults);
 
-        filePath = filePath.endsWith(defaults.getFileExtension()) ?
-                filePath :
-                filePath + "." + defaults.getFileExtension();
-        try (var fos = new FileOutputStream(filePath)) {
-            // Set options
-            options.set(MSLAOptionName.BottomLayersCount, 1);
-            options.set(MSLAOptionName.BottomLayersExposureTime, startTime);
-            options.set(MSLAOptionName.NormalLayersExposureTime, interval);
-            if (options.hasOption(MSLAOptionName.LiftHeight)) options.set(MSLAOptionName.LiftHeight, 1);
-            if (options.hasOption(MSLAOptionName.NormalLayersLiftHeight)) options.set(MSLAOptionName.NormalLayersLiftHeight, 1);
+        // Set options
+        options.set(MSLAOptionName.BottomLayersCount, 1);
+        options.set(MSLAOptionName.BottomLayersExposureTime, startTime);
+        options.set(MSLAOptionName.NormalLayersExposureTime, interval);
+        if (options.hasOption(MSLAOptionName.LiftHeight)) options.set(MSLAOptionName.LiftHeight, 1);
+        if (options.hasOption(MSLAOptionName.NormalLayersLiftHeight)) options.set(MSLAOptionName.NormalLayersLiftHeight, 1);
+        if (options.hasOption(MSLAOptionName.LayerSettings)) options.set(MSLAOptionName.LayerSettings, false);
+        if (options.hasOption(MSLAOptionName.TransitionLayersCount)) options.set(MSLAOptionName.TransitionLayersCount, 0);
 
-            //wsFile.setOption("PerLayerOverride", 0);
-            //wsFile.setOption("TransitionLayerCount", 0);
+        // Create preview image
+        createPreview(wsFile);
 
-            //wsFile.setOption("LiftHeight", 0.5f);
-            //wsFile.setOption("BottomLiftHeight", 0.5f);
-            //wsFile.setOption("LiftHeight1", 0.5f);
-            //wsFile.setOption("LiftHeight2", 0.5f);
-            //wsFile.setOption("BottomLiftHeight1", 0.5f);
-            //wsFile.setOption("BottomLiftHeight2", 0.5f);
+        // Generate pattern layers
+        var pattern = new PCBCalibrationPattern(wsFile.getResolution(), wsFile.getPixelSize());
+        pattern.setStartTime(startTime);
+        var reader = new EncodeReader(wsFile, pattern, repetitions);
+        for (int i = 0; i < repetitions; i++) wsFile.addLayer(reader, null);
+        try {
+            // Wait until all layers are encoded
+            while (wsFile.getEncodersPool().isEncoding()) Thread.sleep(10);
+        } catch (InterruptedException ignored) {}
 
-            // Create preview image
-            createPreview(wsFile);
+        logger.info("Encoding done");
 
-            // Generate pattern layers
-            var pattern = new PCBCalibrationPattern(wsFile.getResolution(), wsFile.getPixelSize());
-            pattern.setStartTime(startTime);
-            var reader = new EncodeReader(wsFile, pattern, repetitions);
-            for (int i = 0; i < repetitions; i++)
-                wsFile.addLayer(reader, null);
-            try {
-                // Wait until all layers are encoded
-                while (wsFile.getEncodersPool().isEncoding()) Thread.sleep(10);
-            } catch (InterruptedException ignored) {}
-            logger.info("Encoding done, writing a file");
-
-            System.out.println(wsFile);
-
-            wsFile.write(fos);
-            fos.flush();
-
-            return filePath;
-        } catch (IOException e) {
-            throw new MSLAException("Error writing PCBCalibration image", e);
-        }
+        return wsFile;
     }
 
     public static void createPreview(MSLAFile<?> file) throws MSLAException {

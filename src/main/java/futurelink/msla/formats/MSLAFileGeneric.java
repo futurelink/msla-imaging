@@ -15,6 +15,8 @@ public abstract class MSLAFileGeneric<T> implements MSLAFile<T> {
 
     public void reset(MSLAFileDefaults defaults) throws MSLAException {
         if (defaults == null) throw new MSLAException("Defaults can't be null");
+        if (!isMachineValid(defaults))
+            throw new MSLAException("Defaults of '" + defaults.getMachineFullName() + "' not applicable to this file");
     }
 
     @Override

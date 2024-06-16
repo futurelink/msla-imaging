@@ -28,7 +28,7 @@ public class CTBFileMachineName implements MSLAFileBlock {
     public CTBFileMachineName() {}
 
     @Override public String getName() { return "MachineName"; }
-    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(this); }
+    @Override public int getDataLength() throws FileFieldsException { return FileFieldsIO.getBlockLength(getBlockFields()); }
     @Override public int getDataFieldOffset(String fieldName) throws FileFieldsException {
         return FileFieldsIO.getBlockLength(getBlockFields(), fieldName);
     }

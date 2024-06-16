@@ -8,6 +8,7 @@ import futurelink.msla.tools.ImageReader;
 import futurelink.msla.tools.ImageWriter;
 import futurelink.msla.utils.options.FileOptionMapper;
 import futurelink.msla.utils.defaults.MachineDefaults;
+import futurelink.msla.utils.options.LayerOptionMapper;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -18,7 +19,6 @@ import java.util.LinkedList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class PhotonWorkshopFileTest extends CommonTestRoutines {
 
@@ -41,12 +41,20 @@ public class PhotonWorkshopFileTest extends CommonTestRoutines {
             assertEquals(426, file.getLayers().count());
 
             // Check options are there
-            var optionMapper = new FileOptionMapper(file, null);
+            var optionMapper = new FileOptionMapper(file, defaults.get(0));
             LinkedList<String> options = new LinkedList<>();
             for (var option : optionMapper.available()) {
                 options.add(option + " in " + optionMapper.getGroup(option) + " = " + optionMapper.get(option));
             }
             assertEquals(fileOptionsCount[i], options.size());
+
+            // Check layer options are there
+            var layerOptionMapper = new LayerOptionMapper(file, defaults.get(0).getLayerDefaults());
+            LinkedList<String> layerOptions = new LinkedList<>();
+            for (var option : layerOptionMapper.available()) {
+                layerOptions.add(option + " in " + layerOptionMapper.getGroup(option) + " = " + layerOptionMapper.get(option));
+            }
+            assertEquals(4, layerOptions.size());
         }
     }
 

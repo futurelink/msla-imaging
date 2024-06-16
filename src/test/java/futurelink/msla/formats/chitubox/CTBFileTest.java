@@ -22,16 +22,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CTBFileTest extends CommonTestRoutines {
 
     @Test
-    void ReadChituboxFileTest() throws MSLAException, IOException, InterruptedException {
+    void ReadJupiterFileTest() throws MSLAException, IOException, InterruptedException {
         logger.info("Temporary dir: " + temp_dir);
         var file = FileFactory.instance.load(
                 resourceFile("test_data/ChituboxFileTest/Example_Chitubox_Slices.ctb")
         );
+        System.out.println(file);
         assertTrue(file.isValid());
         assertEquals("ELEGOO JUPITER", file.getMachineName());
 
-        ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "encrypted_file_small_preview.png"));
-        ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "encrypted_file_large_preview.png"));
+        ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "encrypted_file_large_preview.png"));
+        ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "encrypted_file_small_preview.png"));
 
         assertFileExactSize(temp_dir + "encrypted_file_small_preview.png", 4612);
         assertFileExactSize(temp_dir + "encrypted_file_large_preview.png", 14994);
@@ -57,6 +58,50 @@ public class CTBFileTest extends CommonTestRoutines {
         assertFileExactSize(layerFiles[0], 17987);
         assertFileExactSize(layerFiles[1], 18021);
         assertFileExactSize(layerFiles[2], 18044);
+    }
+
+    @Test
+    void CreateJupiterFileTest() throws MSLAException, InterruptedException, IOException {
+        var outFile = temp_dir + "chitubox_encrypted_file_test.ctb";
+        var file = FileFactory.instance.create("ELEGOO JUPITER");
+        assertTrue(file.isValid());
+
+        var files = new String[]{
+                "test_data/ChituboxFileTest/ELEGOO_Jupiter_Layer_0.png",
+                "test_data/ChituboxFileTest/ELEGOO_Jupiter_Layer_1.png",
+                "test_data/ChituboxFileTest/ELEGOO_Jupiter_Layer_2.png"
+        };
+        var layerBytes = new int[3];
+        var encoders = file.getEncodersPool();
+        try {
+            for (var f : files) {
+                file.addLayer(new ImageReader(file, resourceFile(f)), (layer, data) -> layerBytes[layer] = data.size());
+            }
+            while (encoders.isEncoding()) Thread.sleep(10); // Wait while reading-encoding is done
+        } catch (IOException e) {
+            throw new MSLAException("Error adding layers", e);
+        }
+
+        // Assert encoded layers' data sizes
+        assertEquals(1638, layerBytes[0]);
+        assertEquals(1670, layerBytes[1]);
+        assertEquals(1692, layerBytes[2]);
+
+        // Set large preview
+        file.setPreview(0, ImageIO.read(new File(resourceFile("test_data/ChituboxFileTest/ctb_preview_large_example.png"))));
+        assertEquals("400 x 300", file.getPreview(0).getResolution().toString());
+
+        // Set small preview
+        file.setPreview(1, ImageIO.read(new File(resourceFile("test_data/ChituboxFileTest/ctb_preview_small_example.png"))));
+        assertEquals("200 x 125", file.getPreview(1).getResolution().toString());
+
+        writeMSLAFile(outFile, file);
+
+        assertFileExactSize(outFile, 18532);
+
+        // Read exported file and do checks
+        file = FileFactory.instance.load(outFile);
+        assertTrue(file.isValid());
     }
 
     @Test
@@ -101,7 +146,7 @@ public class CTBFileTest extends CommonTestRoutines {
     }
 
     @Test
-    void CreateTestFile() throws MSLAException, InterruptedException, IOException {
+    void CreateSaturnFileTest() throws MSLAException, InterruptedException, IOException {
         var outFile = temp_dir + "chitubox_file_test.ctb";
         var file = FileFactory.instance.create("ELEGOO SATURN");
         assertTrue(file.isValid());
@@ -131,10 +176,13 @@ public class CTBFileTest extends CommonTestRoutines {
         file.setPreview(0, ImageIO.read(new File(resourceFile("test_data/ChituboxFileTest/ctb_preview_large_example.png"))));
         assertEquals("400 x 300", file.getPreview(0).getResolution().toString());
 
+        // Set small preview
         file.setPreview(1, ImageIO.read(new File(resourceFile("test_data/ChituboxFileTest/ctb_preview_small_example.png"))));
         assertEquals("200 x 125", file.getPreview(1).getResolution().toString());
 
         writeMSLAFile(outFile, file);
+
+        assertFileExactSize(outFile, 36679);
 
         // Read exported file and do checks
         file = FileFactory.instance.load(outFile);
@@ -163,7 +211,10 @@ public class CTBFileTest extends CommonTestRoutines {
         assertFileExactSize(layerFiles[2], 10869);
 
         ImageIO.write(file.getPreview(0).getImage(), "png", new File(temp_dir + "large_preview.png"));
+        assertFileExactSize(temp_dir + "large_preview.png", 6924);
+
         ImageIO.write(file.getPreview(1).getImage(), "png", new File(temp_dir + "small_preview.png"));
+        assertFileExactSize(temp_dir + "small_preview.png", 3789);
     }
 
     @Test

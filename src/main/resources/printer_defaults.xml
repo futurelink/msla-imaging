@@ -37,6 +37,12 @@
             <option name="BottomLayersCount" type="int" value="6" minValue="0" maxValue="99999"/>
             <option name="BottomLayersExposureTime" type="float" value="30.0" minValue="0.5" maxValue="120.0"/>
         </file_options>
+        <layer_options>
+            <option name="LayerLiftHeight" type="float" value="0.0" minValue="0.0" maxValue="100.0"/>
+            <option name="LayerLiftSpeed" type="float" value="0.0" minValue="0.0" maxValue="100.0"/>
+            <option name="LayerExposureTime" type="float" value="0.0" minValue="0.0" maxValue="100.0"/>
+            <option name="LayerHeight" type="float" value="0.0" minValue="0.0" maxValue="100.0"/>
+        </layer_options>
     </printer>
 
     <printer
@@ -362,7 +368,7 @@
             pixelSize="40.0"
             displayWidth="172.8"
             displayHeight="102.4"
-            machineZ="0.0"
+            machineZ="160.0"
             extension="cxdlp"
             file="futurelink.msla.formats.creality.CXDLPFile"
     >
@@ -378,12 +384,12 @@
             <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
             <option name="NormalLayersExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
             <option name="NormalLayersLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option name="NormalLayersLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="NormalLayersLiftSpeed" type="int" value="50" minValue="1" maxValue="100"/>
             <option name="NormalLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
             <option name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
             <option name="BottomLayersExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
             <option name="BottomLayersLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option name="BottomLayersLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="BottomLayersLiftSpeed" type="int" value="50" minValue="1" maxValue="100"/>
             <option name="BottomLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
             <option name="DistortionCompensation" type="boolean" value="0" trueValue="1" falseValue="0"/>
             <option name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
@@ -402,15 +408,16 @@
             manufacturer="CREALITY"
             name="HALOT-ONE PRO"
             resolution="2560x2400"
-            pixelSize="40.0"
-            displayWidth="172.8"
-            displayHeight="102.4"
-            machineZ="0.0"
+            pixelSize="50.0"
+            displayWidth="130.0"
+            displayHeight="122.0"
+            machineZ="160.0"
             extension="cxdlp"
             file="futurelink.msla.formats.creality.CXDLPFile"
     >
         <file_properties>
             <property name="PrinterModel" value="CL-70"/>
+            <property name="Version" value="3"/>
             <property name="AntiAliasGreyMinValue" value="1"/>
             <property name="AntiAliasGreyMaxValue" value="0"/>
         </file_properties>
@@ -419,13 +426,14 @@
             <option name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
             <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
             <option name="NormalLayersExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
-            <option name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="NormalLayersExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
+            <option name="NormalLayersLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option name="NormalLayersLiftSpeed" type="int" value="50" minValue="1" maxValue="100"/>
+            <option name="NormalLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
             <option name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
             <option name="BottomLayersExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
             <option name="BottomLayersLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option name="BottomLayersLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="BottomLayersLiftSpeed" type="int" value="50" minValue="1" maxValue="100"/>
             <option name="BottomLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
             <option name="DistortionCompensation" type="boolean" value="0" trueValue="1" falseValue="0"/>
             <option name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
@@ -444,15 +452,16 @@
             manufacturer="CREALITY"
             name="HALOT-ONE"
             resolution="1620x2560"
-            pixelSize="0.0"
-            displayWidth="0.0"
-            displayHeight="0.0"
-            machineZ="0.0"
+            pixelSize="49.3"
+            displayWidth="80.0"
+            displayHeight="127.0"
+            machineZ="160.0"
             extension="cxdlp"
             file="futurelink.msla.formats.creality.CXDLPFile"
     >
         <file_properties>
             <property name="PrinterModel" value="CL-60"/>
+            <property name="Version" value="3"/>
             <property name="AntiAliasGreyMinValue" value="1"/>
             <property name="AntiAliasGreyMaxValue" value="0"/>
         </file_properties>
@@ -461,13 +470,13 @@
             <option name="RetractSpeed" type="int" value="1" minValue="1" maxValue="100"/>
             <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
             <option name="NormalLayersExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
-            <option name="LiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option name="LiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
-            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="NormalLayersLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
+            <option name="NormalLayersLiftSpeed" type="int" value="50" minValue="1" maxValue="100"/>
+            <option name="NormalLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
             <option name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
             <option name="BottomLayersExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
             <option name="BottomLayersLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option name="BottomLayersLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="BottomLayersLiftSpeed" type="int" value="50" minValue="1" maxValue="100"/>
             <option name="BottomLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
             <option name="DistortionCompensation" type="boolean" value="0" trueValue="1" falseValue="0"/>
             <option name="DistortionCompensationThickness" type="int" value="0" minValue="0" maxValue="1000000"/>
@@ -487,14 +496,15 @@
             name="HALOT-RAY"
             resolution="5760x3600"
             pixelSize="34.39f"
-            displayWidth="0.0"
-            displayHeight="0.0"
-            machineZ="0.0"
+            displayWidth="198.0"
+            displayHeight="123.0"
+            machineZ="210.0"
             extension="cxdlp"
             file="futurelink.msla.formats.creality.CXDLPFile"
     >
         <file_properties>
             <property name="PrinterModel" value="CL925"/>
+            <property name="Version" value="3"/>
             <property name="AntiAliasGreyMinValue" value="1"/>
             <property name="AntiAliasGreyMaxValue" value="0" />
         </file_properties>
@@ -505,13 +515,13 @@
             <option name="NormalLayersExposureTime" type="int" value="30" minValue="1" maxValue="120"/>
             <option name="NormalLayersWaitBeforeCure" type="int" value="4" minValue="1" maxValue="120"/>
             <option name="NormalLayersLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option name="NormalLayersLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="NormalLayersLiftSpeed" type="int" value="50" minValue="1" maxValue="100"/>
             <option name="NormalLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
 
             <option name="BottomLayersCount" type="int" value="2" minValue="0" maxValue="99999"/>
             <option name="BottomLayersExposureTime" type="int" value="40" minValue="1" maxValue="120"/>
             <option name="BottomLayersLiftHeight" type="int" value="6" minValue="1" maxValue="100"/>
-            <option name="BottomLayersLiftSpeed" type="int" value="1" minValue="1" maxValue="100"/>
+            <option name="BottomLayersLiftSpeed" type="int" value="50" minValue="1" maxValue="100"/>
             <option name="BottomLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
 
             <option name="DistortionCompensation" type="boolean" value="0" trueValue="1" falseValue="0"/>
@@ -532,10 +542,10 @@
             manufacturer="ELEGOO"
             name="Mars 4 Max"
             resolution="5760x3600"
-            pixelSize="35.0f"
-            displayWidth="150.0"
-            displayHeight="200.0"
-            machineZ="200.0"
+            pixelSize="34.0f"
+            displayWidth="195.84"
+            displayHeight="122.4"
+            machineZ="150.0"
             extension="goo"
             file="futurelink.msla.formats.elegoo.GOOFile"
     >
@@ -614,7 +624,7 @@
             manufacturer="ELEGOO"
             name="SATURN"
             resolution="3840x2400"
-            pixelSize="35.0f"
+            pixelSize="50.0"
             displayWidth="192.0"
             displayHeight="120.0"
             machineZ="200.0"
@@ -636,7 +646,7 @@
             <option name="LayerWaitAfterLift" type="float" value="0.0" minValue="0" maxValue="100.0"/>
             <option name="LayerWaitAfterRetract" type="float" value="0.0" minValue="0" maxValue="100.0"/>
             <option name="LayerLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
-            <option name="LightOffTime" type="float" value="0.0" minValue="0.0" maxValue="100.0"/>
+            <option name="LayerLightOffDelay" type="float" value="0.0" minValue="0.0" maxValue="100.0"/>
         </layer_options>
         <file_options>
             <option name="Weight" type="float" value="0" minValue="0" maxValue="99999.99"/>
@@ -705,7 +715,9 @@
             <option name="LayerWaitBeforeLift" type="float" value="0.0" minValue="0" maxValue="100.0"/>
             <option name="LayerWaitAfterLift" type="float" value="0.0" minValue="0" maxValue="100.0"/>
             <option name="LayerWaitAfterRetract" type="float" value="0.0" minValue="0" maxValue="100.0"/>
-            <option name="LightPWM" type="int" value="255" minValue="1" maxValue="255"/>
+            <option name="LayerExposureTime" type="float" value="2.5" minValue="0.5" maxValue="150.0"/>
+            <option name="LayerLightOffDelay" value="0"/>
+            <option name="LayerLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
         </layer_options>
         <file_options>
             <option name="Weight" type="float" value="0" minValue="0" maxValue="99999.99"/>
@@ -719,10 +731,13 @@
             <option name="TransitionLayersCount" value="10"/>
             <option name="WaitAfterLift" value="0.0"/>
             <option name="WaitAfterRetract" value="0.5"/>
+            <option name="WaitAfterLift" value="0.0"/>
             <option name="WaitAfterLift2" value="0.0"/>
-            <option name="WaitAfterLift" value="0"/>
+            <option name="WaitAfterLift3" value="0.0"/>
             <option name="WaitBeforeLift" value="0"/>
             <option name="RetractSpeed" value="180"/>
+            <option name="WaitAfterRetract" value="0.0"/>
+            <option name="WaitAfterRetract2" value="0.0"/>
 
             <option name="NormalLayersLightPWM" type="int" value="255" minValue="1" maxValue="255"/>
             <option name="NormalLayersExposureTime" value="2.5"/>

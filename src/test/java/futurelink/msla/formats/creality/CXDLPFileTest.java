@@ -112,6 +112,8 @@ public class CXDLPFileTest extends CommonTestRoutines {
         // Write new file
         writeMSLAFile(outFile, newFile);
 
+        assertFileExactSize(outFile, 371703);
+
         delete_file(temp_dir + "final_0.png"); // Clean up files just in case
         delete_file(temp_dir + "final_1.png");
 
