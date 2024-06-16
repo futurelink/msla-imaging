@@ -109,13 +109,12 @@ public class PhotonWorkshopFileDescriptor {
             stream.writeInt(fields.LayerImageColorTableAddress);
             stream.writeInt(fields.LayerDefinitionAddress);
 
-            // Version 2.3 and greater
+            // Version 2.4 and greater
             if ((versionMajor >= 2) && (versionMinor >= 4)) {
                 stream.writeInt(fields.ExtraAddress);
+                stream.writeInt(fields.MachineAddress);
+                stream.writeInt(fields.LayerImageAddress);
             }
-
-            stream.writeInt(fields.MachineAddress);
-            stream.writeInt(fields.LayerImageAddress);
 
             // Version 2.5 and greater
             if ((versionMajor >= 2) && (versionMinor >= 5)) {
@@ -165,10 +164,11 @@ public class PhotonWorkshopFileDescriptor {
         f.LayerDefinitionAddress = stream.readInt();
 
         // Version 2.4 and greater
-        if ((versionMajor == 2) && (versionMinor >= 4)) f.ExtraAddress = stream.readInt();
-
-        f.MachineAddress = stream.readInt();
-        f.LayerImageAddress = stream.readInt();
+        if ((versionMajor == 2) && (versionMinor >= 4)) {
+            f.ExtraAddress = stream.readInt();
+            f.MachineAddress = stream.readInt();
+            f.LayerImageAddress = stream.readInt();
+        }
 
         // Version 2.5 and greater
         if ((versionMajor == 2) && (versionMinor >= 5)) f.ModelAddress = stream.readInt();

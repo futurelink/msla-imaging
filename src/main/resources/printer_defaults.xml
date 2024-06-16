@@ -551,7 +551,7 @@
     >
         <file_properties>
             <property name="MachineName" value="ELEGOO Mars 4 Max"/>
-            <property name="MachineType" value="DLP"/>
+            <property name="MachineType" value="ELEGOO Mars 4 Max"/>
             <property name="ProfileName" value="DEFAULT"/>
         </file_properties>
         <file_options>

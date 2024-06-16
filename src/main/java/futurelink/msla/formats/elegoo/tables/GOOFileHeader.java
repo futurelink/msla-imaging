@@ -34,8 +34,8 @@ public class GOOFileHeader extends GOOFileTable {
         @MSLAFileField(length = 24, order = 3) private String SoftwareVersion = About.Version;
         @MSLAFileField(length = 24, order = 4) private String FileCreateTime = formatDate(new Date());
         @MSLAFileField(length = 32, order = 5) @Setter private String MachineName;
-        @MSLAFileField(length = 32, order = 6) private String MachineType = "DLP";
-        @MSLAFileField(length = 32, order = 7) private String ProfileName = "DEFAULT";
+        @MSLAFileField(length = 32, order = 6) private String MachineType;
+        @MSLAFileField(length = 32, order = 7) private String ProfileName;
         @MSLAFileField(order = 8) @MSLAOption(MSLAOptionName.AntialiasLevel) private Short AntiAliasingLevel;
         @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.GreyLevel) private Short GreyLevel;
         @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.ImageBlurLevel) private Short BlurLevel;

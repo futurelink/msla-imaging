@@ -33,7 +33,13 @@ public class GOOFilePreview implements MSLAFileBlock, MSLAPreview {
     }
 
     @Override public BufferedImage getImage() { return Image; }
-    @Override public void setImage(BufferedImage image) {}
+    @Override public void setImage(BufferedImage image) {
+        this.Image = new BufferedImage(
+                blockFields.Resolution.getWidth(),
+                blockFields.Resolution.getHeight(),
+                BufferedImage.TYPE_USHORT_565_RGB);
+        if (image != null) { Image.getGraphics().drawImage(image,0, 0,  null); }
+    }
     @Override public Size getResolution() { return this.getBlockFields().Resolution; }
 
     @Override public String getName() { return null; }

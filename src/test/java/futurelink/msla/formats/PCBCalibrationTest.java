@@ -17,8 +17,24 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PCBCalibrationTest extends CommonTestRoutines {
+
     @Test
-    void TestPCBCalibrationOnPhoton() throws MSLAException {
+    void TestPCBCalibrationOnPhotonMono() throws MSLAException {
+        var machineName = "Anycubic Photon Mono";
+        var filePath = PCBCalibration.generateTestFile(
+                machineName,
+                temp_dir + "photon_mono_test_pcb_calibration",
+                10, 1, 10);
+
+        assertFileExactSize(filePath, 155614);
+
+        // Quick test: load file to check it loads fine
+        var file = FileFactory.instance.load(filePath);
+        logger.info(file.toString());
+    }
+
+    @Test
+    void TestPCBCalibrationOnPhotonMonoX6K() throws MSLAException {
         var machineName = "Anycubic Photon Mono X 6K";
         var filePath = PCBCalibration.generateTestFile(
                 machineName,
@@ -143,5 +159,20 @@ public class PCBCalibrationTest extends CommonTestRoutines {
         ImageIO.write(file.getPreview(0).getImage(), "png",
                 new File(temp_dir + "jupiter_test_pcb_calibration_preview.png"));
         assertFileExactSize(temp_dir + "jupiter_test_pcb_calibration_preview.png", 2715);
+    }
+
+    @Test
+    void TestPCBCalibrationOnMars4Max() throws MSLAException {
+        var machineName = "ELEGOO Mars 4 Max";
+        var filePath = PCBCalibration.generateTestFile(
+                machineName,
+                temp_dir + "elegoo_mars4max_test_pcb_calibration",
+                10, 1, 10);
+
+        assertFileExactSize(filePath, 1775974);
+
+        // Quick test: load file to check it loads fine
+        var file = FileFactory.instance.load(filePath);
+        logger.info(file.toString());
     }
 }

@@ -28,7 +28,11 @@ public class MachinePropertyBoolean extends MachineProperty {
     public <T extends Serializable> T displayToRaw(Class<? extends T> rawType, Object optionValue) throws MSLAException {
         if (optionValue == null) return null;
         if (Boolean.class.isAssignableFrom(rawType)) {
-            return (T) ((Boolean) optionValue ? trueValue : falseValue);
+            return (T) (Boolean) switch ((String) optionValue) {
+                case "true" ->  true;
+                case "false" -> false;
+                default -> throw new MSLAException("Invalid option value: " + optionValue);
+            };
         } else if (optionValue instanceof String) {
             return (T) switch ((String) optionValue) {
                 case "true" -> valueToType(rawType.getSimpleName(), trueValue);
