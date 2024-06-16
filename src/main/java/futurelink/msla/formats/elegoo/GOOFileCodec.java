@@ -6,7 +6,7 @@ import futurelink.msla.tools.BufferedImageInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -27,7 +27,7 @@ public class GOOFileCodec implements MSLALayerCodec<byte[]> {
         private int pixelsCount = 0;
         private int size = 0;
 
-        public Output(LinkedList<Byte> data) throws IOException {
+        public Output(List<Byte> data) throws IOException {
             var d = new byte[data.size()];
             for (int i = 0; i < data.size(); ++i) { d[i] = data.get(i); }
             write(d);
@@ -93,7 +93,7 @@ public class GOOFileCodec implements MSLALayerCodec<byte[]> {
 
     @Override
     public MSLALayerEncodeOutput<byte[]> Encode(int layerNumber, MSLALayerEncodeReader reader) throws MSLAException {
-        var RLEData = new LinkedList<Byte>();
+        var RLEData = new ArrayList<Byte>();
         int previousColor = 0;
         int currentColor = 0;
         int stride = 0;

@@ -72,6 +72,7 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
             default -> null;
         };
     }
+    @Override public Short getPreviewsNumber() { return Previews.getPreviewsNumber(); }
     @Override public MSLAPreview getPreview(int index) throws MSLAException { return Previews.getPreview(index); }
     @Override public MSLAPreview getLargePreview() throws MSLAException { return getPreview(1); }
 

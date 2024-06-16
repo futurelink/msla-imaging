@@ -147,6 +147,7 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
                 Header.getResolution().length(), getDecodersPool(), writer);
     }
 
+    @Override public Short getPreviewsNumber() { return 1; }
     @Override public MSLAPreview getPreview(int index) { return Preview; }
     @Override public void setPreview(int index, BufferedImage image) { Preview.setImage(image); }
 

@@ -47,7 +47,7 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         @MSLAFileField(order = 9) @MSLAOption(MSLAOptionName.LiftSpeed) private Float LiftSpeed;// = SpeedConverter.Convert(DefaultLiftSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
         @MSLAFileField(order = 10) @MSLAOption(MSLAOptionName.RetractSpeed) private Float RetractSpeed;// = SpeedConverter.Convert(DefaultRetractSpeed, CoreSpeedUnit, SpeedUnit.MillimetersPerSecond); // mm/s
         @MSLAFileField(order = 11) @MSLAOption(MSLAOptionName.Volume) private Float VolumeMl;
-        @MSLAFileField(order = 12) @MSLAOption(MSLAOptionName.Antialias) private Integer AntiAliasing;
+        @MSLAFileField(order = 12) @MSLAOption(MSLAOptionName.AntialiasLevel) private Integer AntiAliasing;
         @MSLAFileField(order = 13) private Integer ResolutionX() { return Resolution != null ? Resolution.getWidth() : 0; }
         private void setResolutionX(Integer width) { Resolution = new Size(width, ResolutionY()); }
         @MSLAFileField(order = 14) private Integer ResolutionY() { return Resolution != null ? Resolution.getHeight() : 0; }

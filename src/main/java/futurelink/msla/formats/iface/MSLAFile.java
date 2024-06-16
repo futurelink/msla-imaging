@@ -38,6 +38,11 @@ public interface MSLAFile<T> {
     MSLAPreview getPreview(int index) throws MSLAException;
 
     /**
+     * Returns number of available previews in a file.
+     */
+    Short getPreviewsNumber();
+
+    /**
      * Returns {@code MSLAPreview} object.
      * Some of the formats have more than one preview and one of them is larger
      * than the others. This method returns the largest one.

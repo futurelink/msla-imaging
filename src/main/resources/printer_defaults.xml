@@ -22,6 +22,7 @@
             <option name="Volume" type="float" value="0" minValue="0" maxValue="99999.99"/>
             <option name="PrintTime" value="0"/>
             <option name="Currency" type="char" value="$"/>
+            <option name="AntialiasLevel" type="int" value="1" minValue="1" maxValue="16"/>
 
             <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
             <option name="LayerSettings" type="boolean" value="0" trueValue="80" falseValue="0"/>
@@ -31,7 +32,6 @@
             <option name="WaitBeforeCure" type="float" value="0.5" minValue="0.0" maxValue="120.0"/>
             <option name="TransitionLayersCount" type="int" value="0" minValue="0" maxValue="99999"/>
             <option name="TransitionLayersType" value="0"/>
-            <option name="Antialias" type="float" value="1" minValue="0" maxValue="16"/>
 
             <option name="NormalLayersExposureTime" type="float" value="3.0" minValue="0.5" maxValue="30.0"/>
             <option name="BottomLayersCount" type="int" value="6" minValue="0" maxValue="99999"/>
@@ -79,7 +79,7 @@
             <option name="LiftHeight" type="float" value="10.0" minValue="1.0" maxValue="50.0"/>
             <option name="LiftSpeed" type="float" value="4.0" minValue="0.1" maxValue="10.0"/>
             <option name="RetractSpeed" type="float" value="4.0" minValue="0.1" maxValue="10.0"/>
-            <option name="Antialias" type="float" value="1" minValue="0" maxValue="16"/>
+            <option name="AntialiasLevel" type="int" value="1" minValue="1" maxValue="16"/>
             <option name="TransitionLayersCount" type="int" value="10" minValue="0" maxValue="99999"/>
             <option name="TransitionLayersType" value="0"/>
             <option name="AdvancedMode" type="boolean" value="0" trueValue="1" falseValue="0"/>
@@ -142,7 +142,7 @@
             <option name="LiftHeight" value="8.0"/>
             <option name="LiftSpeed" value="2.0"/>
             <option name="RetractSpeed" value="2.0"/>
-            <option name="Antialias" value="2"/>
+            <option name="AntialiasLevel" type="int" value="1" minValue="1" maxValue="16"/>
             <option name="TransitionLayersCount" value="10"/>
             <option name="TransitionLayersType" value="0"/>
             <option name="AdvancedMode" type="boolean" value="1" trueValue="1" falseValue="0"/>
@@ -206,7 +206,7 @@
             <option name="LiftHeight" value="6.0f"/>
             <option name="LiftSpeed" value="2.0"/>
             <option name="RetractSpeed" value="2.0"/>
-            <option name="Antialias" value="1"/>
+            <option name="AntialiasLevel" type="int" value="1" minValue="1" maxValue="16"/>
             <option name="TransitionLayersCount" value="0"/>
             <option name="TransitionLayersType" value="0"/>
             <option name="AdvancedMode" value="1"/>
@@ -269,7 +269,7 @@
             <option name="LiftHeight" value="8.0f"/>
             <option name="LiftSpeed" value="1.0"/>
             <option name="RetractSpeed" value="1.5"/>
-            <option name="Antialias" value="1"/>
+            <option name="AntialiasLevel" type="int" value="1" minValue="1" maxValue="16"/>
             <option name="TransitionLayersCount" value="10"/>
             <option name="TransitionLayersType" value="0"/>
             <option name="AdvancedMode" value="1"/>
@@ -332,7 +332,7 @@
             <option name="LiftHeight" value="6.0f"/>
             <option name="LiftSpeed" value="3.0"/>
             <option name="RetractSpeed" value="4.0"/>
-            <option name="Antialias" value="1"/>
+            <option name="AntialiasLevel" type="int" value="1" minValue="1" maxValue="16"/>
             <option name="TransitionLayersCount" value="10"/>
             <option name="TransitionLayersType" value="0"/>
             <option name="AdvancedMode" value="0"/>
@@ -551,7 +551,7 @@
     >
         <file_properties>
             <property name="MachineName" value="ELEGOO Mars 4 Max"/>
-            <property name="MachineType" value="DLP"/>
+            <property name="MachineType" value="ELEGOO Mars 4 Max"/>
             <property name="ProfileName" value="DEFAULT"/>
         </file_properties>
         <file_options>
@@ -726,7 +726,7 @@
             <option name="LayerHeight" type="float" value="0.05" minValue="0.05" maxValue="0.2"/>
             <option name="LayerSettings" type="boolean" value="0" trueValue="0x40" falseValue="0"/>
 
-            <option name="Antialias" value="15"/>
+            <option name="Antialias" type="boolean" value="15" falseValue="7" trueValue="15"/>
             <option name="AntialiasLevel" value="4"/>
             <option name="TransitionLayersCount" value="10"/>
             <option name="WaitAfterLift" value="0.0"/>

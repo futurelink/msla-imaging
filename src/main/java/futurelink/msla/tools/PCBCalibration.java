@@ -102,6 +102,9 @@ public class PCBCalibration {
         var defaults = MachineDefaults.getInstance().getMachineDefaults(machineName)
                 .orElseThrow(() -> new MSLAException("Printer has no defaults: " + machineName));
         var wsFile = FileFactory.instance.create(machineName);
+        if (wsFile.getResolution() == null) throw new MSLAException("Machine has no resolution set");
+        if (wsFile.getPixelSize() == 0) throw new MSLAException("Machine has no pixel size");
+
         var options = new FileOptionMapper(wsFile, defaults);
 
         // Set options
@@ -112,6 +115,7 @@ public class PCBCalibration {
         if (options.hasOption(MSLAOptionName.NormalLayersLiftHeight)) options.set(MSLAOptionName.NormalLayersLiftHeight, 1);
         if (options.hasOption(MSLAOptionName.LayerSettings)) options.set(MSLAOptionName.LayerSettings, false);
         if (options.hasOption(MSLAOptionName.TransitionLayersCount)) options.set(MSLAOptionName.TransitionLayersCount, 0);
+        if (options.hasOption(MSLAOptionName.Antialias)) options.set(MSLAOptionName.Antialias, false);
 
         // Create preview image
         createPreview(wsFile);
@@ -132,20 +136,27 @@ public class PCBCalibration {
     }
 
     public static void createPreview(MSLAFile<?> file) throws MSLAException {
-        var preview = file.getPreview((short) 0);
-        if (preview != null) {
-            var graphics = preview.getImage().getGraphics();
-            graphics.setFont(graphics.getFont().deriveFont(20.0f));
-            graphics.setColor(Color.WHITE);
-            graphics.drawRoundRect(10, 10,
-                    preview.getResolution().getWidth() - 20,
-                    preview.getResolution().getHeight() - 20,
-                    10, 10);
-            graphics.setColor(Color.WHITE);
-            graphics.drawString("PCB Test pattern", 16, 16 + 20);
-            graphics.setFont(graphics.getFont().deriveFont(16.0f));
-            graphics.setColor(Color.RED);
-            graphics.drawString("DO NOT PRINT!", 16, 16 + 20 + 30);
+        for (var i = 0; i < file.getPreviewsNumber(); i++) {
+            var preview = file.getPreview(i);
+            if (preview != null) {
+                var image = new BufferedImage(
+                        preview.getResolution().getWidth(),
+                        preview.getResolution().getHeight(),
+                        BufferedImage.TYPE_INT_RGB);
+                var graphics = image.getGraphics();
+                graphics.setFont(graphics.getFont().deriveFont(20.0f));
+                graphics.setColor(Color.WHITE);
+                graphics.drawRoundRect(10, 10,
+                        preview.getResolution().getWidth() - 20,
+                        preview.getResolution().getHeight() - 20,
+                        10, 10);
+                graphics.setColor(Color.WHITE);
+                graphics.drawString("PCB Test pattern", 16, 16 + 20);
+                graphics.setFont(graphics.getFont().deriveFont(16.0f));
+                graphics.setColor(Color.RED);
+                graphics.drawString("DO NOT PRINT!", 16, 16 + 20 + 30);
+                preview.setImage(image);
+            }
         }
     }
 }
