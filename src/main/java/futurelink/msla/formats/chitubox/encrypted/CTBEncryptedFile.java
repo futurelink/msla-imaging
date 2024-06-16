@@ -178,6 +178,7 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
 
     @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return CTBCommonFileCodec.class; }
     @Override public String getMachineName() { return MachineName.getBlockFields().getMachineName(); }
+    @Override public Short getPreviewsNumber() { return 2; }
     @Override public MSLAPreview getPreview(int index) throws MSLAException { return (index == 0) ? PreviewLarge : PreviewSmall; }
     @Override public MSLAPreview getLargePreview() { return PreviewLarge; }
     @Override public void setPreview(int index, BufferedImage image) {

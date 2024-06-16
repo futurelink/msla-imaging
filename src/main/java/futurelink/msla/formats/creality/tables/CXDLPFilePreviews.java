@@ -18,6 +18,7 @@ public class CXDLPFilePreviews extends CXDLPFileTable {
         @MSLAFileField(order = 2) CXDLPFilePreview Preview3 = new CXDLPFilePreview(new Size(290, 290));
     }
 
+    public Short getPreviewsNumber() { return 3; }
     public final MSLAPreview getPreview(int index) throws MSLAException {
         return switch (index) {
             case 0 -> blockFields.Preview1;

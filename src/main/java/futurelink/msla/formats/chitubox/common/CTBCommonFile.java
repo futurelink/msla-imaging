@@ -61,6 +61,7 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     }
 
     @Override public Class<? extends MSLALayerCodec<byte[]>> getCodec() { return CTBCommonFileCodec.class; }
+    @Override public Short getPreviewsNumber() { return 2; }
     @Override public MSLAPreview getPreview(int index) {
         if (index == 0) return PreviewLarge;
         else return PreviewSmall;
@@ -68,7 +69,6 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
     @Override public MSLAPreview getLargePreview() { return PreviewLarge; }
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return Header.getBlockFields().getResolution(); }
-    @Override public Float getPixelSize() { return 0.0f; }
 
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
