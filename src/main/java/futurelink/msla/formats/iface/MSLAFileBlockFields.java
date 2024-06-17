@@ -24,7 +24,11 @@ public interface MSLAFileBlockFields {
                         method = getClass().getDeclaredMethod(methodName);
                     } catch (NoSuchMethodException ignored) {}
 
-                    if (method != null) out.add(f.getName() + nameValueSeparator + method.invoke(this));
+                    if (method != null) {
+                        method.setAccessible(true);
+                        out.add(f.getName() + nameValueSeparator + method.invoke(this));
+                        method.setAccessible(false);
+                    }
                     else if (f.canAccess(this)) out.add(f.getName() + nameValueSeparator + f.get(this));
                 }
             }
