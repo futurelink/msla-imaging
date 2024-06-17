@@ -10,6 +10,9 @@ import futurelink.msla.formats.iface.options.MSLAOptionName;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * "LAYERDEF" section's single layer representation.
+ */
 @Getter
 public class PhotonWorkshopFileLayerDef implements MSLAFileBlockFields, MSLAFileLayer {
     @MSLAFileField @Setter private Integer DataAddress = 0;

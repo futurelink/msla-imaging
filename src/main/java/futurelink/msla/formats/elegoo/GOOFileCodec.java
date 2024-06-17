@@ -2,7 +2,7 @@ package futurelink.msla.formats.elegoo;
 
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.tools.BufferedImageInputStream;
+import futurelink.msla.formats.BufferedImageInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * ELEGOO GOO file format codec.
+ */
 public class GOOFileCodec implements MSLALayerCodec<byte[]> {
     private final Logger logger = Logger.getLogger(GOOFileCodec.class.getName());
     private final boolean useColorDifferenceCompression = false;

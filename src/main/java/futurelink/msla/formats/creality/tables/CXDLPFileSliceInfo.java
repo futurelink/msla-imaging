@@ -14,7 +14,7 @@ public class CXDLPFileSliceInfo extends CXDLPFileTable {
 
     @SuppressWarnings("unused")
     @Getter
-    public static class Fields implements MSLAFileBlockFields {
+    static class Fields implements MSLAFileBlockFields {
         @MSLAFileField()
         private Integer DisplayWidthLength = 0;
         @MSLAFileField(order = 1, lengthAt = "DisplayWidthLength", charset = "UTF-16BE")

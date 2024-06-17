@@ -23,9 +23,12 @@ import java.io.OutputStream;
 public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
     @Delegate private final Fields blockFields;
 
+    /**
+     * Header section internal fields.
+     */
     @Getter @Setter
     @SuppressWarnings("unused")
-    public static class Fields implements MSLAFileBlockFields {
+    static class Fields implements MSLAFileBlockFields {
         private final PhotonWorkshopFileTable parent;
         private Size Resolution = null;
 

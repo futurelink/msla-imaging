@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * Generic interface for mSLA layer reader.
- * Method read() returns raw bytes that should be feed to encoder in order to get
+ * Method read() returns raw bytes that should be fed to encoder in order to get
  * proper {@link  MSLALayerEncodeOutput} that can be added as layer data that depends on file format.
  */
 public interface MSLALayerEncodeReader {

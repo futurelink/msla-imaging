@@ -1,4 +1,4 @@
-package futurelink.msla.tools;
+package futurelink.msla.formats;
 
 import futurelink.msla.formats.iface.MSLALayerEncodeReader;
 import lombok.Getter;

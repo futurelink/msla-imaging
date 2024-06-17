@@ -20,9 +20,12 @@ import java.io.OutputStream;
 public class PhotonWorkshopFileMachineTable extends PhotonWorkshopFileTable {
     @Delegate private final Fields blockFields;
 
+    /**
+     * Machine section internal fields.
+     */
     @Getter @Setter
     @SuppressWarnings("unused")
-    public static class Fields implements MSLAFileBlockFields {
+    static class Fields implements MSLAFileBlockFields {
         private final PhotonWorkshopFileTable parent;
 
         @MSLAFileField(length = MarkLength) private String Name() { return "MACHINE"; }

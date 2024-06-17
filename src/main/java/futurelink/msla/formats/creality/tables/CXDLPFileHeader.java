@@ -13,7 +13,7 @@ public class CXDLPFileHeader extends CXDLPFileTable {
     @Delegate private Fields blockFields;
 
     @SuppressWarnings("unused")
-    public static class Fields implements MSLAFileBlockFields {
+    static class Fields implements MSLAFileBlockFields {
         public static final String HEADER_VALUE = "CXSW3DV2";
         public static final String HEADER_VALUE_GENERIC = "CXSW3D";
         public static final Short DEFAULT_VERSION = 3;

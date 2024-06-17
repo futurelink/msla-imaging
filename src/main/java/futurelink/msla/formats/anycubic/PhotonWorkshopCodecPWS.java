@@ -6,6 +6,9 @@ import futurelink.msla.formats.iface.MSLALayerDecodeWriter;
 import futurelink.msla.formats.iface.MSLALayerEncodeOutput;
 import futurelink.msla.formats.iface.MSLALayerEncodeReader;
 
+/**
+ * An INCOMPLETE draft for Photon Workshop file PWS codec.
+ */
 public class PhotonWorkshopCodecPWS extends PhotonWorkshopCodec {
 
     @Override

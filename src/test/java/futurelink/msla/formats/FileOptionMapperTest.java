@@ -69,8 +69,8 @@ public class FileOptionMapperTest extends CommonTestRoutines {
         assertEquals(Float.class, options.getType(MSLAOptionName.BottomLayersExposureTime));
 
         // Check option group mappings
-        assertEquals("Print settings", options.getGroup(MSLAOptionName.LayerHeight).name());
-        assertEquals("All layers", options.getGroup(MSLAOptionName.LightPWM).name());
+        assertEquals("Print settings", options.getGroup(MSLAOptionName.LayerHeight).getName());
+        assertEquals("All layers", options.getGroup(MSLAOptionName.LightPWM).getName());
 
         // Check valid value is processed properly
         options.set(MSLAOptionName.BottomLayersExposureTime, "50");

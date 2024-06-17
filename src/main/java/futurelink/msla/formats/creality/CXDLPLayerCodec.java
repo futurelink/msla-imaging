@@ -4,7 +4,7 @@ import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.creality.tables.CXDLPFileLayer;
 import futurelink.msla.formats.creality.tables.CXDLPFileLayerLine;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.tools.BufferedImageInputStream;
+import futurelink.msla.formats.BufferedImageInputStream;
 
 import java.io.*;
 import java.util.LinkedList;

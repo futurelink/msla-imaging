@@ -3,6 +3,7 @@ package futurelink.msla.utils.options;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.options.MSLAOptionGroup;
 import futurelink.msla.formats.iface.options.MSLAOptionName;
+import lombok.Getter;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 
@@ -13,7 +14,15 @@ public class OptionGroupsMapper {
     private final HashMap<MSLAOptionName, OptionGroup> optionGroups = new HashMap<>();
     private static OptionGroupsMapper instance;
 
-    public record OptionGroup(String name, Integer order) implements MSLAOptionGroup {}
+    @Getter
+    public static class OptionGroup implements MSLAOptionGroup {
+        private final String name;
+        private final Integer order;
+        public OptionGroup(String name, Integer order) {
+            this.name = name;
+            this.order = order;
+        }
+    }
 
     public static OptionGroupsMapper getInstance() throws MSLAException {
          if (instance == null) instance = new OptionGroupsMapper();

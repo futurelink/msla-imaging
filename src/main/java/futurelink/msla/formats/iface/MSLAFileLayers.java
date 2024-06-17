@@ -4,6 +4,9 @@ import futurelink.msla.formats.MSLAException;
 
 import java.util.Map;
 
+/**
+ * mSLA file layers array interface.
+ */
 public interface MSLAFileLayers<T, L> {
     /**
      * Returns file layers count.

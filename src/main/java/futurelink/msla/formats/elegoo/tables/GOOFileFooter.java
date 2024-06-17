@@ -4,6 +4,9 @@ import futurelink.msla.formats.iface.MSLAFileBlockFields;
 import futurelink.msla.formats.iface.MSLAFileField;
 import lombok.Getter;
 
+/**
+ * ELEGOO GOO file format footer block.
+ */
 @Getter
 public class GOOFileFooter extends GOOFileTable {
     private final Fields blockFields = new Fields();

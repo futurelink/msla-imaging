@@ -3,7 +3,7 @@ package futurelink.msla.formats.chitubox.common;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.chitubox.CTBCrypto;
 import futurelink.msla.formats.iface.*;
-import futurelink.msla.tools.BufferedImageInputStream;
+import futurelink.msla.formats.BufferedImageInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

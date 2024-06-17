@@ -6,7 +6,7 @@ import futurelink.msla.formats.io.FileFieldsIO;
 import lombok.Getter;
 
 /**
- * Common class for section representation.
+ * Abstract class for section representation.
  */
 @Getter
 abstract public class PhotonWorkshopFileTable implements MSLAFileBlock {

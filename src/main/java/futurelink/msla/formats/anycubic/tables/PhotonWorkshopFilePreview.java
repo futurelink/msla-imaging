@@ -10,8 +10,11 @@ import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.OutputStream;
 
+/**
+ * Abstract class for preview sections.
+ */
 @Getter
-public abstract class PhotonWorkshopFilePreview extends PhotonWorkshopFileTable implements MSLAPreview {
+abstract class PhotonWorkshopFilePreview extends PhotonWorkshopFileTable implements MSLAPreview {
     protected BufferedImage Image;
 
     interface Fields extends MSLAFileBlockFields {

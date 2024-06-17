@@ -5,11 +5,14 @@ import futurelink.msla.formats.iface.MSLALayerDecodeInput;
 import futurelink.msla.formats.iface.MSLALayerDecodeWriter;
 import futurelink.msla.formats.iface.MSLALayerEncodeOutput;
 import futurelink.msla.formats.iface.MSLALayerEncodeReader;
-import futurelink.msla.tools.BufferedImageInputStream;
+import futurelink.msla.formats.BufferedImageInputStream;
 
 import java.io.*;
 import java.util.logging.Logger;
 
+/**
+ * Anycubic Photon PW0 codec.
+ */
 public class PhotonWorkshopCodecPW0 extends PhotonWorkshopCodec {
     private final Logger logger = Logger.getLogger(PhotonWorkshopCodecPW0.class.getName());
     public final byte RLE1EncodingLimit = 0x7d;

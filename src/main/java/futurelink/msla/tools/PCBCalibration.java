@@ -17,6 +17,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+/**
+ * PCB calibration creator class.
+ */
 public class PCBCalibration {
     private static final Logger logger = Logger.getLogger(PCBCalibration.class.getName());
     private static class EncodeReader implements MSLALayerEncodeReader {

@@ -1,12 +1,16 @@
 package futurelink.msla.formats.elegoo.tables;
 
 import futurelink.msla.formats.MSLAException;
+import futurelink.msla.formats.elegoo.GOOFileCodec;
 import futurelink.msla.formats.iface.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * ELEGOO GOO file format layers.
+ */
 public class GOOFileLayers implements MSLAFileLayers<GOOFileLayerDef, byte[]> {
     private final List<GOOFileLayerDef> Layers = new ArrayList<>();
     private MSLALayerDefaults layerDefaults;
@@ -44,5 +48,10 @@ public class GOOFileLayers implements MSLAFileLayers<GOOFileLayerDef, byte[]> {
             Layers.get(layerNumber).getBlockFields().setData(data.data());
             if (callback != null) callback.onFinish(layerNumber, data);
         });
+    }
+
+    public boolean readLayer(MSLALayerDecoder<byte[]> decoders, MSLALayerDecodeWriter writer, int layer) throws MSLAException {
+        var input = new GOOFileCodec.Input(get(layer).getBlockFields().getData());
+        return decoders.decode(layer, writer, input, null);
     }
 }
