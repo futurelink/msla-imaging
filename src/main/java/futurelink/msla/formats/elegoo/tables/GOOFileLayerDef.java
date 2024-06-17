@@ -11,12 +11,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 
+/**
+ * ELEGOO GOO file format layer definition block.
+ */
 @Getter
 public class GOOFileLayerDef extends GOOFileTable implements MSLAFileLayer {
     private final Fields blockFields = new Fields();
 
     @SuppressWarnings("unused")
-    static public class Fields implements MSLAFileBlockFields {
+    static class Fields implements MSLAFileBlockFields {
         @MSLAFileField @Getter private Short Pause = 0;
         @MSLAFileField(order = 1) @Getter private Float PausePositionZ = 0.0f;
         @MSLAFileField(order = 2) @Getter private Float PositionZ = 0.0f;

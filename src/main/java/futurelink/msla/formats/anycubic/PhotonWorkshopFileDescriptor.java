@@ -17,6 +17,9 @@ import java.util.HashMap;
  */
 @Getter
 public class PhotonWorkshopFileDescriptor {
+    /**
+     * Internal Photon workshop file descriptor fields class.
+     */
     @Setter @Getter
     public static class PhotonWorkshopFileDescriptorFields {
         /**

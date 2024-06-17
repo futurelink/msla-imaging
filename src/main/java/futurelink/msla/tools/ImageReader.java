@@ -1,5 +1,6 @@
 package futurelink.msla.tools;
 
+import futurelink.msla.formats.BufferedImageInputStream;
 import futurelink.msla.formats.MSLAException;
 import futurelink.msla.formats.iface.*;
 import futurelink.msla.utils.Size;

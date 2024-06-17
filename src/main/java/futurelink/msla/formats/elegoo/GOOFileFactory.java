@@ -10,6 +10,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Set;
 
+/**
+ * ELEGOO GOO file factory.
+ */
 public class GOOFileFactory implements MSLAFileFactory {
     @Override
     public String getName() { return "ELEGOO"; }

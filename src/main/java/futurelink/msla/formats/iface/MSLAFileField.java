@@ -5,6 +5,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * mSLA file annotation that marks field as processable by {@link futurelink.msla.formats.io.FileFieldsIO}.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value={ ElementType.FIELD, ElementType.METHOD })
 public @interface MSLAFileField {

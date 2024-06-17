@@ -12,14 +12,16 @@ import lombok.Setter;
 
 import java.awt.image.BufferedImage;
 
-@SuppressWarnings("unused")
+/**
+ * ELEGOO GOO file format preview.
+ */
 @Getter
 public class GOOFilePreview implements MSLAFileBlock, MSLAPreview {
     private BufferedImage Image;
     private final Fields blockFields = new Fields();
 
     @Getter
-    public static class Fields implements MSLAFileBlockFields {
+    static class Fields implements MSLAFileBlockFields {
         private Size Resolution;
         int getImageLength() { return Resolution.length() * 2; }
         @Setter @MSLAFileField(lengthAt = "getImageLength") byte[] Data;

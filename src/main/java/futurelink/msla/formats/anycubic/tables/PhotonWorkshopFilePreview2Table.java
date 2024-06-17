@@ -8,6 +8,9 @@ import lombok.Setter;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * "PREVIEW2" section representation.
+ */
 @Getter
 public class PhotonWorkshopFilePreview2Table extends PhotonWorkshopFilePreview {
     private final Fields blockFields;

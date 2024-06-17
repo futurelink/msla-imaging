@@ -5,6 +5,11 @@ import futurelink.msla.formats.MSLALayerEncoders;
 
 import java.util.Map;
 
+/**
+ * Interface for mSLA layer encoder.
+ * Uses {@link MSLALayerEncodeReader} in order to obtain data to encode.
+ * Callback can be set if its necessary to do something when layer encoding is started/finished/errored.
+ */
 public interface MSLALayerEncoder<D> {
 
     /**

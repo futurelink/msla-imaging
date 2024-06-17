@@ -9,8 +9,15 @@ import java.lang.reflect.*;
 import java.nio.charset.Charset;
 import java.util.*;
 
+/**
+ * This class implements binary file reading-writing operations.
+ */
 public class FileFieldsIO {
     private static final HashMap<Class<?>, LinkedList<MSLAField>> fields = new HashMap<>();
+
+    /**
+     * Describes file endianness.
+     */
     public enum Endianness { BigEndian, LittleEndian }
 
     @Getter
@@ -198,7 +205,7 @@ public class FileFieldsIO {
     }
 
     /**
-     * Calculates file fields block length up to the field specified by {@param lastFieldName}.
+     * Calculates file fields block length up to the field specified by lastFieldName parameter.
      * Effectively this returns an offset of a specific field in a block.
      * @param block file data block fields object to calculate length
      * @param lastFieldName calculate length of a block up to this field

@@ -7,7 +7,10 @@ import futurelink.msla.formats.iface.MSLALayerEncodeOutput;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public abstract class PhotonWorkshopCodec implements MSLALayerCodec<byte[]> {
+/**
+ * Abstract Anycubic Photon codec class.
+ */
+abstract public class PhotonWorkshopCodec implements MSLALayerCodec<byte[]> {
     protected Integer decodedDataLength = 0;
 
     public static class Input implements MSLALayerDecodeInput<byte[]> {

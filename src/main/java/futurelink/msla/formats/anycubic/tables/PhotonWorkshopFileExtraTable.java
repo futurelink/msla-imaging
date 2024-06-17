@@ -17,9 +17,12 @@ import java.io.OutputStream;
 public class PhotonWorkshopFileExtraTable extends PhotonWorkshopFileTable {
     private final Fields blockFields;
 
+    /**
+     * Extra section internal fields.
+     */
     @SuppressWarnings("unused")
     @Getter
-    public static class Fields implements MSLAFileBlockFields {
+    static class Fields implements MSLAFileBlockFields {
         private final PhotonWorkshopFileTable parent;
 
         @MSLAFileField(length = MarkLength, dontCount = true) private String Name() { return "EXTRA"; }

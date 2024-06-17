@@ -15,7 +15,6 @@ import java.util.Map;
 /**
  * "LAYERDEF" section representation.
  */
-
 @Getter
 public class PhotonWorkshopFileLayerDefTable extends PhotonWorkshopFileTable
         implements MSLAFileLayers<PhotonWorkshopFileLayerDef, byte[]>

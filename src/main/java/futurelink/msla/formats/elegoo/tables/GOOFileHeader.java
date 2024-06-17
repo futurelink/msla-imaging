@@ -13,6 +13,9 @@ import lombok.experimental.Delegate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * ELEGOO GOO file format header block.
+ */
 @Getter
 public class GOOFileHeader extends GOOFileTable {
     enum DelayModes {
@@ -24,9 +27,12 @@ public class GOOFileHeader extends GOOFileTable {
     private static final byte DefaultLightPWM = 0x02;
     @Delegate private final Fields blockFields = new Fields();
 
+    /**
+     * Internal fields class.
+     */
     @Getter
     @SuppressWarnings("unused")
-    public static class Fields implements MSLAFileBlockFields {
+    static class Fields implements MSLAFileBlockFields {
         private Size Resolution = null;
         @MSLAFileField(length = 4) private final String Version = "V3.0";
         @MSLAFileField(length = 8, order = 1) private byte[] Magic = { 0x07, 0x00, 0x00, 0x00, 0x44, 0x4C, 0x50, 0x00 };

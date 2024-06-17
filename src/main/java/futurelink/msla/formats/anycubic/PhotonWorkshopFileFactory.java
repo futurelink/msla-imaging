@@ -10,6 +10,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Set;
 
+/**
+ * Anycubic Photon file factory.
+ */
 public class PhotonWorkshopFileFactory implements MSLAFileFactory {
     @Override public String getName() { return "Anycubic"; }
 

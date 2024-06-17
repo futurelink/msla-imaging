@@ -12,7 +12,7 @@ import lombok.experimental.Delegate;
 public class CXDLPFileSliceInfoV3 extends CXDLPFileTable {
     @Delegate private final Fields blockFields = new Fields();
     @Getter
-    public static class Fields implements MSLAFileBlockFields {
+    static class Fields implements MSLAFileBlockFields {
         @MSLAFileField() private Integer SoftwareNameLength = 0;
         @MSLAFileField(order = 1, lengthAt = "SoftwareNameLength") private String SoftwareName;
         @MSLAFileField(order = 2) private Integer MaterialNameLength = 0;

@@ -1,7 +1,6 @@
 package futurelink.msla.formats;
 
 import futurelink.msla.formats.iface.MSLALayerEncodeReader;
-import futurelink.msla.tools.BufferedImageInputStream;
 import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;

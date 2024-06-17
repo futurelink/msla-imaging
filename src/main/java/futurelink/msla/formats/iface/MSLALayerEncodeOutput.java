@@ -2,6 +2,10 @@ package futurelink.msla.formats.iface;
 
 import java.io.IOException;
 
+/**
+ * Interface for mSLA layer encoder output.
+ * @param <T> type of incoming data produced by codec
+ */
 public interface MSLALayerEncodeOutput<T> {
     int size();
     int sizeInBytes();

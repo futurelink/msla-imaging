@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 
+/**
+ * ELEGOO GOO file.
+ */
 public class GOOFile extends MSLAFileGeneric<byte[]> {
     @Getter @MSLAOptionContainer private final GOOFileHeader Header;
     @Getter private final GOOFileLayers Layers;
@@ -99,8 +102,7 @@ public class GOOFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public boolean readLayer(MSLALayerDecodeWriter writer, int layer) throws MSLAException {
-        var input = new GOOFileCodec.Input(Layers.get(layer).getBlockFields().getData());
-        return getDecodersPool().decode(layer, writer, input, null);
+        return Layers.readLayer(getDecodersPool(), writer, layer);
     }
 
     @Override

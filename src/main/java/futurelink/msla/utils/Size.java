@@ -5,6 +5,10 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Size helper class.
+ * Widely used in order to describe machine resolution and image sizes.
+ */
 @Getter
 public class Size implements Serializable {
     private final Integer width;
