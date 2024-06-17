@@ -131,5 +131,5 @@ public class PhotonWorkshopFileHeaderTable extends PhotonWorkshopFileTable {
         super.write(stream);
     }
 
-    @Override public String toString() { return blockFields.fieldsAsString(" = ", "\n"); }
+    @Override public String toString() { return "-- Header data --\n" + blockFields.fieldsAsString(" = ", "\n"); }
 }

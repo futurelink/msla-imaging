@@ -30,8 +30,8 @@ public class DefaultsLoaderTest extends CommonTestRoutines {
         assertEquals(11, defaults.getFileProps().size());
 
         // Check for header options
-        var header = new PhotonWorkshopFileHeaderTable.Fields(null);
-        defaults.setFields(header);
+        var header = new PhotonWorkshopFileHeaderTable((byte) 2, (byte) 4);
+        defaults.setFields(header.getBlockFields());
         assertEquals(10.0f, header.getLiftHeight());
         assertEquals(4.0f, header.getLiftSpeed());
 
@@ -40,8 +40,8 @@ public class DefaultsLoaderTest extends CommonTestRoutines {
         assertEquals("6480 x 3600", defaults.getResolution().toString());
 
         // Check for machine options
-        var machineOptions = new PhotonWorkshopFileMachineTable.Fields(null);
-        defaults.setFields(machineOptions);
+        var machineOptions = new PhotonWorkshopFileMachineTable((byte) 2, (byte) 4);
+        defaults.setFields(machineOptions.getBlockFields());
         assertEquals("pw0Img", machineOptions.getLayerImageFormat());
     }
 

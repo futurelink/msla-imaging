@@ -132,7 +132,9 @@ public class FileOptionMapper extends OptionMapper {
                     var setter = fields.getClass().getDeclaredMethod("set" + option.getName(), option.getType());
                     var rawValue = defaults.displayToRaw(optionName, value, option.getType());
                     logger.info("Raw value is '" + rawValue + "' of " + rawValue.getClass());
+                    setter.setAccessible(true);
                     setter.invoke(fields, rawValue);
+                    setter.setAccessible(false);
                 } catch (NoSuchMethodException ignored) {
                     var f = fields.getClass().getDeclaredField(option.getName());
                     f.setAccessible(true);
@@ -158,7 +160,9 @@ public class FileOptionMapper extends OptionMapper {
                 logger.fine("Getting '" + option.getName() + "' in '" + fileBlock.getClass().getSimpleName() +"' of " + option.getType());
                 try {
                     var getter = fields.getClass().getDeclaredMethod("get" + option.getName());
+                    getter.setAccessible(true);
                     rawValue =  getter.invoke(fields);
+                    getter.setAccessible(false);
                 } catch (NoSuchMethodException ignored) {
                     var f = fields.getClass().getDeclaredField(option.getName());
                     f.setAccessible(true);
