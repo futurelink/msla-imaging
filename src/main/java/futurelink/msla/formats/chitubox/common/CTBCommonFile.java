@@ -14,6 +14,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
@@ -72,12 +73,8 @@ public class CTBCommonFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
-        try {
-            return defaults.getFileClass().equals(this.getClass()) &&
-                    ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
-        } catch (MSLAException e) {
-            return false;
-        }
+        return defaults.getFileClass().equals(this.getClass()) &&
+                ((getResolution() == null) || Objects.equals(defaults.getResolution(), getResolution()));
     }
 
     @Override

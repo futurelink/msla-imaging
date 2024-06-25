@@ -126,8 +126,16 @@ public class MachineDefaults {
             this.fileProps.put("MachineName", new MachineProperty(manufacturer + " " + name));
         }
 
-        @Override public final float getPixelSize() throws MSLAException { return fileProps.getFloat("PixelSize"); }
-        @Override public final Size getResolution() throws MSLAException { return Size.parseSize(fileProps.getString("Resolution")); }
+        @Override public final Float getPixelSize() {
+            try {return fileProps.getFloat("PixelSize"); }
+            catch (MSLAException e) { return null; }
+        }
+
+        @Override public final Size getResolution() {
+            try {return Size.parseSize(fileProps.getString("Resolution")); }
+            catch (MSLAException e) { return null; }
+        }
+
         @Override public final String getMachineFullName() { return getMachineManufacturer() + " " + getMachineName(); }
         @Override public MSLADefaultsParams getFileOption(MSLAOptionName name) { return fileOptions.getOption(name); }
         @Override public boolean hasFileOption(MSLAOptionName name) { return fileOptions.getOption(name) != null; }
@@ -269,7 +277,7 @@ public class MachineDefaults {
      * Returns an optional of 'Defaults' object by given machine name.
      * @param name machine full name
      */
-    public final Optional<Defaults> getMachineDefaults(String name) {
+    public final Optional<MSLAFileDefaults> getMachineDefaults(String name) {
         return Optional.ofNullable(printers.get(name));
     }
 
@@ -282,6 +290,13 @@ public class MachineDefaults {
                 .filter(printerName -> file.isMachineValid(printers.get(printerName)))
                 .map(printers::get)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns 'Defaults' for all supported machines
+     */
+    public final List<MSLAFileDefaults> getMachineDefaults() {
+        return printers.keySet().stream().map(printers::get).collect(Collectors.toList());
     }
 
     private void parseFileProperties(Defaults defaults, Element fileOptionsElement) {
@@ -335,7 +350,7 @@ public class MachineDefaults {
         logger.info("Loading defaults for '" + mandatoryProps.get("manufacturer") + " " + mandatoryProps.get("name") + "' (" + file + ")");
 
         try {
-            var fileClass = ClassLoader.getSystemClassLoader().loadClass(file);
+            var fileClass = getClass().getClassLoader().loadClass(file);
             if (MSLAFile.class.isAssignableFrom(fileClass)) {
                 @SuppressWarnings("unchecked")
                 var def = new Defaults(

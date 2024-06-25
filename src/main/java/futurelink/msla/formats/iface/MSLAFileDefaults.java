@@ -14,8 +14,8 @@ public interface MSLAFileDefaults extends MSLADefaults {
     String getFileExtension();
     Class<? extends MSLAFile<?>> getFileClass();
 
-    Size getResolution() throws MSLAException;
-    float getPixelSize() throws MSLAException;
+    Size getResolution();
+    Float getPixelSize();
 
     MSLADefaultsParams getFileOption(MSLAOptionName name);
     MSLAFileProps getFileProps();

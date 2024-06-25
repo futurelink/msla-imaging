@@ -3,6 +3,7 @@ package futurelink.msla.formats.anycubic;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashMap;
+import java.util.Objects;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
@@ -163,12 +164,8 @@ public class PhotonWorkshopFile extends MSLAFileGeneric<byte[]> {
 
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
-        try {
-            return defaults.getFileClass().equals(this.getClass()) &&
-                    ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
-        } catch (MSLAException e) {
-            return false;
-        }
+        return defaults.getFileClass().equals(this.getClass()) &&
+                ((getResolution() == null) || Objects.equals(defaults.getResolution(), getResolution()));
     }
 
     @Override public MSLAPreview getLargePreview() { return Preview; }

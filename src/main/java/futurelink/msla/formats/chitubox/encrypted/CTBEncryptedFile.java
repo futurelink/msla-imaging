@@ -20,6 +20,7 @@ import java.io.*;
 import java.security.*;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
@@ -195,12 +196,8 @@ public class CTBEncryptedFile extends MSLAFileGeneric<byte[]> {
     }
 
     @Override public boolean isMachineValid(MSLAFileDefaults defaults) {
-        try {
-            return defaults.getFileClass().equals(this.getClass()) &&
-                    ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
-        } catch (MSLAException e) {
-            return false;
-        }
+        return defaults.getFileClass().equals(this.getClass()) &&
+                ((getResolution() == null) || Objects.equals(defaults.getResolution(), getResolution()));
     }
     @Override public float getDPI() { return 0; }
     @Override public Size getResolution() { return SlicerSettings.getBlockFields().getResolution(); }

@@ -10,6 +10,7 @@ import lombok.Getter;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
@@ -93,12 +94,8 @@ public class CXDLPFile extends MSLAFileGeneric<List<CXDLPFileLayerLine>> {
 
     @Override
     public boolean isMachineValid(MSLAFileDefaults defaults) {
-        try {
-            return defaults.getFileClass().equals(this.getClass()) &&
-                    ((getResolution() == null) || defaults.getResolution().equals(getResolution()));
-        } catch (MSLAException e) {
-            return false;
-        }
+        return defaults.getFileClass().equals(this.getClass()) &&
+                ((getResolution() == null) || Objects.equals(defaults.getResolution(), getResolution()));
     }
 
     @Override
