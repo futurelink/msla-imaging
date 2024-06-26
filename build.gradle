@@ -1,14 +1,22 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
-group 'futurelink'
-version '0.1-SNAPSHOT'
+group 'io.msla'
+version '0.1.4'
 
 repositories {
     mavenCentral()
 }
 
+compileJava {
+    options.encoding = 'UTF-8'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
 
 jar {
     archiveBaseName = 'msla-imaging'
@@ -34,4 +42,46 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "maven.msla.io"
+            url = "https://maven.msla.io/repository"
+            credentials {
+                username = System.getProperty("msla.maven.user")
+                password = System.getProperty("msla.maven.password")
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom {
+                name = 'msla-imaging'
+                description = 'mSLA 3D-printer file processing library'
+                url = 'https://msla.io/'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'futurelink'
+                        name = 'Denis Pavlov'
+                        email = 'futurelink.vl@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com:futurelink/msla-imaging.git'
+                    developerConnection = 'scm:git:ssh://github.com:futurelink/msla-imaging.git'
+                    url = "https://github.com/futurelink/msla-imaging"
+                }
+            }
+        }
+    }
 }
