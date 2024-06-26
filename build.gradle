@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'futurelink'
+group 'io.msla'
 version '0.1.4'
 
 repositories {

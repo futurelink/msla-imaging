@@ -9,7 +9,7 @@
             displayHeight="80.0"
             machineZ="165.0"
             extension="pwmo"
-            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+            file="io.msla.formats.anycubic.PhotonWorkshopFile"
     >
         <file_properties>
             <property name="VersionMajor" value="2"/>
@@ -54,7 +54,7 @@
             displayHeight="165.6"
             machineZ="300.0"
             extension="pm3m"
-            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+            file="io.msla.formats.anycubic.PhotonWorkshopFile"
     >
         <file_properties>
             <property name="VersionMajor" value="2"/>
@@ -117,7 +117,7 @@
             displayHeight="123.84"
             machineZ="245.0"
             extension="pwmb"
-            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+            file="io.msla.formats.anycubic.PhotonWorkshopFile"
     >
         <file_properties>
             <property name="VersionMajor" value="2"/>
@@ -181,7 +181,7 @@
             displayHeight="84.0"
             machineZ="165.0"
             extension="pwma"
-            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+            file="io.msla.formats.anycubic.PhotonWorkshopFile"
     >
         <file_properties>
             <property name="VersionMajor" value="2"/>
@@ -244,7 +244,7 @@
             displayHeight="120.0"
             machineZ="245.0"
             extension="pwmx"
-            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+            file="io.msla.formats.anycubic.PhotonWorkshopFile"
     >
         <file_properties>
             <property name="VersionMajor" value="2"/>
@@ -307,7 +307,7 @@
             displayHeight="102.4"
             machineZ="180.0"
             extension="pm3"
-            file="futurelink.msla.formats.anycubic.PhotonWorkshopFile"
+            file="io.msla.formats.anycubic.PhotonWorkshopFile"
     >
         <file_properties>
             <property name="VersionMajor" value="2"/>
@@ -370,7 +370,7 @@
             displayHeight="102.4"
             machineZ="160.0"
             extension="cxdlp"
-            file="futurelink.msla.formats.creality.CXDLPFile"
+            file="io.msla.formats.creality.CXDLPFile"
     >
         <file_properties>
             <property name="PrinterModel" value="CL-79"/>
@@ -413,7 +413,7 @@
             displayHeight="122.0"
             machineZ="160.0"
             extension="cxdlp"
-            file="futurelink.msla.formats.creality.CXDLPFile"
+            file="io.msla.formats.creality.CXDLPFile"
     >
         <file_properties>
             <property name="PrinterModel" value="CL-70"/>
@@ -457,7 +457,7 @@
             displayHeight="127.0"
             machineZ="160.0"
             extension="cxdlp"
-            file="futurelink.msla.formats.creality.CXDLPFile"
+            file="io.msla.formats.creality.CXDLPFile"
     >
         <file_properties>
             <property name="PrinterModel" value="CL-60"/>
@@ -500,7 +500,7 @@
             displayHeight="123.0"
             machineZ="210.0"
             extension="cxdlp"
-            file="futurelink.msla.formats.creality.CXDLPFile"
+            file="io.msla.formats.creality.CXDLPFile"
     >
         <file_properties>
             <property name="PrinterModel" value="CL925"/>
@@ -547,7 +547,7 @@
             displayHeight="122.4"
             machineZ="150.0"
             extension="goo"
-            file="futurelink.msla.formats.elegoo.GOOFile"
+            file="io.msla.formats.elegoo.GOOFile"
     >
         <file_properties>
             <property name="MachineName" value="ELEGOO Mars 4 Max"/>
@@ -629,7 +629,7 @@
             displayHeight="120.0"
             machineZ="200.0"
             extension="ctb"
-            file="futurelink.msla.formats.chitubox.common.CTBCommonFile"
+            file="io.msla.formats.chitubox.common.CTBCommonFile"
     >
         <file_properties>
             <property name="Version" value="4"/>
@@ -698,7 +698,7 @@
             displayHeight="156.264"
             machineZ="300.0"
             extension="ctb"
-            file="futurelink.msla.formats.chitubox.encrypted.CTBEncryptedFile"
+            file="io.msla.formats.chitubox.encrypted.CTBEncryptedFile"
     >
         <file_properties>
             <property name="Version" value="4"/>

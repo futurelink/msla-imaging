@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <options_map>
     <!--
-    All options from futurelink.msla.formats.iface.options.MSLAOptionName must be mapped in this file
+    All options from io.msla.formats.iface.options.MSLAOptionName must be mapped in this file
     in order to properly display them in option mapper and any user interface that is going to be used
     with this library.
 
