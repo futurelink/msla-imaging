@@ -2,18 +2,15 @@ package io.msla.utils.defaults;
 
 import io.msla.formats.MSLAException;
 import io.msla.formats.iface.*;
-import io.msla.formats.iface.MSLAFileField;
 import io.msla.formats.iface.options.MSLAOption;
 import io.msla.formats.iface.options.MSLAOptionName;
-import io.msla.utils.Size;
 import io.msla.utils.defaults.props.MachineProperty;
-import lombok.Getter;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -26,15 +23,17 @@ import java.util.stream.Collectors;
  */
 public class MachineDefaults {
     private static final Logger logger = Logger.getLogger(MachineDefaults.class.getName());
-    private final HashMap<String, Defaults> printers = new HashMap<>();
+    private final HashMap<String, MSLAFileDefaults> printers = new HashMap<>();
     private static MachineDefaults instance;
+
+    private MSLAFileDefaults currentDefaults = null;
 
     public static MachineDefaults getInstance() throws MSLAException {
         if (instance == null) { instance = new MachineDefaults(); }
         return instance;
     }
 
-    private HashMap<MSLAOptionName, String> getBlockFieldsOptions(MSLAFileBlockFields fields) {
+    HashMap<MSLAOptionName, String> getBlockFieldsOptions(MSLAFileBlockFields fields) {
         var ret = new HashMap<MSLAOptionName, String>();
         var props = fields.getClass().getDeclaredFields();
         for (var prop : props)
@@ -43,7 +42,7 @@ public class MachineDefaults {
         return ret;
     }
 
-    private void setFieldDefault(MSLAFileBlockFields fields, String fieldName, MSLADefaultsParams defaultOption)
+    void setFieldDefault(MSLAFileBlockFields fields, String fieldName, MSLADefaultsParams defaultOption)
             throws MSLAException
     {
         if (defaultOption == null) {
@@ -106,158 +105,38 @@ public class MachineDefaults {
         }
     }
 
-    /**
-     * Internal machine defaults class.
-     */
-    public static class Defaults implements MSLAFileDefaults {
-        @Getter private final String machineManufacturer;
-        @Getter private final String machineName;
-        @Getter private final String fileExtension;
-        @Getter private final Class<? extends MSLAFile<?>> fileClass;
-        @Getter private final MSLAFileProps fileProps = new MSLAFileProps();
-        private final MachineOptions fileOptions = new MachineOptions();
-        @Getter private LayerDefaults layerDefaults;
 
-        public Defaults(String manufacturer, String name, String extension, Class<? extends MSLAFile<?>> fileClass) {
-            this.machineName = name;
-            this.machineManufacturer = manufacturer;
-            this.fileExtension = extension;
-            this.fileClass = fileClass;
-            this.fileProps.put("MachineName", new MachineProperty(manufacturer + " " + name));
-        }
-
-        @Override public final Float getPixelSize() {
-            try {return fileProps.getFloat("PixelSize"); }
-            catch (MSLAException e) { return null; }
-        }
-
-        @Override public final Size getResolution() {
-            try {return Size.parseSize(fileProps.getString("Resolution")); }
-            catch (MSLAException e) { return null; }
-        }
-
-        @Override public final String getMachineFullName() { return getMachineManufacturer() + " " + getMachineName(); }
-        @Override public MSLADefaultsParams getFileOption(MSLAOptionName name) { return fileOptions.getOption(name); }
-        @Override public boolean hasFileOption(MSLAOptionName name) { return fileOptions.getOption(name) != null; }
-
-        @Override
-        public <T extends Serializable> Serializable displayToRaw(
-                MSLAOptionName name,
-                T optionValue,
-                Class<? extends T> rawType) throws MSLAException
-        {
-            if (optionValue == null) return null;
-            if (rawType == null) return optionValue;
-            if (!hasFileOption(name)) throw new MSLAException("No defaults defined for option '" + name + "', can't set value");
-            return fileOptions.getOption(name).displayToRaw(rawType, optionValue);
-        }
-
-        @Override
-        public <T> String rawToDisplay(MSLAOptionName name, Serializable optionValue) throws MSLAException {
-            if (optionValue == null) return null;
-            if (!hasFileOption(name)) throw new MSLAException("No defaults defined for option '" + name + "', can't get display value");
-            return fileOptions.getOption(name).rawToDisplay(optionValue.getClass(), optionValue);
-        }
-
-        /**
-         * Gets set of all fields in MSLAFileBlockFields marked as MSLAFileField
-         * @param fields block fields obect
-         */
-        private Set<String> getBlockFieldsProperties(MSLAFileBlockFields fields) {
-            var ret = new HashSet<String>();
-            var props = fields.getClass().getDeclaredFields();
-            for (var prop : props) {
-                if (prop.isAnnotationPresent(MSLAFileField.class)) ret.add(prop.getName());
-            }
-            var methods = fields.getClass().getDeclaredMethods();
-            for (var method : methods) {
-                if (method.isAnnotationPresent(MSLAFileField.class)) ret.add(method.getName());
-            }
-            return ret;
-        }
-
-        public final void setFields(MSLAFileBlockFields fields) throws MSLAException {
-            // Set properties
-            var blockProps = getBlockFieldsProperties(fields);
-            for (var prop : blockProps) {
-                if (fileProps.containsKey(prop) || "ResolutionX".equals(prop) || "ResolutionY".equals(prop)) {
-                    instance.setFieldDefault(fields, prop, fileProps.get(prop));
-                }
-            }
-
-            // Set options
-            var blockOptions = instance.getBlockFieldsOptions(fields);
-            for (var option : blockOptions.keySet()) {
-                var defaultOption = fileOptions.getOption(option);
-                if (defaultOption != null) {
-                    logger.fine("Setting default option '" + option.getName() + "' to " + defaultOption);
-                    instance.setFieldDefault(fields, blockOptions.get(option), defaultOption);
-                }
-            }
-        }
-
-        @Override
-        public MSLADefaultsParams getParameters(String blockName, MSLAOptionName fieldName) {
-            return fileOptions.getOption(fieldName);
-        }
-    }
-
-    /**
-     * Internal machine layer-specific defaults class.
-     */
-    public static class LayerDefaults implements MSLALayerDefaults {
-        private final MachineOptions options = new MachineOptions();
-
-        @Override
-        public void setFields(MSLAFileBlockFields fields) throws MSLAException {
-            var blockOptions = instance.getBlockFieldsOptions(fields);
-            for (var option : blockOptions.keySet()) {
-                var defaultOption = options.getOption(option);
-                if (defaultOption != null) {
-                    logger.fine("Setting layer default option '" + option.getName() + "' to " + defaultOption);
-                    instance.setFieldDefault(fields, blockOptions.get(option), defaultOption);
-                }
-            }
-        }
-
-        @Override
-        public MSLADefaultsParams getParameters(String blockName, MSLAOptionName optionName) {
-            return options.getOption(optionName);
-        }
-
-        @Override
-        public <T extends Serializable> Serializable displayToRaw(
-                MSLAOptionName name,
-                T optionValue,
-                Class<? extends T> rawType) throws MSLAException
-        {
-            if (optionValue == null) return null;
-            if (rawType == null) return optionValue;
-            return options.getOption(name).displayToRaw(rawType, optionValue);
-        }
-
-        @Override
-        public <T> String rawToDisplay(MSLAOptionName name, Serializable optionValue) throws MSLAException {
-            if (optionValue == null) return null;
-            return options.getOption(name).rawToDisplay(optionValue.getClass(), optionValue);
-        }
-    }
 
     private MachineDefaults() throws MSLAException {
         readPrinterDefaultsFile();
     }
 
-    void readPrinterDefaultsFile() throws MSLAException {
+    /**
+     * Rads printer defaults XML from input stream.
+     * @param stream input data stream
+     */
+    void readPrinterDefaults(InputStream stream) throws MSLAException, DocumentException {
         var xmlReader = new SAXReader();
-        try(var resource = getClass().getClassLoader().getResourceAsStream("printer_defaults.xml")) {
-            if (resource == null) throw new MSLAException("Printer defaults not found");
-            var input = xmlReader.read(resource);
+        try {
+            var input = xmlReader.read(stream);
             var root = input.getRootElement();
             var it = root.elementIterator("printer");
             while (it.hasNext()) {
-                var def = parsePrinter(it.next());
-                printers.put(def.getMachineFullName(), def);
+                this.currentDefaults = parsePrinter(it.next());
+                printers.put(this.currentDefaults.getMachineFullName(), this.currentDefaults);
             }
+        } catch (DocumentException e) {
+            throw new MSLAException("Error reading printer defaults", e);
+        }
+    }
+
+    /**
+     * Reads printer defaults XML from internal settings file.
+     */
+    void readPrinterDefaultsFile() throws MSLAException {
+        try(var resource = getClass().getClassLoader().getResourceAsStream("printer_defaults.xml")) {
+            if (resource == null) throw new MSLAException("Printer defaults not found");
+            readPrinterDefaults(resource);
         } catch (DocumentException | IOException e) {
             throw new MSLAException("Error reading printer description XML file", e);
         }
@@ -269,7 +148,7 @@ public class MachineDefaults {
      */
     public final Set<String> getMachines(Class<? extends MSLAFile<?>> fileClass) {
         return printers.keySet().stream().filter(printerName ->
-                fileClass.getSimpleName().equals(printers.get(printerName).fileClass.getSimpleName())
+                fileClass.getSimpleName().equals(printers.get(printerName).getFileClass().getSimpleName())
         ).collect(Collectors.toSet());
     }
 
@@ -299,7 +178,10 @@ public class MachineDefaults {
         return printers.keySet().stream().map(printers::get).collect(Collectors.toList());
     }
 
-    private void parseFileProperties(Defaults defaults, Element fileOptionsElement) {
+    /**
+     * Parses file properties.
+     */
+    private void parseFileProperties(MSLAFileDefaults defaults, Element fileOptionsElement) {
         logger.fine("Getting file properties...");
         for (var it = fileOptionsElement.elementIterator("property"); it.hasNext();) {
             var option = it.next();
@@ -307,34 +189,39 @@ public class MachineDefaults {
             var name = option.attributeValue("name");
             var value = option.attributeValue("value");
             logger.fine("Got file property '" + name + "' = '" + value + "'");
-            defaults.fileProps.put(name, new MachineProperty(value));
+            defaults.getFileProps().put(name, new MachineProperty(value));
         }
     }
 
-    private void parseFileOptions(Defaults defaults, Element optionsBlockElement)
-            throws MSLAException
-    {
+    private void parseFileOptions(MachineFileDefaults defaults, Element optionsBlockElement) throws MSLAException {
         logger.fine("Getting file option...");
-        for (var it = optionsBlockElement.elementIterator("option"); it.hasNext();) {
-            var option = it.next();
+        for (var option : optionsBlockElement.elements()) {
+            try {
+                var optionName = MSLAOptionName.valueOf(option.getName());
+                var value = option.attributeValue("value");
+                logger.fine("Got file option '" + optionName + "' = '" + value + "'");
 
-            // Just for logging
-            var name = option.attributeValue("name");
-            var value = option.attributeValue("value");
-            logger.fine("Got file option '" + name + "' = '" + value + "'");
-
-            defaults.fileOptions.addFromXMLElement(option);
+                defaults.getOptions().addFromXMLElement(optionName, option);
+            } catch (IllegalArgumentException e) {
+                throw new MSLAException("Invalid file option '" + option.getName() + "'", e);
+            }
         }
     }
 
-    private void parseLayerOptions(Defaults defaults, Element layerOptionsElement) throws MSLAException {
+    private void parseLayerOptions(MachineFileDefaults defaults, Element layerOptionsElement) throws MSLAException {
         logger.fine("Getting layer options...");
-        defaults.layerDefaults = new LayerDefaults();
-        for (var it = layerOptionsElement.elementIterator("option"); it.hasNext();)
-            defaults.layerDefaults.options.addFromXMLElement(it.next());
+        layerOptionsElement.elements();
+        for (var element : layerOptionsElement.elements()) {
+            try {
+                var optionName = MSLAOptionName.valueOf(element.getName());
+                defaults.getLayerDefaults().getOptions().addFromXMLElement(optionName, element);
+            } catch (IllegalArgumentException e) {
+                throw new MSLAException("Invalid layer option '" + element.getName() + "'");
+            }
+        }
     }
 
-    private Defaults parsePrinter(Element printerElement) throws MSLAException {
+    private MSLAFileDefaults parsePrinter(Element printerElement) throws MSLAException {
         var mandatoryPropNames = List.of(
                 "name", "manufacturer", "extension", "resolution",
                 "displayWidth", "displayHeight", "machineZ", "pixelSize");
@@ -353,7 +240,7 @@ public class MachineDefaults {
             var fileClass = getClass().getClassLoader().loadClass(file);
             if (MSLAFile.class.isAssignableFrom(fileClass)) {
                 @SuppressWarnings("unchecked")
-                var def = new Defaults(
+                var def = new MachineFileDefaults(
                         mandatoryProps.get("manufacturer"),
                         mandatoryProps.get("name"),
                         mandatoryProps.get("extension"),
@@ -363,11 +250,11 @@ public class MachineDefaults {
                 /*
                  * Populate mandatory properties
                  */
-                def.fileProps.put("DisplayWidth", new MachineProperty(mandatoryProps.get("displayWidth")));
-                def.fileProps.put("DisplayHeight", new MachineProperty(mandatoryProps.get("displayHeight")));
-                def.fileProps.put("MachineZ", new MachineProperty(mandatoryProps.get("machineZ")));
-                def.fileProps.put("Resolution", new MachineProperty(mandatoryProps.get("resolution")));
-                def.fileProps.put("PixelSize", new MachineProperty(mandatoryProps.get("pixelSize")));
+                def.getFileProps().put("DisplayWidth", new MachineProperty(mandatoryProps.get("displayWidth")));
+                def.getFileProps().put("DisplayHeight", new MachineProperty(mandatoryProps.get("displayHeight")));
+                def.getFileProps().put("MachineZ", new MachineProperty(mandatoryProps.get("machineZ")));
+                def.getFileProps().put("Resolution", new MachineProperty(mandatoryProps.get("resolution")));
+                def.getFileProps().put("PixelSize", new MachineProperty(mandatoryProps.get("pixelSize")));
 
                 var elem = printerElement.elements("file_properties");
                 if (elem.size() > 1) throw new MSLAException("Can't be more than one <file_properties> tag for printer '" +
