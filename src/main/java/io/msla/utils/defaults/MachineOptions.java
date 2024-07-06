@@ -31,18 +31,17 @@ public class MachineOptions {
      * @param option XML element
      * @throws MSLAException is thrown if XML element is incorrect or missing required attributes
      */
-    public void addFromXMLElement(Element option) throws MSLAException {
-        var name = option.attributeValue("name");
+    void addFromXMLElement(MSLAOptionName optionName, Element option) throws MSLAException {
         var value = option.attributeValue("value");
         var type = option.attributeValue("type"); // Option type in XML description, to properly display option
-        if (name == null) throw new MSLAException("Attribute 'name' is missing in option description");
+        if (optionName == null) throw new MSLAException("Attribute 'name' is missing in option description");
 
         MachineProperty opt;
         if ("int".equals(type) || "float".equals(type)) {
             var minValue = option.attributeValue("minValue");
-            if (minValue == null) throw new MSLAException("Attribute 'minValue' is required in option '" + name + "'");
+            if (minValue == null) throw new MSLAException("Attribute 'minValue' is required in option '" + optionName + "'");
             var maxValue = option.attributeValue("maxValue");
-            if (maxValue == null) throw new MSLAException("Attribute 'maxValue' is required in option '" + name + "'");
+            if (maxValue == null) throw new MSLAException("Attribute 'maxValue' is required in option '" + optionName + "'");
             if ("int".equals(type)) {
                 opt = new MachinePropertyInt(value, Integer.parseInt(minValue), Integer.parseInt(maxValue));
             } else {
@@ -51,13 +50,13 @@ public class MachineOptions {
         } else if ("char".equals(type)) opt = new MachinePropertyChar(value);
         else if ("boolean".equals(type)) {
             var trueValue = option.attributeValue("trueValue");
-            if (trueValue == null) throw new MSLAException("Attribute 'trueValue' is required in option '" + name + "'");
+            if (trueValue == null) throw new MSLAException("Attribute 'trueValue' is required in option '" + optionName + "'");
             var falseValue = option.attributeValue("falseValue");
-            if (falseValue == null) throw new MSLAException("Attribute 'falseValue' is required in option '" + name + "'");
+            if (falseValue == null) throw new MSLAException("Attribute 'falseValue' is required in option '" + optionName + "'");
             opt = new MachinePropertyBoolean(value, trueValue, falseValue);
         }
         else if ("".equals(type) || type == null) opt = new MachineProperty(value);
         else throw new MSLAException("Option type " + type + " is unknown");
-        options.put(MSLAOptionName.valueOf(name), opt);
+        options.put(optionName, opt);
     }
 }
